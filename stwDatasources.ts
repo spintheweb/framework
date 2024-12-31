@@ -1,38 +1,52 @@
-// Import the MySQL client from the deno_mysql module
-import { Client as MySQLClient } from "https://deno.land/x/mysql/mod.ts";
-//import { Client as PostgresClient } from "https://deno.land/x/postgres/mod.ts";
-//import { MongoClient } from "npm:mongodb@6";
+/**
+ * Spin the Web Datasources
+ * 
+ * STWDatasources manages Spin the Web connection to datasources in general.
+ * 
+ * Language: TypeScript for Deno
+ * 
+ * MIT License. Copyright (c) 2024 Giancarlo Trevisan
+**/
+import { STWContent } from "./stwElements/stwContent.ts";
+import { Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
+import { Client as PostgresClient } from "https://deno.land/x/postgres@v0.19.3/mod.ts";
+import { MongoClient } from "npm:mongodb@6";
 
-// deno-lint-ignore no-explicit-any
-const _clients: { [key: string]: any } = {
-	'mysql': MySQLClient,
-//	'postgress': PostgresClient,
-//	'mongodb': MongoClient,
+interface ISTWDatasource {
+	type: "mysql" | "postgres" | "mongodb", // Datasource type
+	hostname: string, // Server hostname
+	port: number, // Server port
+	username: string, // Username
+	password: string, // Password
+	db: string, // Database name
 }
+export class STWDatasources {
+	static datasources: Map<string, MySQLClient | PostgresClient | MongoClient> = new Map();
 
-// Create a new MySQL client
-const client = new MySQLClient();
+	static async query(content: STWContent): [] {
+		if (!STWDatasources.datasources.size) {
+			for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
+				switch (settings.type) {
+					case "mysql":
+						STWDatasources.datasources.set(settings.name, await new MySQLClient().connect(settings));
+						break;
+					case "postgress":
+						break;
+					case "mongodb":
+						break;
+				}
+			}
+		}
 
-// Connect to the MySQL database
-await client.connect({
-	hostname: "37.187.176.70", // MySQL server hostname
-	username: "ps_ext_user", // MySQL username
-	password: "rN-m81&57cR", // MySQL password
-	db: "rs3hmqg2_pres617", // Database name
-});
-
-const content = {
-	datasource: client,
-	parameters: new Map(),
-	query: "SELECT * FROM psjx_cms_role",
-	layout: new Map([["en", "fff"]]),
-};
-
-// Fetch records from the users table
-const users = await client.query(content.query);
-
-// Log the records to the console
-console.log(users);
-
-// Close the database connection
-await client.close();
+		if (content.dsn && content.query) {
+			const datasource = STWDatasources.datasources.get(content.dsn);
+			if (datasource instanceof MySQLClient)
+				return await datasource.query(content.query) || [];
+			if (datasource instanceof PostgresClient)
+				return [];
+			if (datasource instanceof MongoClient)
+				return [];
+		}
+		return [];
+	}
+}

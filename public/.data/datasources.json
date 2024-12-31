@@ -1,0 +1,11 @@
+[
+    {
+        "name": "mysqlsample",
+        "type": "mysql",
+        "host": "lhcp3334.webapps.net",
+        "port": 3306,
+        "user": "qt3ul9nb_stw",
+        "password": "}rJQN+{O)rAy",
+        "database": "qt3ul9nb_sampledb"
+    }
+]

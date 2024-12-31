@@ -7,6 +7,7 @@
 **/
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
+import { STWDatasources } from "../stwDatasources.ts";
 
 export interface ISTWContent extends ISTWElement {
 	subtype: string;
@@ -42,6 +43,8 @@ export abstract class STWContent extends STWElement {
 
 	override render(_req: Request, _session: STWSession, _body: string = ""): Response {
 		// TODO: layout
+
+		const _records = STWDatasources.query(this);
 
 		// TODO: Show popup with content info
 		let debug: string = "";
