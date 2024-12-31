@@ -1,7 +1,7 @@
 /**
  * Spin the Web server (Web Spinner) 
  * 
- * This file runs on a web server and is responsible for managing a Spin the Web 
+ * This code runs on a web server and is responsible for interpreting a Spin the Web 
  * site. 
  * 
  * Language: TypeScript for Deno
@@ -10,12 +10,23 @@
  **/
 import { serveFile } from "jsr:@std/http/file-server";
 import { getCookies, setCookie } from "jsr:@std/http/cookie";
-import { STWSession, STWElement, STWSite } from "./stwElements.ts"
-import { } from "./stwContents.ts"
+import { STWSession } from "./stwSession.ts";
+import { STWSite } from "./stwElements/stwSite.ts";
+
+// Load Spin the Web elements
+async function loadSTWElements(path: string) {
+	for (const dirEntry of Deno.readDirSync(path))
+		if (dirEntry.isFile) {
+			const module = await import(`${path}/${dirEntry.name}`);
+			new module[Object.keys(module).find(key => key.startsWith("STW")) || "STWSite"]({});
+		}
+}
+await loadSTWElements("./stwElements");
+await loadSTWElements("./stwContents");
 
 interface ISTWMessage {
 	verb: string,
-	pathname: string
+	resource: string
 }
 interface ISTWSettings {
 	hostname: string,
@@ -24,18 +35,19 @@ interface ISTWSettings {
 	maxusers: number,
 	timeout: number, // Session timeout in minutes
 }
-const Settings: ISTWSettings = JSON.parse(await Deno.readTextFile("./public/.data/stwSettings.json"));
+const Settings: ISTWSettings = JSON.parse(Deno.readTextFileSync("./public/.data/stwSettings.json"));
 
-const Site: STWSite = new STWSite(JSON.parse(await Deno.readTextFile("./public/.data/webbase.json")));
+STWSite.load(JSON.parse(Deno.readTextFileSync("./public/.data/webbase.json")));
+
 const Sessions: Map<string, STWSession> = new Map();
 
-async function webspinner(request: Request): Promise<Response> {
+function webspinner(request: Request) {
 	let sessionid: string = getCookies(request.headers).sessionid;
 	if (!sessionid) {
 		sessionid = crypto.randomUUID(); // Create new session
-		Sessions.set(sessionid, { user: "guest", roles: ["guests"], lang: Site.lang, timestamp: Date.now(), site: Site });
+		Sessions.set(sessionid, new STWSession);
 	}
-	const session: STWSession = Sessions.get(sessionid) || { user: "guest", roles: ["guests"], lang: Site.lang, timestamp: Date.now(), site: Site };
+	const session: STWSession = Sessions.get(sessionid) || new STWSession;
 
 	if (Date.now() - session.timestamp > Settings.timeout * 60000) // Session timeout
 		console.log('Refresh?');
@@ -45,9 +57,11 @@ async function webspinner(request: Request): Promise<Response> {
 
 		socket.onmessage = event => {
 			const data: ISTWMessage = JSON.parse(event.data);
-			Site.find(session, data.pathname)?.render(request, session)
-				.then(res => res.text())
-				.then(text => socket.send(text));
+			data.resource.split(",").forEach(async resource => {
+				const text = await STWSite.load().find(session, resource)?.render(request, session, "").text();
+				if (text)
+					socket.send(text);
+			});
 		};
 		socket.onerror = error => console.error("Error:", error);
 
@@ -59,15 +73,16 @@ async function webspinner(request: Request): Promise<Response> {
 	if (request.method === "GET") {
 		let response: Response = new Response(null, { status: 204 }); // 204 No content;
 
-		const element: STWElement | undefined = Site.find(session, pathname);
+		const element = STWSite.load().find(session, pathname);
 
-		if (!element && pathname.indexOf("/.") === -1) // Do not serve paths that have files or directories that begin with a dot
-			response = await serveFile(request, `./public${pathname}`);
-		else if (element)
+		if (!element && pathname.indexOf("/.") === -1) { // Do not serve paths that have files or directories that begin with a dot
+			return serveFile(request, `./public${pathname}`);
+
+		} else if (element)
 			if (element.type === "Content")
-				response = await element.render(request, session, "");
+				response = element.render(request, session, "");
 			else if ("Site,Area,Page".indexOf(element.type) !== -1)
-				response = await element.render(request);
+				response = element.render(request, null, "");
 
 		if (getCookies(request.headers).sessionid)
 			return response;

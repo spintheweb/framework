@@ -1,12 +1,13 @@
 // Import the MySQL client from the deno_mysql module
 import { Client as MySQLClient } from "https://deno.land/x/mysql/mod.ts";
-import { Client as PostgresClient } from "https://deno.land/x/postgres/mod.ts";
-import { MongoClient } from "npm:mongodb@6";
+//import { Client as PostgresClient } from "https://deno.land/x/postgres/mod.ts";
+//import { MongoClient } from "npm:mongodb@6";
 
+// deno-lint-ignore no-explicit-any
 const _clients: { [key: string]: any } = {
 	'mysql': MySQLClient,
-	'postgress': PostgresClient,
-	'mongodb': MongoClient,
+//	'postgress': PostgresClient,
+//	'mongodb': MongoClient,
 }
 
 // Create a new MySQL client

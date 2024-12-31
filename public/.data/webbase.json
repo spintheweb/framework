@@ -263,7 +263,7 @@
                             "query": "",
                             "params": "",
                             "layout": {
-                                "en": "<h1>Production</h1>\nWelcome to the Production department"
+                                "en": "<img src=\"./media/Logo-bn_128x128.png\" title=\"Spin the Web Logo\"><span>Spin the Web Project</span>"
                             }
                         },
                         {
@@ -517,7 +517,7 @@
     "mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
     "lang": "en",
     "langs": [
-        "en"
+        "en", "it"
     ],
     "datasources": {
         "mysqlsample": {
