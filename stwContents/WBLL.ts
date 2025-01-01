@@ -5,10 +5,7 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-
-import { Request } from "npm:express@4.18.2";
-
-import { replacePlaceholders } from './Miscellanea.ts';
+import { processPlaceholders } from "../stwMiscellanea.ts";
 
 const SYNTAX: RegExp = new RegExp([
 	/(\\[aAs])(?:\('([^]*?)'\))/,
@@ -48,7 +45,7 @@ export function lexer(req: Request, wbll: string = '') {
 
 		if (symbol) {
 			if (symbol == '\\a' || symbol == '\\s' || symbol == '\\A') {
-				expression[1] = replacePlaceholders(expression[1], req.stwPublic, req.stwPrivate);
+				expression[1] = processPlaceholders(expression[1], req.stwPublic, req.stwPrivate);
 
 				attrs = {};
 				for (let attr of expression[1].matchAll(/([a-zA-Z0-9-_]+)(?:=(["'])([^]*?)\2)?/gmu))
@@ -109,7 +106,7 @@ function evaluate(req: Request, expression: string) {
 }
 
 function getName(req: Request, name: string = '') {
-	return replacePlaceholders(name, req.stwPublic, req.stwPrivate.stwData[req.stwPrivate.stwR]) || Object.keys(req.stwPrivate.stwData[req.stwPrivate.stwR])[req.stwPrivate.stwC] || `Field${req.stwPrivate.stwC}`;
+	return processPlaceholders(name, req.stwPublic, req.stwPrivate.stwData[req.stwPrivate.stwR]) || Object.keys(req.stwPrivate.stwData[req.stwPrivate.stwR])[req.stwPrivate.stwC] || `Field${req.stwPrivate.stwC}`;
 }
 
 export function getValue(req: Request, key: string) {
@@ -141,7 +138,7 @@ function renderParameters(req: Request, uri: string, params) {
 	try {
 		url = new URL(getValue(req, uri));
 
-		url.href = replacePlaceholders(url.href, req.stwPublic, req.stwPrivate.stwData[req.stwPrivate.stwR]);
+		url.href = processPlaceholders(url.href, req.stwPublic, req.stwPrivate.stwData[req.stwPrivate.stwR]);
 
 		if (params)
 			for (let param in params)

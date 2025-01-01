@@ -18,7 +18,8 @@ async function loadSTWElements(path: string) {
 	for (const dirEntry of Deno.readDirSync(path))
 		if (dirEntry.isFile) {
 			const module = await import(`${path}/${dirEntry.name}`);
-			new module[Object.keys(module).find(key => key.startsWith("STW")) || "STWSite"]({});
+			const element = Object.keys(module).find(key => key.startsWith("STW"));
+			if (element) new module[element]({});
 		}
 }
 await loadSTWElements("./stwElements");
