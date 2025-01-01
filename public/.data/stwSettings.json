@@ -1,7 +1,0 @@
-{
-	"hostname": "127.0.0.1",
-	"port": 80,
-	"multisessions": false,
-	"timeout": 30,
-	"maxusers": 0
-}

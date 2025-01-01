@@ -36,8 +36,8 @@
                     "cssClass": "stwTable",
                     "section": "main",
                     "sequence": "1",
-                    "dsn": "mysqlsample",
-                    "query": "select * from employees limit 10",
+                    "dsn": "yuup",
+                    "query": "SELECT * FROM psjx_cms_role",
                     "params": "",
                     "layout": {
                         "en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')a('sales')pff\nl('Ext.')f\nl('Email')a('mailto:@@Email')f\n"

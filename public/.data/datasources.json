@@ -7,5 +7,14 @@
         "user": "qt3ul9nb_stw",
         "password": "}rJQN+{O)rAy",
         "database": "qt3ul9nb_sampledb"
+    },
+    {
+        "name": "yuup",
+        "type": "mysql",
+        "host": "37.187.176.70",
+        "port": 3306,
+        "user": "ps_ext_user",
+        "password": "rN-m81&57cR",
+        "database": "rs3hmqg2_pres617"
     }
 ]

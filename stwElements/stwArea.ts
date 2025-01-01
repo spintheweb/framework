@@ -21,8 +21,14 @@ export class STWArea extends STWElement {
 		this.mainpage = area.mainpage;
 	}
 
-	override render(req: Request, _session: STWSession | null = null, _body: string = ""): Response {
-		return STWSite.index.get(this.mainpage)?.render(req, _session, _body) || new Response(null, { status: 204 });
+	override serve(req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
+		const page = STWSite.index.get(this.mainpage);
+
+		return page?.serve(req, _session, _body) ||
+			new Promise<Response>(resolve => {
+				const response = new Response(`Area '${this.localize(_session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
+				resolve(response);
+			});
 	}
 }
 

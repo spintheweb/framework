@@ -7,7 +7,7 @@
 **/
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
-import { STWDatasources } from "../stwDatasources.ts";
+// import { STWDatasources } from "../stwDatasources.ts";
 
 export interface ISTWContent extends ISTWElement {
 	subtype: string;
@@ -41,10 +41,19 @@ export abstract class STWContent extends STWElement {
 		this.layout = new Map(Object.entries(content.layout || {}));
 	}
 
-	override render(_req: Request, _session: STWSession, _body: string = ""): Response {
+	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description" | "layout", value: string = ""): string {
+		if (value) {
+			value = name === "slug" ? value.replace(/[^a-z0-9_]/gi, "").toLowerCase() : value;
+			this[name].set(session.lang, value);
+			return value;
+		}
+		return this[name].get(session.lang) || "";
+	}
+
+	override serve(_req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
 		// TODO: layout
 
-		const _records = STWDatasources.query(this);
+		// const _records = STWDatasources.query(this);
 
 		// TODO: Show popup with content info
 		let debug: string = "";
@@ -57,13 +66,17 @@ export abstract class STWContent extends STWElement {
 			section: this.section,
 			sequence: this.sequence,
 			body: `
-				<article id="${this._id}" class="${this.cssClass || "stw" + this.type}" ${debug}>
-					<h1>Caption</h1>
-					<header>Header</header>
+				<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}" ${debug}>
+					<h1>${this.type} &mdash; ${this.localize(_session, "name")}</h1>
+					<header>${this.cssClass} <a href="${this.permalink(_session)}">${this.permalink(_session)}</a></header>
 					${_body}
-					</footer>Footer</footer>
+					</footer>${this.section} ${this.sequence}</footer>
 				</article>`,
 		};
-		return new Response(JSON.stringify(data), { status: 200 });
+
+		return new Promise<Response>(resolve => {
+			const response = new Response(JSON.stringify(data));
+			resolve(response);
+		});
 	}
 }

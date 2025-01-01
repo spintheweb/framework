@@ -12,8 +12,8 @@ export class STWMenu extends STWContent {
     constructor(content: ISTWContent) {
         super(content);
     }
-    override render(_req: Request, _session: STWSession, _body: string): Response {
-        return super.render(_req, _session, _body);
+    override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
+        return super.serve(_req, _session, _body);
     }
 }
 

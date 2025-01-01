@@ -12,7 +12,7 @@ export class STWText extends STWContent {
     constructor(content: ISTWContent) {
         super(content);
     }
-    override render(_req: Request, _session: STWSession, _body: string): Response {
+    override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
         const data = {
             verb: "PUT",
             id: this._id,
@@ -20,7 +20,10 @@ export class STWText extends STWContent {
             sequence: this.sequence,
             body: this.layout.get(_session.lang),
         };
-        return new Response(JSON.stringify(data), { status: 200 });
+        return new Promise<Response>(resolve => {
+            const response = new Response(JSON.stringify(data));
+            resolve(response);
+        });
     }
 }
 

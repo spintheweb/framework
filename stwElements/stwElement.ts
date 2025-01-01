@@ -6,7 +6,6 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
-import { STWContent } from "./stwContent.ts";
 import { STWSite } from "./stwSite.ts";
 
 export type STWRole = string;
@@ -23,26 +22,29 @@ export interface ISTWElement {
 	description: object;
 	visibility: object;
 	children: ISTWElement[];
+	modified: number;
 }
 export abstract class STWElement {
 	_id: string;
 	type: string;
 	name: STWLocalized;
 	slug: STWLocalized;
-	keys: STWLocalized;
+	keywords: STWLocalized;
 	description: STWLocalized;
 	visibility!: STWVisibility;
 	parent!: STWElement;
-	children: (STWElement | STWContent)[] = [];
+	children: STWElement[] = [];
+	modified: number;
 
 	constructor(element: ISTWElement) {
 		this._id = element._id ? element._id : crypto.randomUUID();
 		this.type = element.type || this.constructor.name.replace("STW", "");
 		this.name = new Map(Object.entries(element.name || { "en": `New ${this.type}` }));
 		this.slug = new Map(Object.entries(element.slug || { "en": `New ${this.type}`.replace(/[^a-z0-9_]/gi, '').toLowerCase() }));
-		this.keys = new Map(Object.entries(element.keys || {}));
+		this.keywords = new Map(Object.entries(element.keys || {}));
 		this.description = new Map(Object.entries(element.description || {}));
 		this.visibility = new Map(Object.entries(element.visibility || {}));
+		this.modified = element.modified || Date.now();
 
 		for (const child of element.children || []) {
 			const constructor = STWFactory[child.subtype || child.type];
@@ -56,7 +58,13 @@ export abstract class STWElement {
 		}
 	}
 
-	public localize(session: STWSession, name: "name" | "slug" | "keys" | "description", value: string = ""): string {
+	permalink(session: STWSession): string {
+		if (this.parent)
+			return this.parent.permalink(session) + "/" + this.localize(session, "slug");
+		return "";
+	}
+
+	localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
 		if (value) {
 			value = name === "slug" ? value.replace(/[^a-z0-9_]/gi, "").toLowerCase() : value;
 			this[name].set(session.lang, value);
@@ -65,8 +73,7 @@ export abstract class STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	public isVisible(session: STWSession): boolean {
-		// Check this visibility
+	isVisible(session: STWSession): boolean {
 		let result: boolean = session.roles.reduce((visible, role) => {
 			const roleVisibility = this.visibility.get(role) || null;
 			return visible || (roleVisibility !== null ? roleVisibility : false);
@@ -84,11 +91,11 @@ export abstract class STWElement {
 		}
 		return result;
 	}
-
+	
 	// Export element as XML
-	public export(): string {
-		return `<>`;
-	}
+	export(): string {
+		return "";
+	};
 
-	abstract render(_req: Request, _session: STWSession | null, _body: string): Response;
+	abstract serve(_req: Request, _session: STWSession, _body: string): Promise<Response>;
 }

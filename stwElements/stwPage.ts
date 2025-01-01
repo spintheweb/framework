@@ -20,8 +20,8 @@ export class STWPage extends STWElement {
         this.template = page.template || "/index.html";
     }
 
-    override render(_req: Request, _session: STWSession | null = null, _body: string = ""): Response {
-        // Collection of contents
+    override serve(_req: Request, _session: STWSession | null = null, _body: string = ""): Promise<Response> {
+        // TODO: Collection of contents in cookie
         
         return serveFile(_req, `./public/${this.template}`);
     }
