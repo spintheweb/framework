@@ -55,10 +55,10 @@ export abstract class STWContent extends STWElement {
 
 		// const _records = STWDatasources.query(this);
 
-		// TODO: Show popup with content info
 		let debug: string = "";
-		if (_session.debug)
+		if (_session.debug) {
 			debug = `data-debug="${this.type}: ${this.localize(_session, "name")} @${this.section}.${this.sequence}"`;
+		}
 
 		const data = {
 			verb: "PUT",
@@ -74,9 +74,8 @@ export abstract class STWContent extends STWElement {
 				</article>`,
 		};
 
-		return new Promise<Response>(resolve => {
-			const response = new Response(JSON.stringify(data));
-			resolve(response);
-		});
+		console.debug(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) @${this.section}.${this.sequence} [${this._id}]`);
+
+		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}
 }

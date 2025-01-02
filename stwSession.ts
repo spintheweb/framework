@@ -13,7 +13,7 @@ export class STWSession {
 	timestamp: number; // Session timeout in minutes
 	dev: false; // If true STWManager enabled
 	debug: false; // If true and dev is true contents properties are shown
-	timer: number;
+	private timer: number = 0;
 
 	constructor(sessionId: string) {
 		this.sessionId = sessionId;
@@ -24,19 +24,14 @@ export class STWSession {
 		this.dev = false;
 		this.debug = false;
 
-		this.timer = setInterval(this.timeout, (Deno.env.get("TIMEOUT") || 15) * 60000); // Session timeout
+		console.info(`${new Date().toISOString()}: Session [${this.sessionId}]`);
 	}
 
-	timeout() {
-		clearInterval(this.timer);
-		console.info("What to keep the session alive?");
-	}
+	protected timeout(timer: number) {
+		clearTimeout(timer);
+		console.info(`${new Date().toISOString()}: Want to keep the session [${this.sessionId}] alive?`);
 
-	refresh() {
-		clearInterval(this.timer);
-		this.timestamp = Date.now();
-
-		this.timer = setInterval(this.refresh, (Deno.env.get("TIMEOUT") || 15) * 60000);
+		this.timer = setTimeout(() => this.timeout(this.timer), parseInt(Deno.env.get("TIMEOUT") || "15") * 60000); // Session timeout
 	}
 }
 

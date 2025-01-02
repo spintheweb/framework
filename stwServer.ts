@@ -1,5 +1,5 @@
 /**
- * Spin the Web server (Web Spinner) 
+ * Spin the Web server, a.k.a., Web Spinner 
  * 
  * This code runs on a web server and is responsible for spinning a Spin the Web 
  * site, i.e., serving its webbase (WBML)
@@ -13,7 +13,11 @@ import { getCookies, setCookie } from "jsr:@std/http/cookie";
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 
-// Load Spin the Web elements
+/**
+ * Preload {@linkcode STWFactory} with Spin the Web elements
+ * 
+ * @param path The directory containing the elements
+ */
 async function loadSTWElements(path: string) {
 	for (const dirEntry of Deno.readDirSync(path))
 		if (dirEntry.isFile) {
@@ -25,7 +29,12 @@ async function loadSTWElements(path: string) {
 await loadSTWElements("./stwElements");
 await loadSTWElements("./stwContents");
 
+/**
+ * Contains presently active sessions {@linkcode STWSession} 
+ */
 const Sessions: Map<string, STWSession> = new Map();
+
+let Socket: WebSocket;
 
 Deno.serve(
 	{
@@ -34,24 +43,26 @@ Deno.serve(
 	},
 	async (request: Request): Promise<Response> => {
 		let sessionId: string = getCookies(request.headers).sessionId;
-		if (!sessionId) {
-			sessionId = crypto.randomUUID(); // Create new session
-			Sessions.set(sessionId, new STWSession(sessionId));
-		}
-		const session: STWSession = Sessions.get(sessionId) || new STWSession(sessionId);
+		if (!sessionId)
+			sessionId = crypto.randomUUID();
+		if (!Sessions.has(sessionId))
+			Sessions.set(sessionId, new STWSession(sessionId)); // Create new session
+		const session = Sessions.get(sessionId) || new STWSession(sessionId);
 
 		if (request.headers.get("upgrade") === "websocket") {
 			const { socket, response } = Deno.upgradeWebSocket(request);
 
-			socket.onmessage = event => {
+			Socket = socket;
+
+			Socket.onmessage = event => {
 				const data: { verb: string, resource: string } = JSON.parse(event.data);
-				data.resource.split(",").forEach(async resource => {
+				data.resource?.split(",").forEach(async resource => {
 					const response = await STWSite.get().find(session, resource)?.serve(request, session, "");
 					if (response)
-						socket.send(await response.text());
+						Socket.send(await response.text());
 				});
 			};
-			socket.onerror = error => console.error("Error:", error);
+			Socket.onerror = error => console.error(error);
 
 			return new Promise<Response>(resolve => resolve(response));;
 		}
@@ -59,17 +70,17 @@ Deno.serve(
 		const pathname = new URL(request.url).pathname;
 
 		if (request.method === "GET") {
-			let response: Promise<Response>;
+			let response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content;
 			const element = STWSite.get().find(session, pathname);
 
 			if (!element && pathname.indexOf("/.") === -1)  // Do not serve paths that have files or directories that begin with a dot
 				response = serveFile(request, `./public${pathname}`);
-			else if (element?.type === "Content") // Serve content
-				response = element.serve(request, session, ""); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
-				response = element.serve(request, session, "");
-			else
-				response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+				response = element.serve(request, session, ""); // Serve page, area or site, for areas and sites handle their mainpage
+			else if (Socket && element?.type) {
+				const response = await element.serve(request, session, "");
+				Socket.send(await response.text());
+			}
 
 			if (getCookies(request.headers).sessionId)
 				return response;

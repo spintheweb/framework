@@ -12,7 +12,9 @@
 const websocket = new WebSocket(`ws://${window.location.host}/`);
 
 websocket.onopen = event => {
-	websocket.send(JSON.stringify({ verb: "GET", resource: "04aefc10-293b-11ee-92de-0fc9206ffad8,6b70fab0-2aa9-11ee-956d-479821047fbc,e29cfba0-2952-11ee-8a01-eb5d698979c6,169ecfb2-2916-11ee-ad92-6bd31f953e80" }));
+	websocket.send(JSON.stringify({ verb: "PUT", resource: document.cookie.split("; ").find((row) => row.startsWith("contentsId="))?.split("=")[1] }));
+
+	//	websocket.send(JSON.stringify({ verb: "PUT", resource: "04aefc10-293b-11ee-92de-0fc9206ffad8,6b70fab0-2aa9-11ee-956d-479821047fbc,e29cfba0-2952-11ee-8a01-eb5d698979c6,169ecfb2-2916-11ee-ad92-6bd31f953e80" }));
 };
 
 websocket.onclose = event => { };
@@ -24,12 +26,19 @@ websocket.onmessage = event => {
 	if (data.verb === "PUT" || data.verb === "DELETE")
 		document.getElementById(data.resource)?.remove();
 
-	let insertion = document.getElementById(data.section);
-	insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
-		if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
-			insertion = article;
-	});
-	insertion?.insertAdjacentHTML(insertion.resource === data.section ? "afterBegin" : "afterEnd", data.body);
+	if (data.section === "dialog") {
+		document.querySelector("dialog")?.remove();
+		document.body.insertAdjacentHTML("beforeend", `<dialog>${data.body}</dialog>`);
+		document.querySelector("dialog")?.showModal();
+
+	} else {
+		let insertion = document.getElementById(data.section);
+		insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
+			if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
+				insertion = article;
+		});
+		insertion?.insertAdjacentHTML(insertion.resource === data.section ? "afterbegin" : "afterend", data.body);
+	}
 };
 
 websocket.onerror = event => {

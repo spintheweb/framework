@@ -59,14 +59,17 @@ export class STWSite extends STWElement {
 	}
 
 	private recurse(session: STWSession, children: STWElement[], slugs: string[], i: number = 1): STWElement | null {
+		let result: STWElement | null = null;
 		for (const child of children) {
 			if (child.localize(session, "slug") === slugs[i]) {
-				if (i === slugs.length)
+				if (i + 1 === slugs.length)
 					return child;
-				STWSite.#instance.recurse(session, child.children, slugs, i + 1);
+				result = STWSite.#instance.recurse(session, child.children, slugs, i + 1);
+				if (result)
+					return result;
 			}
 		}
-		return null;
+		return result;
 	}
 
 	override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {

@@ -34,7 +34,7 @@
                     },
                     "subtype": "Table",
                     "cssClass": "stwTable",
-                    "section": "main",
+                    "section": "dialog",
                     "sequence": "1",
                     "dsn": "yuup",
                     "query": "SELECT * FROM psjx_cms_role",

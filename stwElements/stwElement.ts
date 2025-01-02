@@ -91,7 +91,7 @@ export abstract class STWElement {
 		}
 		return result;
 	}
-	
+
 	// Export element as XML
 	export(): string {
 		return "";
