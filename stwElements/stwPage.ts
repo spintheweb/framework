@@ -33,7 +33,7 @@ export class STWPage extends STWElement {
 		const response = await serveFile(_req, `./public/${this.template}`);
 
 		const headers = new Headers(response.headers);
-		headers.set("contentsId", this.contents(_session));
+		headers.set("contents", this.contents(_session));
 
 		console.debug(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) [${this._id}]`);
 

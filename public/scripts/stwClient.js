@@ -11,20 +11,20 @@
 // deno-lint-ignore-file
 const websocket = new WebSocket(`ws://${window.location.host}/`);
 
-websocket.onopen = event => {
-	websocket.send(JSON.stringify({ verb: "PUT", resource: document.cookie.split("; ").find((row) => row.startsWith("contentsId="))?.split("=")[1] }));
-
-	//	websocket.send(JSON.stringify({ verb: "PUT", resource: "04aefc10-293b-11ee-92de-0fc9206ffad8,6b70fab0-2aa9-11ee-956d-479821047fbc,e29cfba0-2952-11ee-8a01-eb5d698979c6,169ecfb2-2916-11ee-ad92-6bd31f953e80" }));
+websocket.onopen = async _event => {
+	const response = await fetch(document.location.href, { method: "HEAD" });
+	const headers = Object.fromEntries(response.headers.entries());
+	websocket.send(JSON.stringify({ verb: "PUT", resource: headers.contents?.split(",") }));
 };
 
-websocket.onclose = event => { };
+websocket.onclose = _event => { };
 
 websocket.onmessage = event => {
-	// verb: "GET" | "PUT" | "DELETE" | "POST", resource: string, section: string, sequence: number, body: string
+	// verb: "GET" | "PUT" | "DELETE" | "POST", id: string, section: string, sequence: number, body: string
 	const data = JSON.parse(event.data);
 
 	if (data.verb === "PUT" || data.verb === "DELETE")
-		document.getElementById(data.resource)?.remove();
+		document.getElementById(data.id)?.remove();
 
 	if (data.section === "dialog") {
 		document.querySelector("dialog")?.remove();
@@ -37,10 +37,10 @@ websocket.onmessage = event => {
 			if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
 				insertion = article;
 		});
-		insertion?.insertAdjacentHTML(insertion.resource === data.section ? "afterbegin" : "afterend", data.body);
+		insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
 	}
 };
 
 websocket.onerror = event => {
-	console.log(`Error: ${event.data}`);
+	console.error(event.data);
 };

@@ -55,8 +55,8 @@ Deno.serve(
 			Socket = socket;
 
 			Socket.onmessage = event => {
-				const data: { verb: string, resource: string } = JSON.parse(event.data);
-				data.resource?.split(",").forEach(async resource => {
+				const data: { verb: string, resource: string[]} = JSON.parse(event.data);
+				data?.resource.forEach(async resource => {
 					const response = await STWSite.get().find(session, resource)?.serve(request, session, "");
 					if (response)
 						Socket.send(await response.text());
@@ -79,7 +79,8 @@ Deno.serve(
 				response = element.serve(request, session, ""); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (Socket && element?.type) {
 				const response = await element.serve(request, session, "");
-				Socket.send(await response.text());
+				const text = await response.text();
+				Socket.send(text);
 			}
 
 			if (getCookies(request.headers).sessionId)
