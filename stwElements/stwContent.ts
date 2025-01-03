@@ -7,7 +7,7 @@
 **/
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
-// import { STWDatasources } from "../stwDatasources.ts";
+import { STWDatasources } from "../stwDatasources.ts";
 
 export interface ISTWContent extends ISTWElement {
 	subtype: string;
@@ -51,9 +51,11 @@ export abstract class STWContent extends STWElement {
 	}
 
 	override serve(_req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
+		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) @${this.section}.${this.sequence} [${this._id}]`);
+
 		// TODO: layout
 
-		// const _records = STWDatasources.query(this);
+		const _records = STWDatasources.query(this);
 
 		let debug: string = "";
 		if (_session.debug) {
@@ -61,7 +63,7 @@ export abstract class STWContent extends STWElement {
 		}
 
 		const data = {
-			verb: "PUT",
+			method: "PUT",
 			id: this._id,
 			section: this.section,
 			sequence: this.sequence,
@@ -73,8 +75,6 @@ export abstract class STWContent extends STWElement {
 					</footer>${this.section} ${this.sequence}</footer>
 				</article>`,
 		};
-
-		console.debug(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}

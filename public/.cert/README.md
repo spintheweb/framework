@@ -11,3 +11,8 @@ $ openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem // Gene
 As an alternative use:
 
 $ certbot certonly
+
+Or:
+
+$ cd public/.cert/
+$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj //CN=studio.spintheweb.org

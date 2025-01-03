@@ -14,7 +14,7 @@ export class STWText extends STWContent {
     }
     override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
         const data = {
-            verb: "PUT",
+            method: "PUT",
             id: this._id,
             section: this.section,
             sequence: this.sequence,

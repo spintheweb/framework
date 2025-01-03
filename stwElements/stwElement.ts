@@ -73,23 +73,34 @@ export abstract class STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	isVisible(session: STWSession): boolean {
-		let result: boolean = session.roles.reduce((visible, role) => {
-			const roleVisibility = this.visibility.get(role) || null;
-			return visible || (roleVisibility !== null ? roleVisibility : false);
-		}, false);
+	/**
+	 * This method determines if the element is visible to the given session.
+	 * 
+	 * @param session The given session
+	 * @returns Return the highest access control associated to the given session
+	 */
+	isVisible(session: STWSession, role: string = "", recurse: boolean = false): number {
+		let ac!: number;
 
-		// Walk webbase from this element up
-		let element = this.parent;
-		while (!result && element) {
-			result = session.roles.reduce((visible, role) => {
-				const roleVisibility = element.visibility.get(role) || null;
-				return visible || (roleVisibility !== null ? roleVisibility : false);
-			}, false);
+		if (this.type === "Page" && STWSite.get().mainpage === this._id)
+			ac = recurse ? 0b11 : 0b01; // Home page always visible
 
-			element = element.parent;
+		if (role) {
+			ac = this.visibility.has(role) ? 0b01 : 0b00;
+		} else
+			for (let i = 0; ac != 0b01 && i < session.roles.length; ++i)
+				if (this.visibility.get(session.roles[i]))
+					ac |= this.visibility.get(session.roles[i]) ? 0b01 : 0b00;
+
+		if (typeof ac === "undefined") {
+			const obj: STWElement = this.parent;
+			if (obj)
+				ac = 0b10 | obj.isVisible(session, role, true);
+			else if (["Site", "Area", "Page"].indexOf(this.type) === -1) // Content
+				ac = 0b10; // NOTE: this covers contents without a parent nor a RBV, it's in limbo!
 		}
-		return result;
+
+		return ac || 0b00;
 	}
 
 	// Export element as XML

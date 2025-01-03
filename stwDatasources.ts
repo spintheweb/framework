@@ -7,32 +7,39 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
-import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql/mod.ts";
-import { Client as PostgresClient } from "https://deno.land/x/postgres@v0.19.3/mod.ts";
-import { MongoClient } from "npm:mongodb@6";
+import { processPlaceholders } from "./stwMiscellanea.ts";
+import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
+import { search as JSONPath } from "./deno-jmespath-0.2.2/index.ts";
 
 interface ISTWDatasource {
-	type: "mysql" | "postgres" | "mongodb", // Datasource type
-	hostname: string, // Server hostname
+	type: "stw" | "mysql" | "postgres" | "mongodb", // Datasource type
+	host: string, // Server hostname
 	port: number, // Server port
-	username: string, // Username
+	user: string, // Username
 	password: string, // Password
-	db: string, // Database name
+	database: string, // Database name
 }
 export class STWDatasources {
-	static datasources: Map<string, MySQLClient | PostgresClient | MongoClient> = new Map();
+	static datasources: Map<string, STWSite | MySQLClient> = new Map();
 
 	static async query(content: STWContent): Promise<ExecuteResult> {
 		try {
 			if (!STWDatasources.datasources.size) {
+				STWDatasources.datasources.set("stw", STWSite.get()); // Webbase
+
 				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
 					switch (settings.type) {
 						case "mysql":
-							STWDatasources.datasources.set(settings.name, await new MySQLClient().connect(settings));
+							STWDatasources.datasources.set(settings.name, await new MySQLClient().connect({
+								hostname: settings.host,
+								username: settings.user,
+								password: settings.password,
+								db: settings.database,
+							}));
 							break;
 						case "postgress":
-							STWDatasources.datasources.set(settings.name, await new PostgresClient());
 							break;
 						case "mongodb":
 							break;
@@ -42,16 +49,17 @@ export class STWDatasources {
 
 			if (content.dsn && content.query) {
 				const datasource = STWDatasources.datasources.get(content.dsn);
+				if (datasource instanceof STWSite)
+					return new Promise<ExecuteResult>(resolve => resolve({
+						// deno-lint-ignore no-explicit-any
+						rows: [JSONPath(datasource as any, processPlaceholders(content.query, new Map(), new Map()))],
+					}));
 				if (datasource instanceof MySQLClient)
-					return datasource.execute(content.query);
-				if (datasource instanceof PostgresClient)
-					return [];
-				if (datasource instanceof MongoClient)
-					return [];
+					return datasource.execute(processPlaceholders(content.query, new Map(), new Map()));
 			}
 		} catch (error) {
 			console.error(error);
 		}
-		return [];
+		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}
 }

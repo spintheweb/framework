@@ -105,7 +105,7 @@ export class STWSite extends STWElement {
 		function _url(element: STWElement) {
 			if (element.type === "Area" && element.children.length > 0)
 				element.children.forEach(child => _url(child));
-			else if (element.type === "Page" && element.isVisible(session))
+			else if (element.type === "Page" && element.isVisible(session) & 1)
 				fragment += `<url><loc>${element.permalink(session)}</loc><lastmod>${element.modified}</lastmod><priority>0.5</priority></url>\n`;
 		}
 	}

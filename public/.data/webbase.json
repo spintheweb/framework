@@ -516,9 +516,7 @@
     "description": {},
     "mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
     "lang": "en",
-    "langs": [
-        "en", "it"
-    ],
+    "langs": ["en"],
     "datasources": {
         "mysqlsample": {
             "name": "mysqlsample",

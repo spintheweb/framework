@@ -7,48 +7,34 @@
 **/
 
 /**
- * Return langs RFC 3282 as a language array sorted by preference
+ * Given text sprinkeled with placeholders, a placeholder is a variable prefixed with @ or \@@, replace the placeholders applying these rules:
+ * * Replace the placeholder with its value
+ * * If the placeholder has no value and is inside square brackets ([]): remove everything within and including the square brackets and the first word next to the closing bracket (]) or the first word preceeding the opening bracket ([) 
+ * * If the placeholder has a value and is inside square brackets simply remove the square brackets
+ * * Braces ({}) confine the behavior of square brackets, and are removed
+ * * If a placeholder is surronded by single (') or double quotes ("), double all single or double quotes in the value
+ * * If a placeholder is enclosed within single (') or double (") quotes immediately followed by ellipses (...) and its value is a comma separated list of values then each of the these values will be enclosed in single or double quotes else the placeholder is replace with its value in all cases the ellipses are removed
  * 
- * @param acceptLanguage 
- * @param _availableLanguages 
+ * TODO: remove trailing or leading word ... '' "". What practical use could `` have?
+ * 
+ * @param text Text sprinkeled with \@\<name> and/or \@@\<name>
+ * @param exposed Placeholders that start with \@, they reference cookies or query string keys 
+ * @param concealed Placeholders that start with \@@, they reference data source fields, session, application or server variables
  * @returns 
  */
-export function pickLanguage(acceptLanguage: string, _availableLanguages: string) {
-	const pattern = /([a-z][a-z](-[a-z][a-z])?|\*)(;q=([01](\.[0-9]+)?))?/gi;
-	let match, accept = '';
-	while (match == pattern.exec(acceptLanguage)) {
-		pattern.lastIndex += (match.index === pattern.lastIndex);
-		accept += (accept !== '' ? ',' : '[') + `{"l":"${match[1]}","q":${match[4] || 1}}`;
-	}
-	return JSON.parse(accept + ']').sort((a, b) => a.q < b.q).map(a => a.l);
-}
-
-/**
- * Given a string with placeholders, a placeholder is a variable prefixed with @ or @@, replace the placeholders applying {[]} be.
- * 
- * Placeholders that start with a single @ can reference cookies or query string keys, these are termed exposed parameters
- * Placeholders that start with a double @@ can reference data source fields, session, application or server variables, these are termed unexposed parameters
- * 
- * TODO: remove trailing or leading word ... '' ""
- * 
- * @param text 
- * @param exposed 
- * @param unexposed 
- * @returns 
- */
-export function processPlaceholders(text: string, exposed: Map<string, string | number | Date>, unexposed: Map<string, string | number | Date>) {
+export function processPlaceholders(text: string, exposed: Map<string, string | number | Date>, concealed: Map<string, string | number | Date>) {
 	text = text.replace(/(\b\s*|\W\s*)?(\[.*?\])(\s*\b|\s*\W)?/g, function (match, p1, p2, p3, _offset, _s) {
 		let flag: boolean = false;
 		match = match.replace(/(\/?@@?\*?[_a-z][a-z0-9_.$]*)/ig, function (_match, p1, _offset, _s) {
 			if (p1.charAt(0) === "/") return p1.substr(1);
 			if (p1.charAt(1) === '@') {
-				if (unexposed.has(p1.substr(1))) {
+				if (concealed.has(p1.substr(1))) {
 					flag = true;
-					return unexposed.get(p1.substr(2)) instanceof Date ? unexposed.get(p1.substr(2))?.toJSON() : unexposed.get(p1.substr(2));
+					return concealed.get(p1.substr(2)) instanceof Date ? (concealed.get(p1.substr(2)) as Date).toJSON() : concealed.get(p1.substr(2));
 				}
 			} else if (exposed.has(p1.substr(1))) {
 				flag = true;
-				return exposed.get(p1.substr(1)) instanceof Date ? exposed.get(p1.substr(1)).toJSON() : exposed.get(p1.substr(1));
+				return exposed.get(p1.substr(1)) instanceof Date ? (exposed.get(p1.substr(1)) as Date).toJSON() : exposed.get(p1.substr(1));
 			}
 			return '';
 		});
@@ -63,8 +49,8 @@ export function processPlaceholders(text: string, exposed: Map<string, string | 
 		if (p1.charAt(0) === '/')
 			return p1.substr(1);
 		if (p1.charAt(1) === '@') 
-			return unexposed.get(p1.substr(2)) instanceof Date ? unexposed.get(p1.substr(2)).toJSON() : unexposed.get(p1.substr(2)) || "";
+			return concealed.get(p1.substr(2)) instanceof Date ? (concealed.get(p1.substr(2)) as Date).toJSON() : concealed.get(p1.substr(2)) || "";
 		
-		return (exposed.get(p1.substr(1)) instanceof Date ? exposed.get(p1.substr(1)).toJSON() : exposed.get(p1.substr(1))) || "";
+		return (exposed.get(p1.substr(1)) instanceof Date ? (exposed.get(p1.substr(1)) as Date).toJSON() : exposed.get(p1.substr(1))) || "";
 	});
 }

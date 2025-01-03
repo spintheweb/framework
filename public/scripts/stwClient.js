@@ -1,7 +1,7 @@
 /**
  * Spin the Web client 
  * 
- * This file runs on web browser and is responsible for real time communication 
+ * This file runs in web browser and is responsible for real time communication 
  * with the web spinner through web sockets.
  * 
  * Language: Javascript
@@ -9,38 +9,47 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
  **/
 // deno-lint-ignore-file
-const websocket = new WebSocket(`ws://${window.location.host}/`);
+self.addEventListener("load", startWebsocket);
+	
+function startWebsocket() {
+	let ws = new WebSocket(self.location.host);
 
-websocket.onopen = async _event => {
-	const response = await fetch(document.location.href, { method: "HEAD" });
-	const headers = Object.fromEntries(response.headers.entries());
-	websocket.send(JSON.stringify({ verb: "PUT", resource: headers.contents?.split(",") }));
-};
+	ws.onopen = _event => {
+		ws.send(JSON.stringify({
+			method: "HEAD",
+			resource: self.document.location.pathname,
+			options: {
+				lang: navigator.language,
+				langs: navigator.languages,
+			}
+		}));
+	};
 
-websocket.onclose = _event => { };
+	ws.onmessage = event => {
+		// event.data = { method: "GET" | "POST" | "PUT" | "DELETE" | "HEAD", id: string, section: string, sequence: number, body: string }
+		const data = JSON.parse(event.data);
 
-websocket.onmessage = event => {
-	// verb: "GET" | "PUT" | "DELETE" | "POST", id: string, section: string, sequence: number, body: string
-	const data = JSON.parse(event.data);
+		if (data.method === "PUT" || data.method === "DELETE")
+			self.document.getElementById(data.id)?.remove();
 
-	if (data.verb === "PUT" || data.verb === "DELETE")
-		document.getElementById(data.id)?.remove();
+		if (data.section === "dialog") {
+			self.document.querySelector("dialog")?.remove();
+			self.document.body.insertAdjacentHTML("afterbegin", `<dialog>${data.body}</dialog>`);
+			self.document.querySelector("dialog")?.showModal();
 
-	if (data.section === "dialog") {
-		document.querySelector("dialog")?.remove();
-		document.body.insertAdjacentHTML("beforeend", `<dialog>${data.body}</dialog>`);
-		document.querySelector("dialog")?.showModal();
+		} else {
+			let insertion = self.document.getElementById(data.section);
+			insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
+				if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
+					insertion = article;
+			});
+			insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
+		}
+	};
 
-	} else {
-		let insertion = document.getElementById(data.section);
-		insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
-			if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
-				insertion = article;
-		});
-		insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
+	ws.onerror = err => {
+		console.error(err);
+		ws = null;
+		setTimeout(startWebsocket, 5000);
 	}
-};
-
-websocket.onerror = event => {
-	console.error(event.data);
-};
+}

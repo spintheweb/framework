@@ -14,8 +14,9 @@ export class STWBreadcrumbs extends STWContent {
     }
     override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
         _body = "";
-        for (let element = this.parent; element; element = element.parent) 
-            _body = `/<a href="/${this._id}">${element.name.get(_session.lang)}</a>` + _body;
+        for (let element = this.parent; element; element = element.parent)
+            if (element.isVisible(_session) & 1)
+                _body = `/<a href="/${this.permalink(_session)}">${element.name.get(_session.lang)}</a>` + _body;
 
         return super.serve(_req, _session, `<nav>${_body}</nav>`);
     }
