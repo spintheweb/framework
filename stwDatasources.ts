@@ -29,6 +29,7 @@ export class STWDatasources {
 			if (!STWDatasources.datasources.size) {
 				STWDatasources.datasources.set("stw", STWSite.get()); // Webbase
 
+				// TODO: Connection pools
 				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
 					switch (settings.type) {
 						case "mysql":

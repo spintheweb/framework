@@ -1,3 +1,7 @@
+:root {
+    --base-color: red;
+}
+
 body {
     font-family: sans-serif;
     font-size: 12pt;
@@ -5,4 +9,14 @@ body {
 
 .stwLanguages a {
     font-size: smaller;
+}
+
+.dialog {
+    font-size: smaller;
+}
+.dialog h1 {
+    border-bottom: thin solid var(--base-color);
+}
+.dialog h1::after {
+    content: "x";
 }

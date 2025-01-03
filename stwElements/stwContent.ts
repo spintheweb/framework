@@ -7,7 +7,6 @@
 **/
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
-import { STWDatasources } from "../stwDatasources.ts";
 
 export interface ISTWContent extends ISTWElement {
 	subtype: string;
@@ -52,10 +51,6 @@ export abstract class STWContent extends STWElement {
 
 	override serve(_req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
 		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) @${this.section}.${this.sequence} [${this._id}]`);
-
-		// TODO: layout
-
-		const _records = STWDatasources.query(this);
 
 		let debug: string = "";
 		if (_session.debug) {

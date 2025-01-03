@@ -20,7 +20,7 @@ const SYNTAX: RegExp = new RegExp([
 	/(?<error>[\S])/ // Anything else is an error
 ].map(r => r.source).join('|'), 'gmu');
 
-interface Token {
+interface IToken {
 	symbol: string;
 	args: args;
 	params: params;

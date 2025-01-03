@@ -1,0 +1,75 @@
+{
+    "_id": "e258daa0-293a-11ee-9729-21da0b1a268c",
+    "type": "Area",
+    "name": {
+        "en": "Manager"
+    },
+    "slug": {
+        "en": "stw"
+    },
+    "children": [
+        {
+            "_id": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef",
+            "type": "Page",
+            "name": {
+                "en": "Elements"
+            },
+            "slug": {
+                "en": "elements"
+            },
+            "children": [
+                {
+                    "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+                    "type": "Content",
+                    "name": {
+                        "en": "Search"
+                    },
+                    "slug": {
+                        "en": "search"
+                    },
+                    "visibility": {},
+                    "subtype": "Form",
+                    "cssClass": null,
+                    "section": "main",
+                    "sequence": "1",
+                    "dsn": "",
+                    "query": "",
+                    "params": "",
+                    "layout": {
+                        "en": "<img src=\"./media/Logo-bn_128x128.png\" title=\"Spin the Web Logo\"><span>Spin the Web Project</span>"
+                    }
+                },
+                {
+                    "_id": "f789bbc0-2952-11ee-a56c-e7d2b4a9289e",
+                    "type": "Content",
+                    "name": {
+                        "en": "Elements"
+                    },
+                    "slug": {
+                        "en": "element"
+                    },
+                    "visibility": {},
+                    "subtype": "Table",
+                    "cssClass": null,
+                    "section": "main",
+                    "sequence": "1",
+                    "dsn": "stw",
+                    "query": "$.._id",
+                    "params": "",
+                    "layout": {
+                        "en": "These are the elements"
+                    }
+                }
+            ],
+            "visibility": {
+                "guests": true
+            },
+            "contentType": "text/html",
+            "template": "index.html"
+        }
+    ],
+    "visibility": {
+        "Developers": true
+    },
+    "mainpage": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef"
+}
