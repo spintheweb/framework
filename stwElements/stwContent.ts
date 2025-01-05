@@ -56,8 +56,8 @@ export abstract class STWContent extends STWElement {
 		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
-		if (session.debug) {
-			debug = `<a href="/stws/content?_id=${this._id}" style="float:right" title="${this.type}: ${this.localize(session, "name")} §${this.section} &gt; ${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
+		if (session.debug && !this.permalink(session).startsWith("/stws/")) {
+			debug = `<a class="stwDebug" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
 		}
 
 		const data = {
@@ -65,13 +65,13 @@ export abstract class STWContent extends STWElement {
 			id: this._id,
 			section: this.section,
 			sequence: this.sequence,
-			body: `
-				<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}">
-					<h1>${debug}</h1>
-					<header></header>
-					${this.render(req, session)}
-					</footer></footer>
-				</article>`,
+			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}">
+				${debug}
+				<h1></h1>
+				<header></header>
+				${this.render(req, session)}
+				</footer></footer>
+			</article>`,
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}

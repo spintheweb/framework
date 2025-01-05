@@ -1,22 +1,53 @@
 :root {
-    --base-color: red;
+	--padding: 0.25em;
+	--base-color: red;
 }
 
 body {
-    font-family: sans-serif;
-    font-size: 12pt;
+	font-family: sans-serif;
+	font-size: 12pt;
+}
+
+article {
+	position: relative;
+	padding: var(--padding);
+}
+article:hover {
+	background-color: rgba(0, 0, 0, 0.05);
 }
 
 .stwLanguages a {
-    font-size: smaller;
+	font-size: smaller;
 }
 
 .dialog {
-    font-size: smaller;
+	font-size: smaller;
 }
 .dialog h1 {
-    border-bottom: thin solid var(--base-color);
+	border-bottom: thin solid var(--base-color);
 }
 .dialog h1::after {
-    content: "x";
+	content: "x";
+}
+
+.stwForm label {
+	display: inline-grid;
+	font-weight: bolder;
+}
+.stwForm label>span {
+	font-size: smaller;
+}
+.stwForm label>input {
+	padding: var(--padding);
+	margin: var(--padding) var(--padding) var(--padding) 0;
+}
+.stwForm button {
+	padding: 0.5em; min-width: 7em;
+	margin: 0.5em 0;
+}
+
+.stwDebug {
+	position: absolute;
+	top: var(--padding);
+	right: var(--padding);
 }

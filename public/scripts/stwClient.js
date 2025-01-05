@@ -10,7 +10,7 @@
  **/
 // deno-lint-ignore-file
 self.addEventListener("load", startWebsocket);
-	
+
 function startWebsocket() {
 	let ws = new WebSocket(self.location.host);
 
@@ -26,7 +26,7 @@ function startWebsocket() {
 	};
 
 	ws.onmessage = event => {
-		// event.data = { method: "GET" | "POST" | "PUT" | "DELETE" | "HEAD", id: string, section: string, sequence: number, body: string }
+		// event.data = { method: "GET" | "PUT" | "DELETE", id: string, section: string, sequence: number, body: string }
 		const data = JSON.parse(event.data);
 
 		if (data.method === "PUT" || data.method === "DELETE") {
@@ -35,10 +35,13 @@ function startWebsocket() {
 				return;
 		}
 
-		if (data.section === "dialog") {
+		if (data.section === "dialog" || data.section === "modaldialog") {
 			self.document.querySelector("dialog")?.remove();
 			self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-			self.document.querySelector("dialog")?.showModal();
+			if (data.section === "modaldialog")
+				self.document.querySelector("dialog")?.showModal();
+			else
+				self.document.querySelector("dialog")?.show();
 
 		} else {
 			let insertion = self.document.getElementById(data.section);

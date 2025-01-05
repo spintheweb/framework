@@ -20,13 +20,13 @@
             "visibility": {},
             "subtype": "Form",
             "cssClass": null,
-            "section": "dialog",
+            "section": "modaldialog",
             "sequence": "1",
             "dsn": "stw",
             "query": "$..[_id=\"@_id\"]",
             "params": "",
             "layout": {
-                "en": "<img src=\"./media/Logo-bn_128x128.png\" title=\"Spin the Web Logo\"><span>Spin the Web Project</span>"
+                "en": "<label><span>Name</span><input name=\"name\"></label><label><span>Slug</span><input name=\"slug\"></label><label><span>Section</span><input name=\"section\"></label><label><span>CSS Class</span><input name=\"cssClass\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\"></label><br><button>Save</button><button formmethod=\"dialog\">Cancel</button>"
             }
         },
         {
@@ -40,7 +40,7 @@
             },
             "children": [
                 {
-                    "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+                    "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c7",
                     "type": "Content",
                     "name": {
                         "en": "Search"

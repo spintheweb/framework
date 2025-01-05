@@ -14,9 +14,11 @@ export class STWForm extends STWContent {
 		super(content);
 	}
 	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(this);
+		// const _records = STWDatasources.query(this);
 
-		return `Rendered ${this.constructor.name} <pre>${_records}</pre>`;
+		// If the from is inside a dialog, method="dialog"
+
+		return `<form method="${this.section.endsWith("dialog") ? "dialog" : "post"}" enctype="multipart/form-data" name="${this.localize(_session, "slug")}">${this.localize(_session, "layout")}</form>`;
 	}
 }
 
