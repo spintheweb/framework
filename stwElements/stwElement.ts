@@ -79,23 +79,20 @@ export abstract class STWElement {
 	 * @param session The given session
 	 * @returns Return the highest access control associated to the given session
 	 */
-	isVisible(session: STWSession, role: string = "", recurse: boolean = false): number {
+	isVisible(session: STWSession, recurse: boolean = false): number {
 		let ac!: number;
 
-		if (this.type === "Page" && STWSite.get().mainpage === this._id)
+		if (STWSite.get().mainpage === this._id)
 			ac = recurse ? 0b11 : 0b01; // Home page always visible
 
-		if (role) {
-			ac = this.visibility.has(role) ? 0b01 : 0b00;
-		} else
-			for (let i = 0; ac != 0b01 && i < session.roles.length; ++i)
-				if (this.visibility.get(session.roles[i]))
-					ac |= this.visibility.get(session.roles[i]) ? 0b01 : 0b00;
+		for (let i = 0; ac != 0b01 && i < session.roles.length; ++i)
+			if (this.visibility.has(session.roles[i]))
+				ac |= this.visibility.get(session.roles[i]) ? 0b01 : 0b00;
 
 		if (typeof ac === "undefined") {
 			const obj: STWElement = this.parent;
 			if (obj)
-				ac = 0b10 | obj.isVisible(session, role, true);
+				ac = 0b10 | obj.isVisible(session, true);
 			else if (["Site", "Area", "Page"].indexOf(this.type) === -1) // Content
 				ac = 0b10; // NOTE: this covers contents without a parent nor a RBV, it's in limbo!
 		}

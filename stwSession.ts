@@ -12,19 +12,19 @@ export class STWSession {
 	lang: string; // Preferred user language 
 	langs: string[]; // Accept-Language
 	timestamp: number; // Session timeout in minutes
-	dev: false; // If true STWManager enabled
-	debug: false; // If true and dev is true contents properties are shown
+	dev: boolean; // If true STW Studio  enabled
+	debug: boolean; // If true and dev is true contents properties are shown
 	private timer: number = 0;
 
 	constructor(sessionId: string) {
 		this.sessionId = sessionId;
 		this.user = "guest";
-		this.roles = ["guests"];
+		this.roles = ["guests", "developers"];
 		this.lang = "en";
 		this.langs = ["en"];
 		this.timestamp = Date.now();
-		this.dev = false;
-		this.debug = false;
+		this.dev = true;
+		this.debug = true;
 
 		console.info(`${new Date().toISOString()}: Session [${this.sessionId}]`);
 	}

@@ -11,14 +11,17 @@ import { STWSite } from "./stwSite.ts";
 
 export interface ISTWArea extends ISTWElement {
 	mainpage: string;
+	version: string;
 }
 export class STWArea extends STWElement {
 	mainpage: string;
+	version: string;
 
 	constructor(area: ISTWArea) {
 		super(area);
 
 		this.mainpage = area.mainpage;
+		this.version = area.version || `v1.0.0 ${new Date().toISOString()}`
 	}
 
 	override serve(req: Request, _session: STWSession, _body: string = ""): Promise<Response> {

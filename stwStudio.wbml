@@ -2,12 +2,33 @@
     "_id": "e258daa0-293a-11ee-9729-21da0b1a268c",
     "type": "Area",
     "name": {
-        "en": "Manager"
+        "en": "STW Studio"
     },
     "slug": {
-        "en": "stw"
+        "en": "stws"
     },
     "children": [
+        {
+            "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+            "type": "Content",
+            "name": {
+                "en": "Content"
+            },
+            "slug": {
+                "en": "content"
+            },
+            "visibility": {},
+            "subtype": "Form",
+            "cssClass": null,
+            "section": "dialog",
+            "sequence": "1",
+            "dsn": "stw",
+            "query": "$..[_id=\"@_id\"]",
+            "params": "",
+            "layout": {
+                "en": "<img src=\"./media/Logo-bn_128x128.png\" title=\"Spin the Web Logo\"><span>Spin the Web Project</span>"
+            }
+        },
         {
             "_id": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef",
             "type": "Page",
@@ -61,15 +82,13 @@
                     }
                 }
             ],
-            "visibility": {
-                "guests": true
-            },
+            "visibility": {},
             "contentType": "text/html",
             "template": "index.html"
         }
     ],
     "visibility": {
-        "Developers": true
+        "developers": true
     },
     "mainpage": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef"
 }

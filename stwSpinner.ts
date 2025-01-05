@@ -13,9 +13,10 @@ import { getCookies, setCookie } from "jsr:@std/http/cookie";
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWPage } from "./stwElements/stwPage.ts";
+import { STWContent } from "./stwElements/stwContent.ts";
 
 /**
- * Preload {@linkcode STWFactory} with Spin the Web elements
+ * Preload {@linkcode STWFactory} with the Spin the Web elements
  * 
  * @param path The directory containing the elements
  */
@@ -68,13 +69,35 @@ Deno.serve(
 					session.langs = data.options.langs || ["en"];
 					session.lang = STWSite.get().langs.includes(data.options.lang) ? data.options.lang : session.langs.find(lang => STWSite.get().langs.includes(lang.substring(0, 2)))?.substring(0, 2) || "en";
 
+					request = new Request(new URL(request.url).origin + data.resource); // URL
 					data.resource = (STWSite.get().find(session, data.resource) as STWPage)?.contents(session) || [];
 				}
-				data.resource?.forEach(async (resource: string) => {
-					const response = await STWSite.get().find(session, resource)?.serve(request, session, "");
-					if (response)
-						Socket.send(await response.text());
+				/**
+				 * Sockets requests contents which may generate output (HTML), execute (API) or do both
+				 */
+				let process = data.resource.length;
+				data.resource?.forEach(async (resource: string, i: number) => {
+					const content = STWSite.get().find(session, resource);
+
+					if (content instanceof STWContent) {
+						const response = await content?.serve(request, session, "");
+						if (response.status == 200)
+							data.resource[i] = await (await content?.serve(request, session, "")).json();
+						else
+							data.resource[i] = { method: "DELETE", id: content._id };
+						if (!--process)
+							send();
+					}
 				});
+
+				function send(): void {
+					data.resource?.sort((a: any, b: any) => {
+						if (a.section == b.section)
+							return Math.trunc(a.sequence) != Math.trunc(b.sequence) ? 0 : a.sequence < b.sequence ? -1 : 1;
+						return 0;
+					});
+					data.resource?.forEach((content: any) => Socket.send(JSON.stringify(content)));
+				}
 			};
 			Socket.onerror = error => console.error(error);
 
@@ -93,8 +116,10 @@ Deno.serve(
 				response = element.serve(request, session, ""); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (Socket && element?.type) {
 				const response = await element.serve(request, session, "");
-				const text = await response.text();
-				Socket.send(text);
+				if (response.status === 200) {
+					const text = await response.text();
+					Socket.send(text);
+				}
 			}
 
 			if (getCookies(request.headers).sessionId)

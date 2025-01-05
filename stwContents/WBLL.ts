@@ -22,20 +22,20 @@ const SYNTAX: RegExp = new RegExp([
 
 interface IToken {
 	symbol: string;
-	args: args;
-	params: params;
-	attrs: attrs;
+	args: Map<string, string>;
+	params: Map<string, string>;
+	attrs: Map<string, string>;
 }
 
 export function lexer(req: Request, wbll: string = '') {
 	const layout = { settings: {}, tokens: [] }, token = {};
-	let symbol: string, args, params, attrs;
+	let symbol: string, args: Map<string, string>, params: Map<string, string>, attrs: Map<string, string>;
 
 	if (typeof wbll != 'string')
 		return layout;
 
 	for (let expression of wbll.matchAll(SYNTAX)) {
-		if (expression.groups.error !== undefined)
+		if (expression.groups?.error !== undefined)
 			throw new SyntaxError(expression.input.slice(0, expression.index) + ' >>>' + expression.input.slice(expression.index));;
 
 		expression = expression.filter((value, i) => (value !== undefined && i));
@@ -47,8 +47,8 @@ export function lexer(req: Request, wbll: string = '') {
 			if (symbol == '\\a' || symbol == '\\s' || symbol == '\\A') {
 				expression[1] = processPlaceholders(expression[1], req.stwPublic, req.stwPrivate);
 
-				attrs = {};
-				for (let attr of expression[1].matchAll(/([a-zA-Z0-9-_]+)(?:=(["'])([^]*?)\2)?/gmu))
+				attrs = new Map();
+				for (const attr of expression[1].matchAll(/([a-zA-Z0-9-_]+)(?:=(["'])([^]*?)\2)?/gmu))
 					attrs[attr[1]] = attr[3] || 'true';
 				if (symbol == '\\s') {
 					layout.settings = attrs;
@@ -128,7 +128,7 @@ export function getValue(req: Request, key: string) {
 export function renderAttributes(req: Request, attrs: string[]) {
 	let html = '';
 	if (attrs)
-		for (let attr in attrs)
+		for (const attr in attrs)
 			html += ` ${attr}="${attr === 'name' ? attrs[attr] : Deno.encode(getValue(req, attrs[attr]))}"`;
 	return html;
 }
@@ -141,12 +141,12 @@ function renderParameters(req: Request, uri: string, params) {
 		url.href = processPlaceholders(url.href, req.stwPublic, req.stwPrivate.stwData[req.stwPrivate.stwR]);
 
 		if (params)
-			for (let param in params)
+			for (const param in params)
 				url.searchParams.set(param[0] === '§' ? Object.keys(req.stwPrivate.stwData[req.stwPrivate.stwR])[req.stwPrivate.stwC] : param, getValue(req, params[param]));
 		return url.href;
 	} catch {
 		url = new URL('https://stw.local/' + uri);
-		for (let param of params) {
+		for (const param of params) {
 			if (param.symbol === 'p')
 				url.searchParams.set(param.name || Object.keys(req.stwPrivate.stwData[0])[req.stwPrivate.stwC], getValue(req, param.value));
 			else if (param.symbol === '>')
@@ -176,7 +176,7 @@ export function renderer(req: Request, contentId: string, layout: string, flags:
 		});
 
 	let html = '', thead = '', str;
-	for (let token of layout.tokens)
+	for (const token of layout.tokens)
 		try {
 			switch (token.symbol) {
 				case '<':

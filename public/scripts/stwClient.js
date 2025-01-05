@@ -29,12 +29,15 @@ function startWebsocket() {
 		// event.data = { method: "GET" | "POST" | "PUT" | "DELETE" | "HEAD", id: string, section: string, sequence: number, body: string }
 		const data = JSON.parse(event.data);
 
-		if (data.method === "PUT" || data.method === "DELETE")
+		if (data.method === "PUT" || data.method === "DELETE") {
 			self.document.getElementById(data.id)?.remove();
+			if (data.method === "DELETE")
+				return;
+		}
 
 		if (data.section === "dialog") {
 			self.document.querySelector("dialog")?.remove();
-			self.document.body.insertAdjacentHTML("afterbegin", `<dialog>${data.body}</dialog>`);
+			self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
 			self.document.querySelector("dialog")?.showModal();
 
 		} else {

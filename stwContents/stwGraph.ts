@@ -1,5 +1,5 @@
 /**
- * Spin the Web Text content
+ * Spin the Web Graph content
  * 
  * Language: TypeScript for Deno
  * 
@@ -8,7 +8,7 @@
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
-export class STWText extends STWContent {
+export class STWGraph extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -16,18 +16,8 @@ export class STWText extends STWContent {
 		if (!this.isVisible(_session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		const data = {
-			method: "PUT",
-			id: this._id,
-			section: this.section,
-			sequence: this.sequence,
-			body: this.layout.get(_session.lang),
-		};
-		return new Promise<Response>(resolve => {
-			const response = new Response(JSON.stringify(data));
-			resolve(response);
-		});
+		return super.serve(_req, _session, _body);
 	}
 }
 
-STWFactory.Text = STWText;
+STWFactory.Tree = STWGraph;

@@ -6,6 +6,7 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { STWSession } from "../stwSession.ts";
+import { ISTWArea, STWArea } from "./stwArea.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
 
 interface ISTWSite extends ISTWElement {
@@ -14,6 +15,7 @@ interface ISTWSite extends ISTWElement {
 	roles: object;
 	datasources: object;
 	mainpage: string;
+	version: string;
 }
 export class STWSite extends STWElement {
 	static #instance: STWSite;
@@ -24,6 +26,7 @@ export class STWSite extends STWElement {
 	langs: string[];
 	datasources: Map<string, string>;
 	mainpage: string;
+	version: string;
 
 	private constructor(site: ISTWSite) {
 		super(site);
@@ -32,6 +35,7 @@ export class STWSite extends STWElement {
 		this.langs = site.langs || ["en"];
 		this.datasources = new Map(Object.entries(site.datasources || { name: "STW", value: "" }));
 		this.mainpage = site.mainpage;
+		this.version = site.version || `v1.0.0 ${new Date().toISOString()}`
 	}
 
 	/**
@@ -41,12 +45,43 @@ export class STWSite extends STWElement {
 	 */
 	static get(): STWSite {
 		if (!STWSite.#instance) {
-			const webbase = Deno.env.get("WEBBASE") || "./public/.data/webbase.json";
+			const webbase = Deno.env.get("WEBBASE") || "./public/.data/webbase.wbml";
 			STWSite.#instance = new STWSite(JSON.parse(Deno.readTextFileSync(webbase)));
 			if (!STWSite.#instance)
-				console.info(`Webbase '${webbase}' not found. Set WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
+				throw new Error(`Webbase '${webbase}' not found. Set WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
+			STWSite.#instance.loadStudio();
 		}
 		return STWSite.#instance;
+	}
+
+	/**
+	 * Load Spin the Web Studio webbase, if it's already present, replace it.
+	 */
+	loadStudio(): void {
+		try {
+			const webbaselet: ISTWArea = JSON.parse(Deno.readTextFileSync(Deno.env.get("STWSTUDIO") || "./stwStudio.wbml"));
+			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
+			if (studio)
+				this.delete(studio._id);
+			STWSite.get().children.push(new STWArea(webbaselet));
+				
+		} catch (error) {
+			console.error(`Unable to load STW Studio '${Deno.env.get("STWSTUDIO")}'`, error);
+		}
+	}
+
+	/**
+	 * Remove the element _id with all its descendent from the webbase
+	 * 
+	 * @param _id The UUID of the element to be removed
+	 */
+	delete(_id: string): void {
+		const element = STWSite.index.get(_id);
+		element?.children.forEach((child, i) => {
+			this.delete(child._id);
+			STWSite.index.delete(child._id);
+			element.children.splice(i, 1);
+		});
 	}
 
 	// Find the element given an _id or permalink

@@ -30,13 +30,13 @@ export class STWPage extends STWElement {
 	 */
 	contents(_session: STWSession): string[] {
 		const contents = this.children.filter(content => (content as STWContent).section !== "dialog" && content.isVisible(_session) & 1).map(content => content._id);
-		walk(this.parent, contents);
+		climb(this.parent, contents);
 		return contents;
 
-		function walk(element: STWElement, contents: string[]): void {
+		function climb(element: STWElement, contents: string[]): void {
 			if (element) {
 				element.children.filter(content => (content as STWContent).section && content.isVisible(_session) & 1).map(content => contents.push(content._id));
-				walk(element.parent, contents);
+				climb(element.parent, contents);
 			}
 		}
 	}

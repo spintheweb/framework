@@ -1,5 +1,5 @@
 /**
- * Spin the Web Text content
+ * Spin the Web Plot content
  * 
  * Language: TypeScript for Deno
  * 
@@ -8,7 +8,7 @@
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
-export class STWText extends STWContent {
+export class STWPlot extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -16,18 +16,15 @@ export class STWText extends STWContent {
 		if (!this.isVisible(_session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		const data = {
-			method: "PUT",
-			id: this._id,
-			section: this.section,
-			sequence: this.sequence,
-			body: this.layout.get(_session.lang),
-		};
-		return new Promise<Response>(resolve => {
-			const response = new Response(JSON.stringify(data));
-			resolve(response);
-		});
+		_body = `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="350">
+			<ellipse
+			cx="258" cy="169" rx="250" ry="80"
+			transform="matrix(0.866025,-0.5,0.5,0.866025,-46,152)"
+			style="fill:none;stroke:black;stroke-width:3" />
+		</svg>`;
+
+		return super.serve(_req, _session, _body);
 	}
 }
 
-STWFactory.Text = STWText;
+STWFactory.Plot = STWPlot;
