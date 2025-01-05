@@ -7,16 +7,16 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { STWDatasources } from "../stwDatasources.ts";
 
 export class STWTree extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
-		if (!this.isVisible(_session))
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+	override render(_req: Request, _session: STWSession): string {
+		const _records = STWDatasources.query(this);
 
-		return super.serve(_req, _session, _body);
+		return `Rendered ${this.constructor.name} <pre>${_records}</pre>`;
 	}
 }
 

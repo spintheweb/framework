@@ -44,15 +44,14 @@ export class STWPage extends STWElement {
 	/**
 	 * Resolve a {@linkcode Response} with the requested page
 	 * 
-	 * @param _req The server request context
-	 * @param _session The current session
-	 * @param _body ""
+	 * @param req The server request context
+	 * @param session The current session
 	 * @returns - A response for the request
 	 */
-	override serve(_req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
-		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) [${this._id}]`);
+	override serve(req: Request, session: STWSession): Promise<Response> {
+		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(session)}) [${this._id}]`);
 
-		return serveFile(_req, `./public/${this.template}`);
+		return serveFile(req, `./public/${this.template}`);
 	}
 }
 

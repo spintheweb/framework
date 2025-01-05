@@ -22,12 +22,21 @@ export class STWShortcut extends STWContent {
 
 		this.reference = STWSite.index.get(content.reference) as STWContent;
 	}
-	override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
-		// If the shortcut reference is undefined makes no sense to continue
+	override serve(_req: Request, _session: STWSession): Promise<Response> {
 		if (!this.isVisible(_session) || !this.reference)
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		return super.serve(_req, _session, _body);
+		const data = {
+			method: "PUT",
+			id: this._id,
+			section: this.section,
+			sequence: this.sequence,
+			body: `Shortcut for ${this.reference}`,
+		};
+		return new Promise<Response>(resolve => {
+			const response = new Response(JSON.stringify(data));
+			resolve(response);
+		});
 	}
 }
 

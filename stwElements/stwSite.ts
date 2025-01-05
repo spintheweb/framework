@@ -107,12 +107,12 @@ export class STWSite extends STWElement {
 		return result;
 	}
 
-	override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
+	override serve(req: Request, session: STWSession): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 
-		return page?.serve(_req, _session, _body) ||
+		return page?.serve(req, session) ||
 			new Promise<Response>(resolve => {
-				const response = new Response(`Site ${this.localize(_session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
+				const response = new Response(`Site ${this.localize(session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);
 			});
 	}

@@ -105,5 +105,5 @@ export abstract class STWElement {
 		return "";
 	};
 
-	abstract serve(_req: Request, _session: STWSession, _body: string): Promise<Response>;
+	abstract serve(req: Request, session: STWSession): Promise<Response>;
 }

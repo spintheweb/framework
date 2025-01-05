@@ -51,16 +51,16 @@ export class STWDatasources {
 			if (content.dsn && content.query) {
 				const datasource = STWDatasources.datasources.get(content.dsn);
 				if (datasource instanceof STWSite)
-					return new Promise<ExecuteResult>(resolve => resolve({
+					return await new Promise<ExecuteResult>(resolve => resolve({
 						// deno-lint-ignore no-explicit-any
 						rows: [JSONPath(datasource as any, processPlaceholders(content.query, new Map(), new Map()))],
 					}));
 				if (datasource instanceof MySQLClient)
-					return datasource.execute(processPlaceholders(content.query, new Map(), new Map()));
+					return await datasource.execute(processPlaceholders(content.query, new Map(), new Map()));
 			}
 		} catch (error) {
 			console.error(error);
 		}
-		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
+		return await new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}
 }

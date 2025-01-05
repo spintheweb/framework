@@ -13,18 +13,10 @@ export class STWTable extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override serve(_req: Request, _session: STWSession, _body: string): Promise<Response> {
-		if (!this.isVisible(_session))
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
-
-		// TODO: layout
-
+	override render(_req: Request, _session: STWSession): string {
 		const _records = STWDatasources.query(this);
 
-//		_records.fields?.forEach
-		_body = ``;
-
-		return super.serve(_req, _session, _body);
+		return `Rendered ${this.constructor.name} for ${_session.user} <pre>${_records}</pre>`;
 	}
 }
 

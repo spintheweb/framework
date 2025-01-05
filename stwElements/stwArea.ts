@@ -24,12 +24,12 @@ export class STWArea extends STWElement {
 		this.version = area.version || `v1.0.0 ${new Date().toISOString()}`
 	}
 
-	override serve(req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
+	override serve(req: Request, session: STWSession): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 
-		return page?.serve(req, _session, _body) ||
+		return page?.serve(req, session) ||
 			new Promise<Response>(resolve => {
-				const response = new Response(`Area '${this.localize(_session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
+				const response = new Response(`Area '${this.localize(session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);
 			});
 	}

@@ -49,12 +49,15 @@ export abstract class STWContent extends STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	override serve(_req: Request, _session: STWSession, _body: string = ""): Promise<Response> {
-		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(_session)}) @${this.section}.${this.sequence} [${this._id}]`);
+	serve(req: Request, session: STWSession): Promise<Response> {
+		if (!this.isVisible(session))
+			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+
+		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
-		if (_session.debug) {
-			debug = `<a href="/stws/content?_id=${this._id}" style="float:right" title="${this.type}: ${this.localize(_session, "name")} §${this.section} @${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
+		if (session.debug) {
+			debug = `<a href="/stws/content?_id=${this._id}" style="float:right" title="${this.type}: ${this.localize(session, "name")} §${this.section} &gt; ${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
 		}
 
 		const data = {
@@ -64,12 +67,16 @@ export abstract class STWContent extends STWElement {
 			sequence: this.sequence,
 			body: `
 				<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}">
-					<h1>${this.type} &mdash; ${this.localize(_session, "name")}${debug}</h1>
-					<header>${this.cssClass}</header>
-					${_body}
-					</footer>${this.section} ${this.sequence} ${_req.url}</footer>
+					<h1>${debug}</h1>
+					<header></header>
+					${this.render(req, session)}
+					</footer></footer>
 				</article>`,
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
+	}
+
+	render(_req: Request, _session: STWSession): string {
+		return `Rendered ${this.constructor.name}`;
 	}
 }
