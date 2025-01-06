@@ -27,8 +27,8 @@ interface IToken {
 	attrs: Map<string, string>;
 }
 
-export function lexer(req: Request, wbll: string = '') {
-	const layout = { settings: {}, tokens: [] }, token = {};
+export function lexer(req: Request, wbll: string = ''): any {
+	let layout = { settings: {}, tokens: [] }, token = {};
 	let symbol: string, args: Map<string, string>, params: Map<string, string>, attrs: Map<string, string>;
 
 	if (typeof wbll != 'string')

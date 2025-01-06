@@ -25,7 +25,7 @@
                         "en": "customers"
                     },
                     "visibility": {
-                        "guests": false
+                        "guests": true
                     },
                     "subtype": "Table",
                     "cssClass": "stwTable",
@@ -104,7 +104,7 @@
                     "query": "",
                     "params": "",
                     "layout": {
-                        "en": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\nt('\n<form action=\"/stw/logon\" method=\"post\" >\n<input name=\"user\">\n<input type=\"password\" name=\"password\">\n<button type=\"submit\">Logon</button>\n</form>')"
+                        "en": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\ne(';user;)\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;esite;logon;@@usr;@@pwd')"
                     }
                 },
                 {
@@ -117,18 +117,16 @@
                         "en": "info"
                     },
                     "visibility": {
-                        "guests": false
+                        "guests": true
                     },
-                    "subtype": "Text",
-                    "cssClass": "stwText",
+                    "subtype": "Geomap",
+                    "cssClass": null,
                     "section": "main",
                     "sequence": "4",
                     "dsn": "",
                     "query": "",
                     "params": "",
-                    "layout": {
-                        "en": "<p><a href=\"/home/customers\">Dialog</a></p><p>This site uses <a target=\"_blank\" href=\"https://www.mysqltutorial.org/getting-started-with-mysql/mysql-sample-database/\">MySQL Sample Database</a></p>"
-                    }
+                    "layout": {}
                 }
             ],
             "visibility": {},
@@ -392,10 +390,6 @@
         "en"
     ],
     "datasources": {
-        "mysqlsample": {
-            "name": "mysqlsample",
-            "type": "mysql",
-            "config": "{\"host\":\"lhcp3334.webapps.net\",\"port\":\"3306\",\"user\":\"qt3ul9nb_stw\",\"password\":\"}rJQN+{O)rAy\",\"database\":\"qt3ul9nb_sampledb\"}"
-        }
+        "mysqlsample": "https://www.mysqltutorial.org/getting-started-with-mysql/mysql-sample-database/"
     }
 }

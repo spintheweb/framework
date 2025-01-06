@@ -112,7 +112,7 @@ Deno.serve(
 		let response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content;
 
 		if (request.method === "GET") {
-			if (!element && pathname.indexOf("/.") === -1)  // Do not serve paths that have files or directories that begin with a dot
+			if (!element && pathname.indexOf("/.") === -1) // Do not serve paths that have files or directories that begin with a dot
 				response = serveFile(request, `./public${pathname}`);
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
 				response = element.serve(request, session); // Serve page, area or site, for areas and sites handle their mainpage

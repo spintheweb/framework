@@ -51,11 +51,37 @@ function startWebsocket() {
 			});
 			insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
 		}
+		loadScripts(self.document.getElementById(data.id)?.querySelector("template[data-stwCallback]"));
 	};
 
 	ws.onerror = err => {
 		console.error(err);
 		ws = null;
 		setTimeout(startWebsocket, 5000);
+	}
+
+	function loadScripts(scripts) {
+		const promises = [];
+		scripts?.content.querySelectorAll("script").forEach(code => {
+			const promise = new Promise((resolve, reject) => {
+				let script = self.document.createElement("script");
+				code.getAttributeNames().forEach(name => script.setAttribute(name, code.getAttribute(name)));
+				if (code.innerText)
+					script.insertAdjacentText("afterbegin", code.innerText);
+				script.onload = resolve;
+				script.onerror = reject;
+				self.document.head.append(script);
+			});
+			promises.push(promise);
+		});
+		if (promises.length > 0)
+			Promise.allSettled(promises)
+				.then(() => { 
+					[scripts.getAttribute("stwCallback")](); 
+					scripts.remove(); 
+				})
+				.catch(err => 
+					console.error(err)
+				);
 	}
 }

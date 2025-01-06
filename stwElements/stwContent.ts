@@ -5,6 +5,7 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { lexer } from "../stwContents/WBLL.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 
@@ -60,6 +61,23 @@ export abstract class STWContent extends STWElement {
 			debug = `<a class="stwDebug" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
 		}
 
+		let layout;
+		try {
+			layout = lexer(req, this.localize(session, "layout"));
+		} catch (error: any) {
+			return new Promise<Response>(resolve => resolve(new Response(JSON.stringify({
+				method: "PUT",
+				id: this._id,
+				section: this.section,
+				sequence: this.sequence,
+				body: `<article id="${this._id}" data-sequence="${this.sequence}" class="stwError">
+					${debug}
+					<h1>Syntax error</h1>
+					<samp>${error.message}</samp>
+				</article>`,
+			}))));
+		}
+
 		const data = {
 			method: "PUT",
 			id: this._id,
@@ -67,10 +85,10 @@ export abstract class STWContent extends STWElement {
 			sequence: this.sequence,
 			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}">
 				${debug}
-				<h1></h1>
-				<header></header>
+				${layout.settings.caption ? `<h1>${layout.settings.caption}</h1>` : ""}
+				${layout.settings.header ? `<header>${layout.settings.header}</header>` : ""}
 				${this.render(req, session)}
-				</footer></footer>
+				${layout.settings.footer ? `<footer>${layout.settings.footer}</footer>` : ""}
 			</article>`,
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
