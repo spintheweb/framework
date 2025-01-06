@@ -17,7 +17,7 @@ export class STWBreadcrumbs extends STWContent {
 		let body = "";
 		for (let element = STWSite.get().find(_session, new URL(_req.url).pathname); element; element = element.parent)
 			if (element.isVisible(_session) & 1)
-				body = `/<a href="${element.permalink(_session)}">${element.name.get(_session.lang)}</a>` + body;
+				body = `/<a href="${element.pathname(_session)}">${element.name.get(_session.lang)}</a>` + body;
 
 		return `<nav>${body}</nav>`;
 	}

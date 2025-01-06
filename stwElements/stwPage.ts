@@ -49,7 +49,7 @@ export class STWPage extends STWElement {
 	 * @returns - A response for the request
 	 */
 	override serve(req: Request, session: STWSession): Promise<Response> {
-		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(session)}) [${this._id}]`);
+		console.info(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
 
 		return serveFile(req, `./public/${this.template}`);
 	}

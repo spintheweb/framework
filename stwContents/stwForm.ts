@@ -1,6 +1,8 @@
 /**
  * Spin the Web Form content
  * 
+ * A form content 
+ * 
  * Language: TypeScript for Deno
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
@@ -16,9 +18,11 @@ export class STWForm extends STWContent {
 	override render(_req: Request, _session: STWSession): string {
 		// const _records = STWDatasources.query(this);
 
-		// If the from is inside a dialog, method="dialog"
-
-		return `<form method="${this.section.endsWith("dialog") ? "dialog" : "post"}" enctype="multipart/form-data" name="${this.localize(_session, "slug")}">${this.localize(_session, "layout")}</form>`;
+		// If the form is inside a dialog, method="dialog"
+		return `<form method="${this.section.endsWith("dialog") ? "dialog" : ""}">
+			<input type="hidden" name="stworigin" value="${this._id}">
+			${this.localize(_session, "layout")}
+		</form>`;
 	}
 }
 

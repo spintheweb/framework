@@ -53,10 +53,10 @@ export abstract class STWContent extends STWElement {
 		if (!this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		console.info(`${new Date().toISOString()}: ${this.type} (${this.permalink(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		console.info(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
-		if (session.debug && !this.permalink(session).startsWith("/stws/")) {
+		if (session.debug && !this.pathname(session).startsWith("/stws/")) {
 			debug = `<a class="stwDebug" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
 		}
 

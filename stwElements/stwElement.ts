@@ -58,9 +58,13 @@ export abstract class STWElement {
 		}
 	}
 
-	permalink(session: STWSession): string {
+	/**
+	 * @param session The session
+	 * @returns Return a / separated reverse chain of slugs of this element up to the root element
+	 */
+	pathname(session: STWSession): string {
 		if (this.parent)
-			return this.parent.permalink(session) + "/" + this.localize(session, "slug");
+			return this.parent.pathname(session) + "/" + this.localize(session, "slug");
 		return "";
 	}
 
@@ -74,10 +78,13 @@ export abstract class STWElement {
 	}
 
 	/**
-	 * This method determines if the element is visible to the given session.
+	 * Determines the Role Based Visibility of the element climbing up the webbase hierarchy if necessary.
+	 * By default an element is not visible except for the site's mainpage. Given the session roles, 
+	 * apply a logical OR of these roles in element visiblity, if no role applies move to 
+	 * the element parent.
 	 * 
-	 * @param session The given session
-	 * @returns Return the highest access control associated to the given session
+	 * @param session The session
+	 * @returns Return a number greater than 0 if element visible
 	 */
 	isVisible(session: STWSession, recurse: boolean = false): number {
 		let ac!: number;
@@ -90,9 +97,8 @@ export abstract class STWElement {
 				ac |= this.visibility.get(session.roles[i]) ? 0b01 : 0b00;
 
 		if (typeof ac === "undefined") {
-			const obj: STWElement = this.parent;
-			if (obj)
-				ac = 0b10 | obj.isVisible(session, true);
+			if (this.parent)
+				ac = 0b10 | this.parent.isVisible(session, true);
 			else if (["Site", "Area", "Page"].indexOf(this.type) === -1) // Content
 				ac = 0b10; // NOTE: this covers contents without a parent nor a RBV, it's in limbo!
 		}

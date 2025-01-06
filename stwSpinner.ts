@@ -44,7 +44,7 @@ let Socket: WebSocket;
 Deno.serve(
 	{
 		hostname: Deno.env.get("HOSTNAME") || "127.0.0.1",
-		port: parseInt(Deno.env.get("PORT") || "443"),
+		port: parseInt(Deno.env.get("PORT") || "80"),
 		// cert: await Deno.readTextFile(Deno.env.get("CERTFILE") || ""),
 		// key: await Deno.readTextFile(Deno.env.get("KEYFILE") || "")
 	},
@@ -80,9 +80,9 @@ Deno.serve(
 					const content = STWSite.get().find(session, resource);
 
 					if (content instanceof STWContent) {
-						const response = await content?.serve(request, session, "");
+						const response = await content?.serve(request, session);
 						if (response.status == 200)
-							data.resource[i] = await (await content?.serve(request, session, "")).json();
+							data.resource[i] = await (await content?.serve(request, session)).json();
 						else
 							data.resource[i] = { method: "DELETE", id: content._id };
 						if (!--process)
@@ -91,11 +91,13 @@ Deno.serve(
 				});
 
 				function send(): void {
+					// deno-lint-ignore no-explicit-any
 					data.resource?.sort((a: any, b: any) => {
 						if (a.section == b.section)
 							return Math.trunc(a.sequence) != Math.trunc(b.sequence) ? 0 : a.sequence < b.sequence ? -1 : 1;
 						return 0;
 					});
+					// deno-lint-ignore no-explicit-any
 					data.resource?.forEach((content: any) => Socket.send(JSON.stringify(content)));
 				}
 			};
@@ -107,35 +109,40 @@ Deno.serve(
 		const pathname = new URL(request.url).pathname;
 		const element = STWSite.get().find(session, pathname);
 
-		if (request.method === "GET") {
-			let response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content;
+		let response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content;
 
+		if (request.method === "GET") {
 			if (!element && pathname.indexOf("/.") === -1)  // Do not serve paths that have files or directories that begin with a dot
 				response = serveFile(request, `./public${pathname}`);
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
-				response = element.serve(request, session, ""); // Serve page, area or site, for areas and sites handle their mainpage
+				response = element.serve(request, session); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (Socket && element?.type) {
-				const response = await element.serve(request, session, "");
-				if (response.status === 200) {
-					const text = await response.text();
+				const res = await element.serve(request, session);
+				if (res.status === 200) {
+					const text = await res.text();
 					Socket.send(text);
 				}
 			}
 
-			if (getCookies(request.headers).sessionId)
-				return response;
-			else {
+			if (!getCookies(request.headers).sessionId) {
 				const headers = new Headers(request.headers);
 				setCookie(headers, { name: "sessionId", value: sessionId, httpOnly: true, secure: true, sameSite: "Lax" });
-				headers.set("contents", (await response).headers.get("contents") || ""); // HEADER based approach
+				headers.set("contents", (await response).headers.get("contents") || "");
 				return new Response((await response).body, { headers: headers });
 			}
+
+		} else if (request.method == "POST") {
+			const maxupload = parseInt(Deno.env.get("MAX_UPLOADSIZE") || "200") * 1024;
+
+			const data: Record<string, any> = {};
+			for (const [key, value] of (await request.formData()).entries())
+				data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
+
+			// TODO: Handle data: stworigin and stwaction
+			Socket.send(JSON.stringify({ method: "PUT", section: "modaldialog", body: `<label>Form data</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
 		}
 
-		return new Promise<Response>(resolve => {
-			const response = new Response(null, { status: 204 }); // 204 No content
-			resolve(response);
-		});
+		return response;
 	}
 );
 

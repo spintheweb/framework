@@ -26,7 +26,7 @@
             "query": "$..[_id=\"@_id\"]",
             "params": "",
             "layout": {
-                "en": "<label><span>Name</span><input name=\"name\"></label><label><span>Slug</span><input name=\"slug\"></label><label><span>Section</span><input name=\"section\"></label><label><span>CSS Class</span><input name=\"cssClass\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\"></label><br><button>Save</button><button formmethod=\"dialog\">Cancel</button>"
+                "en": "<label><span>Name</span><input name=\"name\"></label><label><span>Slug</span><input name=\"slug\"></label><label><span>Section</span><input name=\"section\"></label><label><span>CSS Class</span><input name=\"cssClass\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\"></label><br><button name=\"stwaction\" value=\"update\" formmethod=\"post\">Save</button><button formmethod=\"dialog\">Cancel</button>"
             }
         },
         {

@@ -45,10 +45,10 @@ export class STWSite extends STWElement {
 	 */
 	static get(): STWSite {
 		if (!STWSite.#instance) {
-			const webbase = Deno.env.get("WEBBASE") || "./public/.data/webbase.wbml";
+			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
 			STWSite.#instance = new STWSite(JSON.parse(Deno.readTextFileSync(webbase)));
 			if (!STWSite.#instance)
-				throw new Error(`Webbase '${webbase}' not found. Set WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
+				throw new Error(`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
 			STWSite.#instance.loadStudio();
 		}
 		return STWSite.#instance;
@@ -59,7 +59,7 @@ export class STWSite extends STWElement {
 	 */
 	loadStudio(): void {
 		try {
-			const webbaselet: ISTWArea = JSON.parse(Deno.readTextFileSync(Deno.env.get("STWSTUDIO") || "./stwStudio.wbml"));
+			const webbaselet: ISTWArea = JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml"));
 			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 			if (studio)
 				this.delete(studio._id);
@@ -67,7 +67,7 @@ export class STWSite extends STWElement {
 			STWSite.get().children[0].parent = STWSite.#instance;
 				
 		} catch (error) {
-			console.error(`Unable to load STW Studio '${Deno.env.get("STWSTUDIO")}'`, error);
+			console.error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`, error);
 		}
 	}
 
@@ -142,7 +142,7 @@ export class STWSite extends STWElement {
 			if (element.type === "Area" && element.children.length > 0)
 				element.children.forEach(child => _url(child));
 			else if (element.type === "Page" && element.isVisible(session) & 1)
-				fragment += `<url><loc>${element.permalink(session)}</loc><lastmod>${element.modified}</lastmod><priority>0.5</priority></url>\n`;
+				fragment += `<url><loc>${element.pathname(session)}</loc><lastmod>${element.modified}</lastmod><priority>0.5</priority></url>\n`;
 		}
 	}
 }
