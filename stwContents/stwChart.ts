@@ -1,5 +1,5 @@
 /**
- * Spin the Web Plot content
+ * Spin the Web Chart content
  * 
  * This content uses Chart.js for plotting data https://www.chartjs.org/
  * 
@@ -11,7 +11,7 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWDatasources } from "../stwDatasources.ts";
 
-export class STWPlot extends STWContent {
+export class STWChart extends STWContent {
 	// TODO: scripts should be loaded in the template, e.g. index.html
 	static scripts: string = `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`;
 
@@ -19,7 +19,7 @@ export class STWPlot extends STWContent {
 		super(content);
 	}
 	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(this);
+		const _records = STWDatasources.query(_session, this);
 
 		return `<canvas id="Chart${this._id}"></canvas>
 			<script onload="drawGraph('Chart${this._id}')">
@@ -44,4 +44,4 @@ export class STWPlot extends STWContent {
 	}
 }
 
-STWFactory.Plot = STWPlot;
+STWFactory.Chart = STWChart;

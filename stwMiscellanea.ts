@@ -7,7 +7,7 @@
 **/
 
 /**
- * Given text sprinkeled with placeholders, a placeholder is a variable prefixed with @ or \@@, replace the placeholders applying these rules:
+ * Given text sprinkeled with placeholders, a placeholder is a variable prefixed with \@, \@@ or \@@@, replace the placeholders applying these rules:
  * * Replace the placeholder with its value
  * * If the placeholder has no value and is inside square brackets ([]): remove everything within and including the square brackets and the first word next to the closing bracket (]) or the first word preceeding the opening bracket ([) 
  * * If the placeholder has a value and is inside square brackets simply remove the square brackets
@@ -17,24 +17,23 @@
  * 
  * TODO: remove trailing or leading word ... '' "". What practical use could `` have?
  * 
- * @param text Text sprinkeled with \@\<name> and/or \@@\<name>
- * @param exposed Placeholders that start with \@, they reference cookies or query string keys 
- * @param concealed Placeholders that start with \@@, they reference data source fields, session, application or server variables
+ * @param text Text sprinkeled with placeholders \@\<name>, \@@\<name> and or \@@@<name>
+ * @param placeholders Placeholders values
  * @returns 
  */
-export function processPlaceholders(text: string, exposed: Map<string, string | number | Date>, concealed: Map<string, string | number | Date>) {
+export function processPlaceholders(text: string, placeholders: Map<string, string>) {
 	text = text.replace(/(\b\s*|\W\s*)?(\[.*?\])(\s*\b|\s*\W)?/g, function (match, p1, p2, p3, _offset, _s) {
 		let flag: boolean = false;
-		match = match.replace(/(\/?@@?\*?[_a-z][a-z0-9_.$]*)/ig, function (_match, p1, _offset, _s) {
+		match = match.replace(/(\/?@@\*?[_a-z][a-z0-9_.$]*)/ig, function (_match, p1, _offset, _s) {
 			if (p1.charAt(0) === "/") return p1.substr(1);
 			if (p1.charAt(1) === '@') {
-				if (concealed.has(p1.substr(1))) {
+				if (placeholders.has(p1.substr(1))) {
 					flag = true;
-					return concealed.get(p1.substr(2)) instanceof Date ? (concealed.get(p1.substr(2)) as Date).toJSON() : concealed.get(p1.substr(2));
+					return placeholders.get(p1.substr(2));
 				}
-			} else if (exposed.has(p1.substr(1))) {
+			} else if (placeholders.has(p1.substr(1))) {
 				flag = true;
-				return exposed.get(p1.substr(1)) instanceof Date ? (exposed.get(p1.substr(1)) as Date).toJSON() : exposed.get(p1.substr(1));
+				return placeholders.get(p1.substr(1));
 			}
 			return '';
 		});
@@ -49,8 +48,8 @@ export function processPlaceholders(text: string, exposed: Map<string, string | 
 		if (p1.charAt(0) === '/')
 			return p1.substr(1);
 		if (p1.charAt(1) === '@') 
-			return concealed.get(p1.substr(2)) instanceof Date ? (concealed.get(p1.substr(2)) as Date).toJSON() : concealed.get(p1.substr(2)) || "";
+			return placeholders.get(p1.substr(2)) || "";
 		
-		return (exposed.get(p1.substr(1)) instanceof Date ? (exposed.get(p1.substr(1)) as Date).toJSON() : exposed.get(p1.substr(1))) || "";
+		return placeholders.get(p1.substr(1)) || "";
 	});
 }

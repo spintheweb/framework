@@ -45,6 +45,8 @@ export class STWSite extends STWElement {
 	 */
 	static get(): STWSite {
 		if (!STWSite.#instance) {
+			console.info(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
+
 			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
 			STWSite.#instance = new STWSite(JSON.parse(Deno.readTextFileSync(webbase)));
 			if (!STWSite.#instance)
@@ -58,18 +60,28 @@ export class STWSite extends STWElement {
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */
 	loadStudio(): void {
+		console.info(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
+
 		try {
-			const webbaselet: ISTWArea = JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml"));
+			if (URL.parse(Deno.env.get("STUDIO_WEBBASE"))) {
+				fetch(new URL(Deno.env.get("STUDIO_WEBBASE")))
+					.then(response => response.json())
+					.then(webbaselet => load(webbaselet))
+					.catch(_error => { throw _error });
+			} else
+				load(JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml")));
+
+		} catch (_error) {
+			console.error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`);
+		}
+
+		function load(webbaselet: ISTWArea) {
 			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 			if (studio)
-				this.delete(studio._id);
+				STWSite.#instance.delete(studio._id);
 
-			console.info(`Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
-			STWSite.get().children.unshift(new STWArea(webbaselet));
-			STWSite.get().children[0].parent = STWSite.#instance;
-				
-		} catch (_error) {
-			throw new Error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`);
+			STWSite.#instance.children.unshift(new STWArea(webbaselet));
+			STWSite.#instance.children[0].parent = STWSite.#instance;
 		}
 	}
 

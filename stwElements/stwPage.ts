@@ -29,7 +29,7 @@ export class STWPage extends STWElement {
 	 * @returns String array of contents ids
 	 */
 	contents(_session: STWSession): string[] {
-		const contents = this.children.filter(content => (content as STWContent).section !== "dialog" && content.isVisible(_session) & 1).map(content => content._id);
+		const contents = this.children.filter(content => !(content as STWContent).section.startsWith("stwDialog") && content.isVisible(_session) & 1).map(content => content._id);
 		climb(this.parent, contents);
 		return contents;
 
@@ -49,7 +49,7 @@ export class STWPage extends STWElement {
 	 * @returns - A response for the request
 	 */
 	override serve(req: Request, session: STWSession): Promise<Response> {
-		console.info(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
+		console.debug(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
 
 		return serveFile(req, `./public/${this.template}`);
 	}

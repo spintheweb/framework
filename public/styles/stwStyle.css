@@ -27,7 +27,7 @@ article:hover {
 	border-bottom: thin solid var(--base-color);
 }
 .dialog h1::after {
-	content: "x";
+	content: "&#10006;";
 }
 
 .stwForm label {
@@ -44,10 +44,4 @@ article:hover {
 .stwForm button {
 	padding: 0.5em; min-width: 7em;
 	margin: 0.5em 0;
-}
-
-.stwDebug {
-	position: absolute;
-	top: var(--padding);
-	right: var(--padding);
 }

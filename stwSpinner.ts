@@ -108,6 +108,8 @@ Deno.serve(
 			return new Promise<Response>(resolve => resolve(response));;
 		}
 
+		session.setPlaceholders(request);
+
 		const pathname = new URL(request.url).pathname;
 		const element = STWSite.get().find(session, pathname);
 
@@ -141,7 +143,7 @@ Deno.serve(
 			for (const [key, value] of (await request.formData()).entries())
 				data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
 
-			// TODO: Handle data: stworigin and stwaction
+			// TODO: Handle data: stwOrigin and stwAction
 			Socket.send(JSON.stringify({ method: "PUT", section: "modaldialog", body: `<label>Form data</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
 		}
 

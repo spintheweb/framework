@@ -35,9 +35,9 @@ function startWebsocket() {
 				return;
 		}
 
-		if (data.section === "stwDialog" || data.section === "stwModalDialog") {
+		if (data.section === "stwDialog" || data.section === "stwDialogModal") {
 			self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-			if (data.section === "stwModalDialog") {
+			if (data.section === "stwDialogModal") {
 				self.document.querySelector("dialog")?.remove();
 				self.document.querySelector("dialog")?.showModal();
 			} else

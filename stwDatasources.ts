@@ -11,7 +11,8 @@ import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
 import { processPlaceholders } from "./stwMiscellanea.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
-import { search as JSONPath } from "./deno-jmespath-0.2.2/index.ts";
+import { JSONPath } from "https://cdn.skypack.dev/jsonpath-plus";
+import { STWSession } from "./stwSession.ts";
 
 interface ISTWDatasource {
 	type: "stw" | "mysql" | "postgres" | "mongodb", // Datasource type
@@ -24,7 +25,7 @@ interface ISTWDatasource {
 export class STWDatasources {
 	static datasources: Map<string, STWSite | MySQLClient> = new Map();
 
-	static async query(content: STWContent): Promise<ExecuteResult> {
+	static async query(session: STWSession, content: STWContent): Promise<ExecuteResult> {
 		try {
 			if (!STWDatasources.datasources.size) {
 				STWDatasources.datasources.set("stw", STWSite.get()); // Webbase
@@ -51,15 +52,14 @@ export class STWDatasources {
 			if (content.dsn && content.query) {
 				const datasource = STWDatasources.datasources.get(content.dsn);
 				if (datasource instanceof STWSite)
-					return await new Promise<ExecuteResult>(resolve => resolve({
-						// deno-lint-ignore no-explicit-any
-						rows: [JSONPath(datasource as any, processPlaceholders(content.query, new Map(), new Map()))],
-					}));
+					return {
+						rows: [JSONPath({ path: processPlaceholders(content.query, session.placeholders), json: datasource })],
+					}
 				if (datasource instanceof MySQLClient)
-					return await datasource.execute(processPlaceholders(content.query, new Map(), new Map()));
+					return await datasource.execute(processPlaceholders(content.query, session.placeholders));
 			}
 		} catch (error) {
-			console.error(error);
+			throw error;
 		}
 		return await new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}

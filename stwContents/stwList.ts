@@ -14,7 +14,7 @@ export class STWList extends STWContent {
 		super(content);
 	}
 	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(this);
+		const _records = STWDatasources.query(_session, this);
 
 		return `Rendered ${this.constructor.name} <pre>${_records}</pre>`;
 	}

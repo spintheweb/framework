@@ -119,14 +119,14 @@
                     "visibility": {
                         "guests": true
                     },
-                    "subtype": "Plot",
+                    "subtype": "Chart",
                     "cssClass": null,
                     "section": "main",
                     "sequence": "4",
                     "dsn": "",
                     "query": "",
                     "params": "",
-                    "layout": {},
+                    "layout": { "en": "\\s('caption=\"This is a chart\" mode=\"bar\" header=\"This is the header\" footer=\"This is the footer\"')"},
                     "reference": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
                 }
             ],
