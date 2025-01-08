@@ -23,6 +23,9 @@ function startWebsocket() {
 				langs: navigator.languages,
 			}
 		}));
+		
+		// TODO: Update lang to reflect the session language, should each <article> have a lang attribute that reflects its language?
+		self.document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
 	};
 
 	ws.onmessage = event => {

@@ -80,7 +80,7 @@ Deno.serve(
 					const content = STWSite.get().find(session, resource);
 
 					if (content instanceof STWContent) {
-						const response = await content?.serve(request, session);
+						const response = await content?.serve(request, session, undefined);
 						if (response.status == 200)
 							data.resource[i] = await response.json();
 						else
@@ -119,9 +119,9 @@ Deno.serve(
 			if (!element && pathname.indexOf("/.") === -1) // Do not serve paths that have files or directories that begin with a dot
 				response = serveFile(request, `./public${pathname}`);
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
-				response = element.serve(request, session); // Serve page, area or site, for areas and sites handle their mainpage
+				response = element.serve(request, session, undefined); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (Socket && element?.type) {
-				const res = await element.serve(request, session);
+				const res = await element.serve(request, session, undefined);
 				if (res.status === 200) {
 					const text = await res.text();
 					Socket.send(text);

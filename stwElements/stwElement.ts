@@ -111,5 +111,6 @@ export abstract class STWElement {
 		return "";
 	};
 
-	abstract serve(req: Request, session: STWSession): Promise<Response>;
+	// deno-lint-ignore no-explicit-any
+	abstract serve(req: Request, session: STWSession, _shortcut: any): Promise<Response>;
 }

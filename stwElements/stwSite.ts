@@ -63,8 +63,8 @@ export class STWSite extends STWElement {
 		console.info(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
 
 		try {
-			if (URL.parse(Deno.env.get("STUDIO_WEBBASE"))) {
-				fetch(new URL(Deno.env.get("STUDIO_WEBBASE")))
+			if (URL.parse(Deno.env.get("STUDIO_WEBBASE") || "")) {
+				fetch(new URL(Deno.env.get("STUDIO_WEBBASE") || ""))
 					.then(response => response.json())
 					.then(webbaselet => load(webbaselet))
 					.catch(_error => { throw _error });
@@ -122,10 +122,11 @@ export class STWSite extends STWElement {
 		return result;
 	}
 
-	override serve(req: Request, session: STWSession): Promise<Response> {
+	// deno-lint-ignore no-explicit-any
+	override serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 
-		return page?.serve(req, session) ||
+		return page?.serve(req, session, undefined) ||
 			new Promise<Response>(resolve => {
 				const response = new Response(`Site ${this.localize(session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);

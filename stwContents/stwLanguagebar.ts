@@ -17,7 +17,7 @@ export class STWLanguagebar extends STWContent {
 		if (STWSite.get().langs.length == 1)
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		return super.serve(_req, _session);
+		return super.serve(_req, _session, undefined);
 	}
 
 	override render(_req: Request, _session: STWSession): string {

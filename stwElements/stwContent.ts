@@ -56,15 +56,16 @@ export abstract class STWContent extends STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	serve(req: Request, session: STWSession): Promise<Response> {
-		if (!this.isVisible(session))
+	// deno-lint-ignore no-explicit-any
+	serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
+		if (!_shortcut && !this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		console.debug(`${new Date().toISOString()}: ├─ ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		console.debug(`${new Date().toISOString()}: ├─ ${(_shortcut || this).type} (${(_shortcut || this).pathname(session)}) @${(_shortcut || this).section}.${(_shortcut || this).sequence} [${(_shortcut || this)._id}]`);
 
 		let debug: string = "";
 		if (session.debug && !this.pathname(session).startsWith("/stws/")) {
-			debug = `<a class="stwInfo" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}">&#128712;</a>`;
+			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
 		}
 
 		let layout;
@@ -83,9 +84,9 @@ export abstract class STWContent extends STWElement {
 		const data = {
 			method: "PUT",
 			id: this._id,
-			section: this.section,
-			sequence: this.sequence,
-			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${this.cssClass || "stw" + this.type}">
+			section: (_shortcut || this).section,
+			sequence: (_shortcut || this).sequence,
+			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(_shortcut || this).cssClass || "stw" + this.type}">
 				${debug}
 				${layout.settings.caption ? `<h1>${layout.settings.caption}</h1>` : ""}
 				${layout.settings.header ? `<header>${layout.settings.header}</header>` : ""}

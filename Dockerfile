@@ -13,4 +13,4 @@ COPY . .
 # Compile the main app so that it doesn't need to be compiled each startup/entry.
 RUN deno cache stwSpinner.ts
 
-CMD ["run", "--allow-net", "--allow-read", "--allow-env", "--env-file", "stwSpinner.ts"]
+CMD ["run", "--allow-net", "--allow-read", "--allow-env", "--env-file", "--allow-import", "stwSpinner.ts"]

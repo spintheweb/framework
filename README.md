@@ -41,4 +41,4 @@ A web spinner&mdash;a web server that understands WBML&mdash;receives a request 
 * The _session context_ stores the connected user, its associated roles and locale. When a new session is established, the user is preset to _guest_ and roles to _guests_.
 
 ## Spin the Web Studio
-Spin the Web Studio is a webbaselet that eases the development of a Spin the Web site. It is added to a site webbase and is accessible to developers (.i.e. users with a developers role), its contents interact directly with the underlying site webbase.
+Spin the Web Studio is a webbaselet that eases the development of a Spin the Web site. It is added to a site webbase and is accessible to developers (i.e. users with a developers role), its contents interact directly with the underlying site webbase. The latest release is available at this location https://www.spintheweb.org/resources/stwStudio.wbml.

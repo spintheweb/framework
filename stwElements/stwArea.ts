@@ -24,10 +24,11 @@ export class STWArea extends STWElement {
 		this.version = area.version || `v1.0.0 ${new Date().toISOString()}`
 	}
 
-	override serve(req: Request, session: STWSession): Promise<Response> {
+	// deno-lint-ignore no-explicit-any
+	override serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 
-		return page?.serve(req, session) ||
+		return page?.serve(req, session, undefined) ||
 			new Promise<Response>(resolve => {
 				const response = new Response(`Area '${this.localize(session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);

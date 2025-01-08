@@ -48,7 +48,8 @@ export class STWPage extends STWElement {
 	 * @param session The current session
 	 * @returns - A response for the request
 	 */
-	override serve(req: Request, session: STWSession): Promise<Response> {
+	// deno-lint-ignore no-explicit-any
+	override serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
 		console.debug(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
 
 		return serveFile(req, `./public/${this.template}`);
