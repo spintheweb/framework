@@ -4,6 +4,9 @@
     "name": {
         "en": "STW Studio"
     },
+    "description": {
+        "en": "Spin the Web studio webbaselet v1.0.0\nMIT License. Copyright (c) 2025 Giancarlo Trevisan"
+    },
     "slug": {
         "en": "stws"
     },
@@ -20,7 +23,7 @@
             "visibility": {},
             "subtype": "Form",
             "cssClass": null,
-            "section": "modaldialog",
+            "section": "stwModalDialog",
             "sequence": "1",
             "dsn": "stw",
             "query": "$..[_id=\"@_id\"]",
@@ -88,6 +91,7 @@
         }
     ],
     "visibility": {
+        "everyone": false,
         "developers": true
     },
     "mainpage": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef"

@@ -82,7 +82,7 @@ Deno.serve(
 					if (content instanceof STWContent) {
 						const response = await content?.serve(request, session);
 						if (response.status == 200)
-							data.resource[i] = await (await content?.serve(request, session)).json();
+							data.resource[i] = await response.json();
 						else
 							data.resource[i] = { method: "DELETE", id: content._id };
 						if (!--process)
@@ -98,7 +98,9 @@ Deno.serve(
 						return 0;
 					});
 					// deno-lint-ignore no-explicit-any
-					data.resource?.forEach((content: any) => Socket.send(JSON.stringify(content)));
+					data.resource?.forEach((content: any) => 
+						Socket.send(JSON.stringify(content))
+					);
 				}
 			};
 			Socket.onerror = error => console.error(error);
@@ -134,6 +136,7 @@ Deno.serve(
 		} else if (request.method == "POST") {
 			const maxupload = parseInt(Deno.env.get("MAX_UPLOADSIZE") || "200") * 1024;
 
+			// deno-lint-ignore no-explicit-any
 			const data: Record<string, any> = {};
 			for (const [key, value] of (await request.formData()).entries())
 				data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;

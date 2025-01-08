@@ -29,7 +29,7 @@
                     },
                     "subtype": "Table",
                     "cssClass": "stwTable",
-                    "section": "dialog",
+                    "section": "stwDialog",
                     "sequence": "1",
                     "dsn": "yuup",
                     "query": "SELECT * FROM psjx_cms_role",
@@ -119,14 +119,15 @@
                     "visibility": {
                         "guests": true
                     },
-                    "subtype": "Geomap",
+                    "subtype": "Plot",
                     "cssClass": null,
                     "section": "main",
                     "sequence": "4",
                     "dsn": "",
                     "query": "",
                     "params": "",
-                    "layout": {}
+                    "layout": {},
+                    "reference": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
                 }
             ],
             "visibility": {},
@@ -382,8 +383,8 @@
         "users": false,
         "editors": false
     },
-    "keywords": {},
-    "description": {},
+    "keywords": { "en": "stw" },
+    "description": { "en": "This site demonstrate..." },
     "mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
     "lang": "en",
     "langs": [

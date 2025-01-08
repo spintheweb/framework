@@ -14,20 +14,14 @@ export class STWLanguagebar extends STWContent {
 		super(content);
 	}
 	override serve(_req: Request, _session: STWSession): Promise<Response> {
-		if (!this.isVisible(_session) || STWSite.get().langs.length == 1)
+		if (STWSite.get().langs.length == 1)
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		const data = {
-			method: "PUT",
-			id: this._id,
-			section: this.section,
-			sequence: this.sequence,
-			body: `<nav>${STWSite.get().langs.reduce((langs, lang) => `${langs}<a href="/stw/language/${lang}">${lang.toUpperCase()}</a> `, "")}</nav>`,
-		};
-		return new Promise<Response>(resolve => {
-			const response = new Response(JSON.stringify(data));
-			resolve(response);
-		});
+		return super.serve(_req, _session);
+	}
+
+	override render(_req: Request, _session: STWSession): string {
+		return `<nav>${STWSite.get().langs.reduce((langs, lang) => `${langs}<a href="/stw/language/${lang}">${lang.toUpperCase()}</a> `, "")}</nav>`;
 	}
 }
 

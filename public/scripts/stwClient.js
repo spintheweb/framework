@@ -35,13 +35,20 @@ function startWebsocket() {
 				return;
 		}
 
-		if (data.section === "dialog" || data.section === "modaldialog") {
-			self.document.querySelector("dialog")?.remove();
+		if (data.section === "stwDialog" || data.section === "stwModalDialog") {
 			self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-			if (data.section === "modaldialog")
+			if (data.section === "stwModalDialog") {
+				self.document.querySelector("dialog")?.remove();
 				self.document.querySelector("dialog")?.showModal();
-			else
+			} else
 				self.document.querySelector("dialog")?.show();
+
+		} else if (data.section === "stwConsole") {
+			const stwConsole = self.document.getElementById("stwConsole");
+			if (stwConsole)
+				stwConsole.insertAdjacentHTML("beforeend", `<li onclick="this.remove()">${data.body}&#128473;</li>`);
+			else
+				self.document.body.insertAdjacentHTML("beforeend", `<ul id="stwConsole"><li onclick="this.remove()">${data.body}&#128473;</li></ul>`);
 
 		} else {
 			let insertion = self.document.getElementById(data.section);
@@ -51,37 +58,23 @@ function startWebsocket() {
 			});
 			insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
 		}
-		loadScripts(self.document.getElementById(data.id)?.querySelector("template[data-stwCallback]"));
+
+		// Load content script
+		const script = self.document.getElementById(data.id)?.querySelector("script[onload]");
+		if (script) {
+			const callback = script.onload, element = self.document.createElement("script");
+			element.insertAdjacentText("afterbegin", script.innerText);
+			self.document.head.append(element);
+			script.remove();
+
+			if (callback)
+				callback();
+		}
 	};
 
 	ws.onerror = err => {
 		console.error(err);
 		ws = null;
 		setTimeout(startWebsocket, 5000);
-	}
-
-	function loadScripts(scripts) {
-		const promises = [];
-		scripts?.content.querySelectorAll("script").forEach(code => {
-			const promise = new Promise((resolve, reject) => {
-				let script = self.document.createElement("script");
-				code.getAttributeNames().forEach(name => script.setAttribute(name, code.getAttribute(name)));
-				if (code.innerText)
-					script.insertAdjacentText("afterbegin", code.innerText);
-				script.onload = resolve;
-				script.onerror = reject;
-				self.document.head.append(script);
-			});
-			promises.push(promise);
-		});
-		if (promises.length > 0)
-			Promise.allSettled(promises)
-				.then(() => { 
-					[scripts.getAttribute("stwCallback")](); 
-					scripts.remove(); 
-				})
-				.catch(err => 
-					console.error(err)
-				);
 	}
 }

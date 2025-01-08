@@ -23,7 +23,7 @@ export class STWShortcut extends STWContent {
 		this.reference = STWSite.index.get(content.reference) as STWContent;
 	}
 	override serve(_req: Request, _session: STWSession): Promise<Response> {
-		if (!this.isVisible(_session) || !this.reference)
+		if (!this.isVisible(_session) || !this.reference || this.reference instanceof STWShortcut)
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
 		const data = {
@@ -31,7 +31,7 @@ export class STWShortcut extends STWContent {
 			id: this._id,
 			section: this.section,
 			sequence: this.sequence,
-			body: `Shortcut for ${this.reference}`,
+			body: this.reference.render(_req, _session),
 		};
 		return new Promise<Response>(resolve => {
 			const response = new Response(JSON.stringify(data));
@@ -40,4 +40,4 @@ export class STWShortcut extends STWContent {
 	}
 }
 
-STWFactory.Tree = STWShortcut;
+STWFactory.Shortcut = STWShortcut;

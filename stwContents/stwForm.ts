@@ -16,7 +16,7 @@ export class STWForm extends STWContent {
 		super(content);
 	}
 	override render(_req: Request, _session: STWSession): string {
-		// const _records = STWDatasources.query(this);
+		const _records = STWDatasources.query(this);
 
 		// If the form is inside a dialog, method="dialog"
 		return `<form method="${this.section.endsWith("dialog") ? "dialog" : ""}">

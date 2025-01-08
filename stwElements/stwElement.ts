@@ -90,7 +90,7 @@ export abstract class STWElement {
 		let ac!: number;
 
 		if (STWSite.get().mainpage === this._id)
-			ac = recurse ? 0b11 : 0b01; // Home page always visible
+			ac = recurse ? 0b11 : 0b01; // Main site page always visible
 
 		for (let i = 0; ac != 0b01 && i < session.roles.length; ++i)
 			if (this.visibility.has(session.roles[i]))

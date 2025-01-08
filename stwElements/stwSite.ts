@@ -63,11 +63,13 @@ export class STWSite extends STWElement {
 			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 			if (studio)
 				this.delete(studio._id);
+
+			console.info(`Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
 			STWSite.get().children.unshift(new STWArea(webbaselet));
 			STWSite.get().children[0].parent = STWSite.#instance;
 				
-		} catch (error) {
-			console.error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`, error);
+		} catch (_error) {
+			throw new Error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`);
 		}
 	}
 

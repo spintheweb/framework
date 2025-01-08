@@ -27,6 +27,7 @@ export abstract class STWContent extends STWElement {
 	query: string;
 	parameters: string;
 	layout: STWLocalized;
+	protected _layout!: Map<string, object>; // TODO: compiled version of layout
 
 	constructor(content: ISTWContent) {
 		super(content);
@@ -58,23 +59,19 @@ export abstract class STWContent extends STWElement {
 
 		let debug: string = "";
 		if (session.debug && !this.pathname(session).startsWith("/stws/")) {
-			debug = `<a class="stwDebug" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}"><i class="fas fa-sliders-h"></i></a>`;
+			debug = `<a class="stwDebug" href="/stws/content?_id=${this._id}" title="${this.type}: ${this.localize(session, "name")} §${this.section}:${this.sequence}">&#128712;</i></a>`;
 		}
 
 		let layout;
 		try {
 			layout = lexer(req, this.localize(session, "layout"));
+		// deno-lint-ignore no-explicit-any
 		} catch (error: any) {
 			return new Promise<Response>(resolve => resolve(new Response(JSON.stringify({
 				method: "PUT",
 				id: this._id,
-				section: this.section,
-				sequence: this.sequence,
-				body: `<article id="${this._id}" data-sequence="${this.sequence}" class="stwError">
-					${debug}
-					<h1>Syntax error</h1>
-					<samp>${error.message}</samp>
-				</article>`,
+				section: "stwProblems",
+				body: `<date>${Date.now()}</date><samp>${error.message}</samp>`,
 			}))));
 		}
 

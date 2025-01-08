@@ -1,6 +1,8 @@
 /**
  * Spin the Web Geomap content
  * 
+ * This content used OpenLayers to render maps
+ * 
  * Language: TypeScript for Deno
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
@@ -10,24 +12,26 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWDatasources } from "../stwDatasources.ts";
 
 export class STWGeomap extends STWContent {
+	// TODO: scripts should be loaded in the template, e.g. index.html
+	static scripts: string = `<script src="https://www.openlayers.org/api/OpenLayers.js"></script>`;
+
 	constructor(content: ISTWContent) {
 		super(content);
 	}
 	override render(_req: Request, _session: STWSession): string {
 		const _records = STWDatasources.query(this);
 
-		return `<div id="Map${this._id}" style="height:250px"></div>
-			<template data-stwCallback="stwLoadOpenLayersMap">
-				<!--script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/10.3.1/index.js" integrity="sha512-+o0vxcUhkW07ZmZ3vD13Wgt0bzTXqmUIbqNSyCWfBiEv8Ziq9BExylSJTQVjEvT6YU2Ob6Bq1MUPDnwn7U6Mng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script-->
-				<script>
-					function stwLoadOpenLayersMap() {
-						alert("Map it!"); return;
-						const map = new OpenLayers.Map("Map${this._id}");
+		return `<div id="Map${this._id}"></div>
+			<script onload="stwLoadOpenLayersMap('Map${this._id}')">
+				function stwLoadOpenLayersMap(id) {
+					if (typeof OpenLayers !== "undefined") {
+						map = new OpenLayers.Map(id);
 						map.addLayer(new OpenLayers.Layer.OSM());
 						map.zoomToMaxExtent();
-					}
-				</script>
-			</template>`;
+					} else
+					 	self.document.getElementById(id).innerHTML = 'OpenLayers not loaded, see <a target="_blank" href="https://openlayers.org/">https://openlayers.org/</a>';
+				}
+			</script>`;
 	}
 }
 
