@@ -6,9 +6,11 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
-import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { STWContent, ISTWContent, ISTWOption } from "../stwElements/stwContent.ts";
 
 export class STWMenu extends STWContent {
+	options!: ISTWOption[];
+
 	constructor(content: ISTWContent) {
 		super(content);
 	}

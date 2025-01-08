@@ -9,6 +9,11 @@ import { lexer } from "../stwContents/WBLL.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 
+export interface ISTWOption {
+	name: string;
+	pathname: string;
+}
+
 export interface ISTWContent extends ISTWElement {
 	subtype: string;
 	cssClass: string;

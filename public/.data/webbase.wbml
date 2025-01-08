@@ -119,9 +119,9 @@
                     "visibility": {
                         "guests": true
                     },
-                    "subtype": "Chart",
+                    "subtype": "Navigation",
                     "cssClass": null,
-                    "section": "main",
+                    "section": "leftSidebar",
                     "sequence": "4",
                     "dsn": "",
                     "query": "",
