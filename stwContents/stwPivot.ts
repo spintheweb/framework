@@ -1,5 +1,5 @@
 /**
- * Spin the Web Tree content
+ * Spin the Web Pivot content
  * 
  * Language: TypeScript for Deno
  * 
@@ -9,14 +9,14 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwDatasources.ts";
 
-export class STWTree extends STWContent {
+export class STWPivot extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
 
 	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		return `TODO: Render ${this.constructor.name} <pre>${_records}</pre>`;
+		return `TODO: Render ${this.constructor.name} for ${_session.user} <pre>${_records}</pre>`;
 	}
 }
 
-STWFactory.Tree = STWTree;
+STWFactory.Pivot = STWPivot;

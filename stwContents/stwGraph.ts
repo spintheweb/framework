@@ -7,16 +7,15 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWDatasources } from "../stwDatasources.ts";
+import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWGraph extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(_session, this);
 
-		return `Rendered ${this.constructor.name} <pre>${_records}</pre>`;
+	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+		return `TODO: Render ${this.constructor.name} <pre>${_records}</pre>`;
 	}
 }
 

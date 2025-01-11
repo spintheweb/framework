@@ -7,12 +7,14 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
-import { processPlaceholders } from "./stwMiscellanea.ts";
+import { rePlaceholders } from "./stwMiscellanea.ts";
+import { JSONPath } from "https://cdn.skypack.dev/pin/jsonpath-plus@v10.2.0-GvMkcF9wt4NgYRRcWkuH/mode=imports/optimized/jsonpath-plus.js";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
-import { JSONPath } from "https://cdn.skypack.dev/jsonpath-plus";
-import { STWSession } from "./stwSession.ts";
+
+export type ISTWRecords = ExecuteResult;
 
 interface ISTWDatasource {
 	type: "stw" | "mysql" | "postgres" | "mongodb", // Datasource type
@@ -52,15 +54,44 @@ export class STWDatasources {
 			if (content.dsn && content.query) {
 				const datasource = STWDatasources.datasources.get(content.dsn);
 				if (datasource instanceof STWSite)
-					return {
-						rows: [JSONPath({ path: processPlaceholders(content.query, session.placeholders), json: datasource })],
-					}
+					return await fetchWebbaseData(session, content);
 				if (datasource instanceof MySQLClient)
-					return await datasource.execute(processPlaceholders(content.query, session.placeholders));
+					return await datasource.execute(rePlaceholders(content.query, session.placeholders));
 			}
 		} catch (error) {
-			throw error;
+			console.error(error);
+//			throw error;
 		}
-		return await new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
+		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
+	}
+}
+
+/**
+ * This function queries the webbase using JSONPath
+ * 
+ * @param session The session
+ * @param content The content being rendered
+ * @returns The result set
+ */
+function fetchWebbaseData(session: STWSession, content: STWContent): Promise<ExecuteResult> {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve({
+				affectedRows: 1,
+				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: STWSite.get(), callback: localize })],
+			});
+		}, 1000); // Mock delay to simulate async behavior
+	});
+
+	/**
+	 * Given the session language include all the element locale neutral properties and only the localized versions of those localized
+	 * 
+	 * @param value 
+	 * @param type 
+	 * @param payload 
+	 */
+	// deno-lint-ignore no-explicit-any
+	function localize(_value: any, _type: any, _payload: any) {
+		console.info(_value, _type);
 	}
 }

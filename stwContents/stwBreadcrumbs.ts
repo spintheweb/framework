@@ -16,7 +16,7 @@ export class STWBreadcrumbs extends STWContent {
 	override render(_req: Request, _session: STWSession): string {
 		let body = "";
 		for (let element = STWSite.get().find(_session, new URL(_req.url).pathname); element; element = element.parent)
-			if (element.isVisible(_session) & 1)
+			if (element.isVisible(_session) & 1 && element.pathname(_session))
 				body = `/<a href="${element.pathname(_session)}">${element.name.get(_session.lang)}</a>` + body;
 
 		return `<nav>${body}</nav>`;

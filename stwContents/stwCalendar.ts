@@ -7,13 +7,15 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWCalendar extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override render(_req: Request, _session: STWSession): string {
-		return `Rendered ${this.constructor.name} for ${_session.user}`;
+
+	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+		return `TODO: Render ${this.constructor.name} for ${_session.user}`;
 	}
 }
 

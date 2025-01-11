@@ -12,8 +12,9 @@ export class STWImagemap extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
+	
 	override render(_req: Request, _session: STWSession): string {
-		return `Rendered ${this.constructor.name} for ${_session.user}`;
+		return `TODO: Render ${this.constructor.name} for ${_session.user}`;
 	}
 }
 

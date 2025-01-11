@@ -55,7 +55,7 @@ export class STWSite extends STWElement {
 		}
 		return STWSite.#instance;
 	}
-
+	
 	/**
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */

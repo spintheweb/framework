@@ -26,7 +26,7 @@
             "section": "stwDialogModal",
             "sequence": "1",
             "dsn": "stw",
-            "query": "..[?_id==\"{@_id}\"]",
+            "query": "$..[[?(\\@._id=='@_id')]]",
             "params": "",
             "layout": {
                 "en": "t('<label><span>Name</span><input name=\"name\" value\"@@name\"></label><label><span>Slug</span><input name=\"slug\" value\"@@slug\"></label><label><span>Section</span><input name=\"section\" value\"@@section\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\" value\"@@sequence\"></label><label><span>CSS Class</span><input name=\"cssClass\" value\"@@cssClass\"></label><br><button name=\"stwAction\" value=\"update\" formmethod=\"post\">Save</button><button formmethod=\"dialog\">Cancel</button>')"

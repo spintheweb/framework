@@ -9,19 +9,29 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWDatasources } from "../stwDatasources.ts";
+import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWForm extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(_session, this);
+
+	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+		let body = "";
+
+		if (_records.rows?.length) {
+			Object.entries(_records.rows[0]).forEach((key, value) => _session.placeholders.set(`@@${key}`, value.toString()));
+
+			// TODO: Render layout
+			Object.entries(_records.rows[0]).forEach((key, value) =>
+				body += `<label><span>${key}</span><input name="${key}" value="${value}"></label>`
+			);
+		}
 
 		// If the form is inside a dialog, method="dialog"
 		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : ""}">
 			<input type="hidden" name="stwOrigin" value="${this._id}">
-			${this.localize(_session, "layout")}
+			${body}
 		</form>`;
 	}
 }

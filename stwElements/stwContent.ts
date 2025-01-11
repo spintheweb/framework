@@ -6,12 +6,14 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { lexer } from "../stwContents/WBLL.ts";
+import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 
 export interface ISTWOption {
-	name: string;
-	pathname: string;
+	name: STWLocalized;
+	path?: string;
+	target?: string;
 }
 
 export interface ISTWContent extends ISTWElement {
@@ -57,11 +59,11 @@ export abstract class STWContent extends STWElement {
 	}
 
 	// deno-lint-ignore no-explicit-any
-	serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
+	async serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
 		if (!_shortcut && !this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		console.debug(`${new Date().toISOString()}: ├─ ${(_shortcut || this).type} (${(_shortcut || this).pathname(session)}) @${(_shortcut || this).section}.${(_shortcut || this).sequence} [${(_shortcut || this)._id}]`);
+		console.debug(`${new Date().toISOString()}: ${_shortcut ? "│└" : "├─"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
 		if (session.debug && !this.pathname(session).startsWith("/stws/")) {
@@ -90,14 +92,14 @@ export abstract class STWContent extends STWElement {
 				${debug}
 				${layout.settings.caption ? `<h1>${layout.settings.caption}</h1>` : ""}
 				${layout.settings.header ? `<header>${layout.settings.header}</header>` : ""}
-				${this.render(req, session)}
+				${this.render(req, session, await STWDatasources.query(session, this))}
 				${layout.settings.footer ? `<footer>${layout.settings.footer}</footer>` : ""}
 			</article>`,
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}
 
-	render(_req: Request, _session: STWSession): string {
-		return `Rendered ${this.constructor.name}`;
+	render(_req: Request, _session: STWSession, _record: ISTWRecords): string {
+		return `Render ${this.constructor.name}`;
 	}
 }

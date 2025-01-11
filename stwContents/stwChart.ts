@@ -9,7 +9,7 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWDatasources } from "../stwDatasources.ts";
+import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWChart extends STWContent {
 	// TODO: scripts should be loaded in the template, e.g. index.html
@@ -18,9 +18,8 @@ export class STWChart extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
-	override render(_req: Request, _session: STWSession): string {
-		const _records = STWDatasources.query(_session, this);
 
+	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return `<canvas id="Chart${this._id}"></canvas>
 			<script onload="drawGraph('Chart${this._id}')">
 				function drawGraph(id) {

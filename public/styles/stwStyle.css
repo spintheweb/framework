@@ -1,6 +1,12 @@
 :root {
+	color-scheme: light dark;
+	--background-light: white;
+	--foreground-light: black;
+	--background-dark: black;
+	--foreground-dark: white;
+
 	--padding: 0.25em;
-	--base-color: red;
+	--special-color: red;
 }
 
 body {
@@ -12,6 +18,7 @@ article {
 	position: relative;
 	padding: var(--padding);
 }
+
 article:hover {
 	background-color: rgba(0, 0, 0, 0.05);
 }
@@ -23,9 +30,11 @@ article:hover {
 .dialog {
 	font-size: smaller;
 }
+
 .dialog h1 {
-	border-bottom: thin solid var(--base-color);
+	border-bottom: thin solid var(--special-color);
 }
+
 .dialog h1::after {
 	content: "&#10006;";
 }
@@ -34,14 +43,59 @@ article:hover {
 	display: inline-grid;
 	font-weight: bolder;
 }
+
 .stwForm label>span {
 	font-size: smaller;
 }
+
 .stwForm label>input {
 	padding: var(--padding);
 	margin: var(--padding) var(--padding) var(--padding) 0;
 }
+
 .stwForm button {
-	padding: 0.5em; min-width: 7em;
+	padding: 0.5em;
+	min-width: 7em;
 	margin: 0.5em 0;
+}
+
+.stwNavigation nav {
+	list-style-type: none;
+}
+
+.stwNavigation li {
+	padding: var(--padding);
+}
+
+.stwNavigation a {
+	display: block;
+	text-overflow: ellipsis;
+}
+
+.stwHOrientation {
+	display: flex;
+}
+
+@media (prefers-color-scheme: light) {
+	.stwSelected {
+		color: var(--background-dark);
+		background-color: var(--foreground-light);
+	}
+
+	.stwNavigation li:has(a):hover {
+		background-color: var(--background-dark);
+		color: var(--foreground-light);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.stwSelected {
+		color: var(--foreground-light);
+		background-color: var(--foreground-dark);
+	}
+
+	.stwNavigation li:has(a):hover {
+		background-color: var(--background-light);
+		color: var(--foreground-dark);
+	}
 }

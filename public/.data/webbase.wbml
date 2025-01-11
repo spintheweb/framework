@@ -119,7 +119,7 @@
                     "visibility": {
                         "guests": true
                     },
-                    "subtype": "Shortcut",
+                    "subtype": "Navigation",
                     "cssClass": null,
                     "section": "leftSidebar",
                     "sequence": "4",
