@@ -8,7 +8,7 @@
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
+import { STWLayout } from "../stwContents/wbll2.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWNavigation}, {@linkcode STWTabs} and {@linkcode STWImagemap}
@@ -58,18 +58,13 @@ export abstract class STWContent extends STWElement {
 		return this.layout.get(session.lang) || new STWLayout("");
 	}
 
-	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description" | "layout", value: string = ""): string {
+	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
 		if (value) {
 			value = name === "slug" ? value.replace(/[^a-z0-9_]/gi, "").toLowerCase() : value;
 			this[name].set(session.lang, value);
 			return value;
 		}
 		return this[name].get(session.lang) || "";
-	}
-
-	// deno-lint-ignore no-explicit-any
-	private localizeLayout(session: STWSession): any {
-		return this._layout.get(session.lang);
 	}
 
 	// deno-lint-ignore no-explicit-any
@@ -84,7 +79,7 @@ export abstract class STWContent extends STWElement {
 			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
 		}
 
-		const layout = this.localizeLayout(session);
+		const layout = this.layout.get(session.lang);
 
 		const data = {
 			method: "PUT",
@@ -93,10 +88,10 @@ export abstract class STWContent extends STWElement {
 			sequence: (_shortcut || this).sequence,
 			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(_shortcut || this).cssClass || "stw" + this.type}">
 				${debug}
-				${layout.settings.caption ? `<h1>${layout.settings.caption}</h1>` : ""}
-				${layout.settings.header ? `<header>${layout.settings.header}</header>` : ""}
+				${layout?.settings.get("caption") ? `<h1>${layout?.settings.get("caption")}</h1>` : ""}
+				${layout?.settings.get("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
 				${this.render(req, session, await STWDatasources.query(session, this))}
-				${layout.settings.footer ? `<footer>${layout.settings.footer}</footer>` : ""}
+				${layout?.settings.get("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
 			</article>`,
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
