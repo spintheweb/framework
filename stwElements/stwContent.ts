@@ -8,7 +8,6 @@
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
-import { STWLayout } from "../stwContents/wbll2.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWNavigation}, {@linkcode STWTabs} and {@linkcode STWImagemap}
