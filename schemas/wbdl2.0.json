@@ -1,0 +1,224 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.spintheweb.org/wbdl2.0.json",
+    "title": "Webbase Description Language",
+    "description": "A language for describing sites",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "description": "The unique identifier of the webbase",
+            "type": "string",
+            "format": "uuid"
+        },
+        "_idParent": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "site",
+                "area",
+                "page",
+                "content"
+            ]
+        },
+        "name": {
+            "$ref": "#/$defs/translation"
+        },
+        "status": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "pattern": "^([A-Z])$"
+        },
+        "visibility": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "patternProperties": {
+                "^([a-z0-9_]{1,25})?$": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "children": {
+            "type": "array",
+            "items": {
+                "$ref": "#"
+            }
+        }
+    },
+    "unevaluatedProperties": false,
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "site"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "lang": {
+                        "type": "string",
+                        "pattern": "^([a-z]{2}(-[A-Z]{2})?)$"
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "mainpage": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "keywords": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "description": {
+                        "$ref": "#/$defs/translation"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "area"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "mainpage": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "keywords": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "description": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "slug": {
+                        "$ref": "#/$defs/translation"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "page"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "keywords": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "description": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "slug": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "template": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "content"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "slug": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "subtype": {
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "serversidecode"
+                        ]
+                    },
+                    "section": {
+                        "type": "string"
+                    },
+                    "sequence": {
+                        "type": "number"
+                    },
+                    "dsn": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "query": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "parameters": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "layout": {
+                        "$ref": "#/$defs/translation"
+                    },
+                    "cssCLass": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    ],
+    "$defs": {
+        "translation": {
+            "type": "object",
+            "patternProperties": {
+                "^([a-z]{2}(-[A-Z]{2})?)$": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

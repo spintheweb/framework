@@ -5,15 +5,19 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { lexer } from "../stwContents/WBLL.ts";
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
+import { STWLayout } from "../stwContents/wbll.ts";
 
+/**
+ * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWNavigation}, {@linkcode STWTabs} and {@linkcode STWImagemap}
+ */
 export interface ISTWOption {
 	name: STWLocalized;
 	path?: string;
 	target?: string;
+	options?: ISTWOption[];
 }
 
 export interface ISTWContent extends ISTWElement {
@@ -33,8 +37,7 @@ export abstract class STWContent extends STWElement {
 	dsn: string;
 	query: string;
 	parameters: string;
-	layout: STWLocalized;
-	protected _layout!: Map<string, object>; // TODO: compiled version of layout
+	protected layout!: Map<string, STWLayout>;
 
 	constructor(content: ISTWContent) {
 		super(content);
@@ -46,7 +49,13 @@ export abstract class STWContent extends STWElement {
 		this.dsn = content.dsn;
 		this.query = content.query;
 		this.parameters = content.parameters;
-		this.layout = new Map(Object.entries(content.layout || {}));
+
+		for (const [lang, layout] of Object.entries(content.layout))
+			this.layout.set(lang, new STWLayout(layout));
+	}
+
+	getLayout(session: STWSession): STWLayout {
+		return this.layout.get(session.lang) || new STWLayout("");
 	}
 
 	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description" | "layout", value: string = ""): string {
@@ -56,6 +65,11 @@ export abstract class STWContent extends STWElement {
 			return value;
 		}
 		return this[name].get(session.lang) || "";
+	}
+
+	// deno-lint-ignore no-explicit-any
+	private localizeLayout(session: STWSession): any {
+		return this._layout.get(session.lang);
 	}
 
 	// deno-lint-ignore no-explicit-any
@@ -70,18 +84,7 @@ export abstract class STWContent extends STWElement {
 			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
 		}
 
-		let layout;
-		try {
-			layout = lexer(req, this.localize(session, "layout"));
-		// deno-lint-ignore no-explicit-any
-		} catch (error: any) {
-			return new Promise<Response>(resolve => resolve(new Response(JSON.stringify({
-				method: "PUT",
-				id: this._id,
-				section: "stwProblems",
-				body: `<date>${Date.now()}</date><samp>${error.message}</samp>`,
-			}))));
-		}
+		const layout = this.localizeLayout(session);
 
 		const data = {
 			method: "PUT",

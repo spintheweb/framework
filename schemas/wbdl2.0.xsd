@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema version="1.0"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified">
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+      WBDL 2.0 (Webbase Description Language Schema) https://github.com/spintheweb/schemas/wbdl2.0.xsd
+      The purpose of this schema is to formalize the description of a web site in terms of structure, navigation and contents.
+      Copyright (c) 2016 KeyVisions (TM)
+        </xs:documentation>
+    </xs:annotation>
+    <xs:element name="wbdl">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element name="webbase" type="webbaseType" />
+                <xs:element name="webbaselet" type="webbaseletType" />
+            </xs:choice>
+            <xs:attribute name="version" type="xs:decimal" fixed="1.0"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType abstract="true" name="baseType">
+        <xs:sequence>
+            <xs:element name="title" type="textType" minOccurs="1"/>
+            <xs:element name="slug" type="textType" minOccurs="1"/>
+            <xs:element name="keywords" type="textType" minOccurs="0"/>
+            <xs:element name="description" type="textType" minOccurs="0"/>
+            <xs:element name="vcl" type="vclType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="script" type="textType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attribute name="guid" type="guid" use="required"/>
+        <xs:attribute name="created" type="xs:dateTime" use="required"/>
+        <xs:attribute name="modified" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="webbaseType">
+        <xs:complexContent>
+            <xs:extension base="baseType">
+                <xs:sequence>
+                    <xs:element name="security" type="securityType" minOccurs="0"/>
+                    <xs:element name="texts" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="predefined" type="textType" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="datasources" type="datasourcesType" minOccurs="0"/>
+                    <xs:element name="area" type="areaType" minOccurs="1"/>
+                </xs:sequence>
+                <xs:attribute name="lang" type="xs:language" use="required"/>
+                <xs:attribute name="url" type="xs:anyURI" use="required"/>
+                <xs:attribute name="mainpage" type="xs:IDREF" use="required"/>
+                <xs:attribute name="key" type="xs:normalizedString" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="webbaseletType">
+        <xs:sequence>
+            <xs:element name="datasources" type="datasourcesType" minOccurs="0"/>
+            <xs:element name="security" type="securityType" minOccurs="0"/>
+            <xs:choice>
+                <xs:element name="area" type="areaType"/>
+                <xs:element name="page" type="pageType"/>
+                <xs:element name="content" type="contentType"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="lang" type="xs:language" use="required"/>
+        <xs:attribute name="key" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="guid" type="guid" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="areaType">
+        <xs:complexContent>
+            <xs:extension base="baseType">
+                <xs:sequence>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="area" type="areaType" minOccurs="0"/>
+                        <xs:element name="page" type="pageType" minOccurs="0"/>
+                    </xs:choice>
+                </xs:sequence>
+                <xs:attribute name="mainpage" type="xs:IDREF"/>
+                <xs:attribute name="sequence" type="xs:decimal"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="pageType">
+        <xs:complexContent>
+            <xs:extension base="baseType">
+                <xs:sequence>
+                    <xs:element name="visibility" type="textType" minOccurs="0"/>
+                    <xs:element name="content" type="contentType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="template" type="xs:normalizedString" use="required"/>
+                <xs:attribute name="content-type" type="xs:normalizedString" default="text/html"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="contentType">
+        <xs:complexContent>
+            <xs:extension base="baseType">
+                <xs:sequence>
+                    <xs:element name="data" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="src" type="xs:IDREF"/>
+                                    <xs:attribute name="preprocess" type="xs:boolean"/>
+                                    <xs:attribute name="parameters" type="xs:normalizedString"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="renderas" type="contentEnum" default="form"/>
+                <xs:attribute name="section" type="xs:NCName"/>
+                <xs:attribute name="sequence" type="xs:decimal"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="vclType">
+        <xs:attribute name="allow" type="xs:IDREFS"/>
+        <xs:attribute name="deny" type="xs:IDREFS"/>
+    </xs:complexType>
+
+    <xs:complexType name="textType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="text">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="lang" type="xs:language" use="required"/>
+                            <xs:attribute name="modified" type="xs:dateTime" use="required"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="linksType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="link">
+                <xs:complexType>
+                    <xs:sequence maxOccurs="1" minOccurs="0">
+                        <xs:element name="link" type="linksType"/>
+                        <xs:element name="title" type="textType"/>
+                    </xs:sequence>
+                    <xs:attribute name="target" type="xs:IDREF"/>
+                    <xs:attribute name="parameters" type="xs:normalizedString"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="datasourcesType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="datasource">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:normalizedString">
+                            <xs:attribute name="id" type="xs:ID" use="required"/>
+                            <xs:attribute name="cnnstr" type="xs:string" use="optional"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="securityType">
+        <xs:sequence>
+            <xs:element name="group" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="id" use="required" type="xs:ID"/>
+                    <xs:attribute name="name" use="required" type="xs:NCName"/>
+                    <xs:attribute name="description" type="xs:normalizedString"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="user" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="id" use="required" type="xs:ID"/>
+                    <xs:attribute name="name" type="xs:NCName" use="required"/>
+                    <xs:attribute name="fullname" type="xs:normalizedString" use="required"/>
+                    <xs:attribute name="description" type="xs:normalizedString"/>
+                    <xs:attribute name="password" type="xs:normalizedString"/>
+                    <xs:attribute name="memberof" type="xs:IDREFS" use="optional"/>
+                    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="contentEnum">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="form"/>
+            <xs:enumeration value="list"/>
+            <xs:enumeration value="table"/>
+            <xs:enumeration value="tree"/>
+            <xs:enumeration value="graph"/>
+            <xs:enumeration value="chart"/>
+            <xs:enumeration value="dial"/>
+            <xs:enumeration value="map"/>
+            <xs:enumeration value="calendar"/>
+            <xs:enumeration value="tabs"/>
+            <xs:enumeration value="arealinks"/>
+            <xs:enumeration value="pagelinks"/>
+            <xs:enumeration value="slicer"/>
+            <xs:enumeration value="pathlink"/>
+            <xs:enumeration value="imagemap"/>
+            <xs:enumeration value="serversidecode"/>
+            <xs:enumeration value="clientsidecode"/>
+            <xs:enumeration value="shortcut"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="guid">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
