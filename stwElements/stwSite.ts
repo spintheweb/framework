@@ -10,7 +10,6 @@ import { ISTWArea, STWArea } from "./stwArea.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
 
 interface ISTWSite extends ISTWElement {
-	lang: string;
 	langs: string[];
 	roles: object;
 	datasources: object;
@@ -22,7 +21,6 @@ export class STWSite extends STWElement {
 
 	static index: Map<string, STWElement> = new Map();
 
-	lang: string;
 	langs: string[];
 	datasources: Map<string, string>;
 	mainpage: string;
@@ -31,7 +29,6 @@ export class STWSite extends STWElement {
 	private constructor(site: ISTWSite) {
 		super(site);
 
-		this.lang = site.lang || "en";
 		this.langs = site.langs || ["en"];
 		this.datasources = new Map(Object.entries(site.datasources || { name: "STW", value: "" }));
 		this.mainpage = site.mainpage;
@@ -140,7 +137,7 @@ export class STWSite extends STWElement {
 		return '<?xml version="1.0" encoding="utf-8"?>\n' +
 			'<wbml version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://webspinner.org" xsi:schemaLocation="https://webspinner.org/schemas wbol.xsd">\n' +
 			`<!--Spin the Web (TM) webbase generated ${(new Date()).toISOString()}-->\n` +
-			`<site id="${this._id}" language="${this.lang}" languages="${this.langs}" mainpage="${this.mainpage}">\n${super.export()}${fragment}</site>\n` +
+			`<site id="${this._id}" language="${this.langs[0]}" languages="${this.langs}" mainpage="${this.mainpage}">\n${super.export()}${fragment}</site>\n` +
 			'</wbml>';
 	}
 

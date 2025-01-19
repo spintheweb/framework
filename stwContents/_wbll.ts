@@ -2,17 +2,16 @@
  * Spin the Web WBLL - Webbabse Layout Language
  * 
  * Given a text layout, tokenize it (lex it), the tokenized layout is then ready to be rendered.
- * Rendering is session defined, first all placeholders are replaced then content specific renderings are applied.
+ * Rendering is session specific, first all placeholders are replaced then content specific renderings are applied.
  * 
  * Language: TypeScript for Deno
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { rePlaceholders } from "../stwMiscellanea.ts";
 import { STWSession } from "../stwSession.ts";
 
 const SYNTAX: RegExp = new RegExp([
-	/(\\[aAs])(?:\('([^]*?)'\))/,
+	/(\\[aAs])(?:\('([^]+?)'\))/,
 	/(\\[rnt])(?:\('([^]*?)'\))?/,
 	/(?:([aAbo]))(?:\('([^]*?)'\))?((<|>|p(\('[^]*?'\))?)*)/,
 	/(?:([cefhilmruwxyz]))(?:\('([^]*?)'\))?/,
@@ -20,18 +19,23 @@ const SYNTAX: RegExp = new RegExp([
 	/(?:([jJtT]))(?:\('([^]*?)'\))/,
 	/\/\/.*$/,
 	/\/\*[^]*(\*\/)?/,
-	/([<>])/, // TODO: Group consecutive moves
+	/([<>]+)/, // TODO: Group consecutive moves
 	/(?<error>[\S])/ // Anything else is an error
-].map(r => r.source).join('|'), 'gmu');
+].map(r => r.source).join('|'), "gmu");
 
 class STWToken {
 	symbol: string;
 	args: string[] = [];
-	params: Map<string, string> = new Map();
+	params: STWToken[] = []; // Only p, < and > symbols allowed
 	attrs: Map<string, string> = new Map();
+	text?: STWToken;
 
-	constructor(symbol: string) {
+	constructor(symbol: string, args?: string[], params?: STWToken[], attrs?: Map<string, string>, text?: STWToken) {
 		this.symbol = symbol;
+		if (args) this.args = args;
+		if (params) this.params = params;
+		if (attrs) this.attrs = new Map(attrs);
+		this.text = text;
 	}
 }
 
@@ -54,56 +58,43 @@ export class STWLayout {
 			const pattern = expression.filter((value, i) => (value !== undefined && i));
 
 			if (pattern[0]) {
-				let token = new STWToken(pattern[0]);
+				const token = new STWToken(pattern[0]);
 
-				if ("\\a\\s\\A".indexOf(token.symbol) != -1) {
+				if (token.symbol[0] == "\\" && "\\a\\s\\A\\t\\n".indexOf(token.symbol) != -1) {
 					for (const attr of pattern[1].matchAll(/([a-zA-Z0-9-_]+)(?:=(["'])([^]*?)\2)?/gmu))
 						token.attrs.set(attr[1], attr[3] || "true");
-					if (token.symbol == "\\s") {
+					if (token.symbol == "\\s")
 						this.settings = new Map(token.attrs);
-						this.settings.set("class", "");
-						continue;
-					}
-					if (this.settings.size && token.symbol == "\\a" && !Object.keys(token).length) {
-						token.attrs.set("class", token.attrs.get("class") || "");
-						continue;
-					}
+					else if (token.symbol == "\\a" && this.tokens.at(-1))
+						(this.tokens.at(-1) as STWToken).attrs = token.attrs;
+					else
+						this.tokens.push(token);
+					continue;
 
-				} else if ("tTjJ".indexOf(token.symbol) != -1) {
-					token.args = ["", "", expression[1]];
-
-				} else if (expression[1]) {
-					token.args = token.symbol == 'h' ? [""] : [];
-					for (const arg of (expression[1] + ';').matchAll(/(?:(=?(["']?)[^]*?\2));/gmu))
+				} else if (pattern[1]) {
+					token.args = "chrw".indexOf(token.symbol) != -1 ? [""] : []; // No format
+					for (const arg of (pattern[1] + ';').matchAll(/(?:(=?(["']?)[^]*?\2));/gmu))
 						token.args.push(arg[1]);
 				}
 
-				if (expression[2]?.match("^[<>p]")) {
-					for (const symbol of expression[2].matchAll(/(<|>|p(?:\('([^]*?)'\)?)?)/gmu)) {
+				if (pattern[2]?.match("^[<>p]")) {
+					for (const symbol of pattern[2].matchAll(/(<|>|p(?:\('([^]*?)'\)?)?)/gmu)) {
 						if (symbol[2]) {
 							const pair = [...symbol[2].matchAll(/([a-zA-Z0-9-_]*)(?:;([^]*))?/gmu)][0];
-							token.params.push({ symbol: 'p', name: pair[1], value: pair[2] || "@@" });
+
+							this.tokens.at(-1)?.params.push(new STWToken("p", [pair[1], pair[2] || "@@"]));
 						} else
-							token.params.push({ symbol: symbol[0][0], value: "@@" });
+							token.params.push(new STWToken(symbol[0][0]));
 					}
 				}
 
-				if (token.symbol == '\\a' && (token.symbol == '\\t' || token.symbol != '\\')) {
-					token = this.tokens.pop();
-					if (token.content)
-						token.content.attrs = attrs;
-					else
-						token.attrs = Object.assign(token.attrs || {}, attrs);
+				if ("fitvxyz".indexOf(token.symbol) != -1 && this.tokens.at(-1) && "aA".indexOf(this.tokens.at(-1)?.symbol || "") != -1 && !this.tokens.at(-1)?.text) {
+					(this.tokens.at(-1) as STWToken).text = token;
+					continue;
 
-				} else if (!token.content && "aAbB".indexOf(token.symbol) != -1 && "fitvxyz".indexOf(token.symbol) != -1) {
-					this.tokens.pop();
-
-				} else {
-					if (token.symbol == "A") {
-						token.symbol = "a";
-						token.attrs.set("target", "_blank");
-					}
-					token.args = token.args || ["@@"];
+				} else if (token.symbol == "A") {
+					token.symbol = "a";
+					token.attrs.set("target", "_blank");
 				}
 
 				this.tokens.push(token);
@@ -115,12 +106,12 @@ export class STWLayout {
 		return this;
 	}
 
-	render(req: Request, session: STWSession): string {
-		const layout = this.replaceholders(session);
+	render(_req: Request, session: STWSession): string {
+		const _layout = this.replaceholders(session);
 		return "";
 	}
 }
-
+/*
 export function renderAttributes(req: Request, attrs: string[]) {
 	let html = '';
 	if (attrs)
@@ -184,7 +175,7 @@ export function renderer(req: Request, contentId: string, layout: string, flags:
 				case 'a':
 					str = token.args ? token.args[0] : '@@';
 					html += `<a href="${renderParameters(req, str, token.params)}" ${renderAttributes(req, token.attrs)}>
-                        ${renderer(req, contentId, { settings: layout.settings, tokens: [token.content || { symbol: 't', args: [str] }] }, 0b0001)}</a>`;
+						${renderer(req, contentId, { settings: layout.settings, tokens: [token.content || { symbol: 't', args: [str] }] }, 0b0001)}</a>`;
 					continue;
 				case 'b':
 					// TODO: Table buttons?
@@ -194,7 +185,7 @@ export function renderer(req: Request, contentId: string, layout: string, flags:
 						str = '@@';
 					token.params.stwHandler = contentId;
 					html += `<button formaction="${renderParameters(req, str, token.params)}" ${renderAttributes(req, token.attrs)}>
-                        ${renderer(req, contentId, { settings: layout.settings, tokens: [token.content || { symbol: 't', args: [''] }] } || str, 0b0001)}</button>`;
+						${renderer(req, contentId, { settings: layout.settings, tokens: [token.content || { symbol: 't', args: [''] }] } || str, 0b0001)}</button>`;
 					continue;
 				case 'c':
 					token.attrs = token.attrs || {};
@@ -214,7 +205,7 @@ export function renderer(req: Request, contentId: string, layout: string, flags:
 				case 'h':
 					token.attrs = token.attrs || {};
 					token.attrs.type = 'hidden';
-				/* falls through */
+				// falls through 
 				case 'e':
 					token.attrs = token.attrs || {};
 					token.attrs.name = getName(req, token.args[1]);
@@ -308,3 +299,4 @@ export function renderer(req: Request, contentId: string, layout: string, flags:
 		return thead;
 	return html + ((flags & 0b1000) == 0b1000 ? '</td>' : '');
 }
+*/

@@ -8,6 +8,7 @@
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
+import { STWLayout } from "../stwContents/_wbll.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWNavigation}, {@linkcode STWTabs} and {@linkcode STWImagemap}
@@ -49,8 +50,11 @@ export abstract class STWContent extends STWElement {
 		this.query = content.query;
 		this.parameters = content.parameters;
 
-		for (const [lang, layout] of Object.entries(content.layout))
-			this.layout.set(lang, new STWLayout(layout));
+		if (content.layout) {
+			this.layout = new Map();
+			for (const [lang, wbll] of Object.entries(content.layout))
+				this.layout.set(lang, new STWLayout(wbll));
+		}
 	}
 
 	getLayout(session: STWSession): STWLayout {
@@ -78,7 +82,7 @@ export abstract class STWContent extends STWElement {
 			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
 		}
 
-		const layout = this.layout.get(session.lang);
+		const layout = this?.layout.get(session.lang);
 
 		const data = {
 			method: "PUT",
