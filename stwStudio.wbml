@@ -52,7 +52,7 @@
                         "en": "search"
                     },
                     "visibility": {},
-                    "subtype": "Form",
+                    "subtype": "Text",
                     "cssClass": null,
                     "section": "main",
                     "sequence": "1",
@@ -81,7 +81,7 @@
                     "query": "$.._id",
                     "params": "",
                     "layout": {
-                        "en": "These are the elements"
+                        "en": "\\s('caption=\"These are the elements\"')"
                     }
                 }
             ],

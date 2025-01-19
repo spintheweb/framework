@@ -50,10 +50,15 @@ export abstract class STWContent extends STWElement {
 		this.query = content.query;
 		this.parameters = content.parameters;
 
-		if (content.layout) {
+		if (["Text", "Script", "Shortcut"].includes(this.type) == false && content.layout) {
 			this.layout = new Map();
-			for (const [lang, wbll] of Object.entries(content.layout))
-				this.layout.set(lang, new STWLayout(wbll));
+			for (const [lang, wbll] of Object.entries(content.layout)) {
+				try {
+					this.layout.set(lang, new STWLayout(wbll));
+				} catch (error) {
+					throw SyntaxError(`${this.type} (${this.name.entries().next().value}) @${this.section}.${this.sequence} [${this._id}]\n └ Layout: ${(error as Error).message}`);
+				}
+			}
 		}
 	}
 
@@ -82,7 +87,7 @@ export abstract class STWContent extends STWElement {
 			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
 		}
 
-		const layout = this?.layout.get(session.lang);
+		const layout = this.layout?.get(session.lang);
 
 		const data = {
 			method: "PUT",

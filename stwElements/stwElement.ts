@@ -74,7 +74,7 @@ export abstract class STWElement {
 			this[name].set(session.lang, value);
 			return value;
 		}
-		return this[name].get(session.lang) || "";
+		return this[name].get(session.lang) || this[name].keys().next().value || "undefined";
 	}
 
 	/**

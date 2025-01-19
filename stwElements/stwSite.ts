@@ -68,8 +68,8 @@ export class STWSite extends STWElement {
 			} else
 				load(JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml")));
 
-		} catch (_error) {
-			console.error(`Unable to load STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'`);
+		} catch (error) {
+			console.error(`${(error as Error).name}: ${(error as Error).message}`);
 		}
 
 		function load(webbaselet: ISTWArea) {

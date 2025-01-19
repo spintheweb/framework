@@ -47,9 +47,14 @@ export class STWLayout {
 	wbll: string; // Webbase Layout Language
 	settings: Map<string, string> = new Map();
 	tokens: STWToken[] = [];
+	render: (session: STWSession) => string; // TODO: After lexing, convert layout in function
 
 	constructor(wbll: string) {
 		this.wbll = wbll;
+
+		this.render = (_session: STWSession): string => {
+			return wbll;
+		};
 
 		for (const expression of this.wbll.matchAll(SYNTAX)) {
 			if (expression.groups?.error !== undefined)
@@ -100,15 +105,6 @@ export class STWLayout {
 				this.tokens.push(token);
 			}
 		}
-	}
-
-	private replaceholders(_session: STWSession): ISTWLayout {
-		return this;
-	}
-
-	render(_req: Request, session: STWSession): string {
-		const _layout = this.replaceholders(session);
-		return "";
 	}
 }
 /*
