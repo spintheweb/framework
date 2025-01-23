@@ -1,33 +1,33 @@
 /**
- * CSS Standard for stwNavigation content
+ * CSS Standard for stwMenus content
 */
-.stwNavigation a {
+.stwMenus a {
 	display: block;
 	background-color: inherit;
 	color: inherit;
 }
 
-.stwNavigation menu {
+.stwMenus menu {
 	list-style-type: none;
 	margin: 0;
 	padding: 0.25em 0;
 	cursor: pointer;
 }
 
-.stwNavigation>menu {
+.stwMenus nav>menu {
 	display: flex;
 }
 
-.stwNavigation menu li {
+.stwMenus menu li {
 	position: relative;
 	min-width: calc(var(--min-menu-width) + 0.25em);
 }
 
-.stwNavigation>menu>li {
+.stwMenus nav>menu>li {
 	min-width: 0 !important;
 }
 
-.stwNavigation menu menu>li:has(menu)::after {
+.stwMenus menu menu>li:has(menu)::after {
 	position: absolute;
 	top: 0;
 	right: 0.125em;
@@ -35,7 +35,7 @@
 	font-size: 1.5em;
 }
 
-.stwNavigation menu li>menu {
+.stwMenus menu li>menu {
 	display: none;
 	position: absolute;
 	background-color: light-dark(var(--light-bg), var(--dark-bg));
@@ -44,23 +44,23 @@
 	z-index: 1;
 }
 
-.stwNavigation menu li li>menu {
+.stwMenus menu li li>menu {
 	top: 0;
 	left: var(--min-menu-width);
 }
 
-.stwNavigation menu li>div {
+.stwMenus menu li>div {
 	background-color: light-dark(var(--light-bg), var(--dark-bg));
 	padding: 0 1em;
 	line-height: 1.5em;
 }
 
-.stwNavigation menu li>div:hover,
-.stwNavigation menu li>div:active {
+.stwMenus menu li>div:hover,
+.stwMenus menu li>div:active {
 	background-color: light-dark(var(--dark-bg), var(--light-bg));
 	color: light-dark(var(--dark-color), var(--light-color));
 }
 
-.stwNavigation menu li:hover>menu {
+.stwMenus menu li:hover>menu {
 	display: inherit;
 }

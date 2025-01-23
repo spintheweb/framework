@@ -42,7 +42,7 @@ class STWToken {
 export class STWLayout {
 	wbll: string; // Webbase Layout Language
 	settings: Map<string, string> = new Map();
-	render: (_req: Request, session: STWSession) => string;
+	render: (req: Request, session: STWSession) => string;
 
 	constructor(contentType: string, wbll: string) {
 		this.wbll = wbll;
@@ -102,7 +102,12 @@ export class STWLayout {
 			}
 		}
 
-		// TODO: Compiler
+		/**
+		 * TODO: Compiler
+		 * 
+		 * session.placeholders holds the current record [field, value] pair, the field variable in the render function 
+		 * is the index that point to an entry in the placeholders Map.
+		 */ 
 		let fn = `const type="${contentType}";let html="",field=0,df=0;`;
 		tokens.forEach(token => {
 			if (token.symbol === "a")
@@ -116,13 +121,13 @@ export class STWLayout {
 			else if (token.symbol === "e")
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if (token.symbol === "f")
-				fn += `html += _session.placeholders.get("${token.args[0]}");`;
+				fn += `html += session.placeholders.get("${token.args[0]}");`;
 			else if (token.symbol === "i")
 				fn += `html += \`<img ${attributes(token.attrs)}>\`;`;
 			else if (token.symbol === "j")
 				fn += `html += \`<script>${token.args[0]}</script>\`;`;
 			else if (token.symbol === "k")
-				fn += `_session.placeholders.set("${token.args[0]}", "${token.args[1]}");`;
+				fn += `session.placeholders.set("${token.args[0]}", "${token.args[1]}");`;
 			else if (token.symbol === "l")
 				fn += `html += \`<label ${attributes(token.attrs)}>${token.args[0]}</label>\`;`;
 			else if (token.symbol === "m")
@@ -130,9 +135,9 @@ export class STWLayout {
 			else if (token.symbol === "n") // Like text
 				fn += `html += \`${token.args[0]}\`;`;
 			else if (token.symbol === "o") {
-				fn += `const element = STWSite.get().find(_session, "${token.args[0]}");
+				fn += `const element = STWSite.get().find(session, "${token.args[0]}");
 					if (element instanceof STWContent)
-						html += element.render(_req, _session, _record);`
+						html += element.render(req, session, record);`
 			} else if (token.symbol === "\\n") // Content type sensitive
 				fn += "html += \`<br>\`;";
 			else if (token.symbol === "\\r")
@@ -144,11 +149,10 @@ export class STWLayout {
 			fn += `field += df; df = 0;`;
 		});
 		fn += "return html;";
-		this.render = new Function("_req", "_session", fn) as (_req: Request, _session: STWSession) => string;
+		this.render = new Function("req", "session", fn) as (req: Request, session: STWSession) => string;
 
 		function attributes(map: Map<string, string>): string {
-			const array = Array.from(map, ([key, value]) => ({ key, value }));
-			return array.reduce((attrs, attr) => attrs + ` ${attr.key}="${attr.value}"`, "");
+			return map.entries().reduce((attrs, attr) => attrs + ` ${attr[0]}="${attr[1]}"`, "");
 		}
 		function querystring(params: STWToken[]): string {
 			return params.reduce((params, param) => params + `${param.args[0]}=${param.args[1]}&`, "?");

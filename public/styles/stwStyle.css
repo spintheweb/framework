@@ -53,13 +53,13 @@ article {
 	margin: 0.5em 0;
 }
 
-.stwNavigation a {
+.stwMenus a {
 	display: block;
 	background-color: inherit;
 	color: inherit;
 }
 
-.stwNavigation menu {
+.stwMenus menu {
 	list-style-type: none;
 	margin: 0;
 	padding: 0.25em 0;
@@ -68,20 +68,20 @@ article {
 	color: light-dark(Menu, MenuText);
 }
 
-.stwNavigation>menu {
+.stwMenus nav>menu {
 	display: flex;
 }
 
-.stwNavigation menu li {
+.stwMenus menu li {
 	position: relative;
 	min-width: calc(var(--min-menu-width) + 0.25em);
 }
 
-.stwNavigation>menu>li {
+.stwMenus nav>menu>li {
 	min-width: 0 !important;
 }
 
-.stwNavigation menu menu>li:has(menu)::after {
+.stwMenus menu menu>li:has(menu)::after {
 	position: absolute;
 	top: 0;
 	right: 0.125em;
@@ -89,32 +89,34 @@ article {
 	font-size: 1.5em;
 }
 
-.stwNavigation menu li>menu {
+.stwMenus menu li>menu {
 	display: none;
 	position: absolute;
 	border: thin solid light-dark(Window, WindowText);
 	z-index: 1;
 }
 
-.stwNavigation menu li li>menu {
+.stwMenus menu li li>menu {
 	top: 0;
 	left: var(--min-menu-width);
 }
 
-.stwNavigation menu li>div {
+.stwMenus menu li>div {
 	padding: 0 1em;
 	line-height: 1.5em;
 }
 
-.stwNavigation menu li>div:hover,
-.stwNavigation menu li>div:active {
+.stwMenus menu li>div:hover,
+.stwMenus menu li>div:active {
 	background-color: light-dark(Highlight, HighlightText);
 	color: light-dark(HighlightText, Highlight);
 }
 
-.stwNavigation menu li:hover>menu {
+.stwMenus menu li:hover>menu {
 	display: inherit;
 }
+
+.stwMenu
 
 .stwSelected {
 	background-color: light-dark(Highlight, HighlightText);

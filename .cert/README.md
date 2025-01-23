@@ -1,6 +1,6 @@
 # Certificate folder
 
-This folder contains the site private key and SSL certificate, these should be added to ../.env
+This folder contains the site private key and SSL certificate, these should be added to .env
 
 Use the following openssl commands to generate them:
 
@@ -14,5 +14,5 @@ $ certbot certonly
 
 Or:
 
-$ cd public/.cert/
+$ cd .cert/
 $ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj //CN=studio.spintheweb.org

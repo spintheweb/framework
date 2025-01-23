@@ -11,7 +11,7 @@ import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
 
 /**
- * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWNavigation}, {@linkcode STWTabs} and {@linkcode STWImagemap}
+ * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWMenus}, {@linkcode STWTabs} and {@linkcode STWImagemap}
  */
 export interface ISTWOption {
 	name: STWLocalized;

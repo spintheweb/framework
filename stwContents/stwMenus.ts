@@ -1,5 +1,5 @@
 /**
- * Spin the Web Navigation content
+ * Spin the Web Menus content
  * 
  * Language: TypeScript for Deno
  * 
@@ -10,7 +10,7 @@ import { STWContent, ISTWContent, ISTWOption } from "../stwElements/stwContent.t
 import { STWSite } from "../stwElements/stwSite.ts";
 
 // TODO: If the permalink of an element is changed the pathname of the corrisponding options needs to be updated
-export class STWNavigation extends STWContent {
+export class STWMenus extends STWContent {
 	options: ISTWOption[] = [];
 
 	constructor(content: ISTWContent) {
@@ -26,6 +26,7 @@ export class STWNavigation extends STWContent {
 							{ name: new Map([["en", "Dogs"]]), path: "/home" },
 							{ name: new Map([["en", "Cats"]]), path: "/home" },
 							{ name: new Map([["en", "Bears"]]), path: "/home" },
+							{ name: new Map([["en", "-"]]) },
 							{ name: new Map([["en", "Orcas"]]), path: "/home" },
 							{ name: new Map([["en", "Whales"]]), path: "/home" },
 						]
@@ -45,18 +46,18 @@ export class STWNavigation extends STWContent {
 	override render(_req: Request, _session: STWSession): string {
 		let body: string = "";
 		this.options.forEach(option => subrender(option));
-		return `<nav class="stwVOrientation"><menu>${body}</menu></nav>`;
+		return `<nav><menu>${body}</menu></nav>`;
 
-		function subrender(option: ISTWOption): void {
+		function subrender(option: ISTWOption, iteration: boolean = false): void {
 			const element = STWSite.get().find(_session, option.path || "");
 			const name = option.name.get(_session.lang) || (element ? element.localize(_session, "name") : option.path);
 
 			if (name === "-")
-				body += "<hr>";
+				body += iteration ? "<hr>" : "";
 			else if (!element || element.isVisible(_session)) {
 				body += `<li><div>${option.path ? `<a href="${option.path}" ${option.target ? `target="${option.target}"` : ""}>${name}</a>` : name}</div>`;
 				if (option.options) {
-					body += "<menu>", option.options.forEach(option => subrender(option)), body += "</menu>";
+					body += "<menu>", option.options.forEach(option => subrender(option, true)), body += "</menu>";
 				}
 				body += "</li>";
 			}
@@ -65,4 +66,4 @@ export class STWNavigation extends STWContent {
 
 }
 
-STWFactory.Navigation = STWNavigation;
+STWFactory.Menus = STWMenus;
