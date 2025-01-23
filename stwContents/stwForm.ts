@@ -19,14 +19,11 @@ export class STWForm extends STWContent {
 	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		let body = "";
 
-		if (_records.rows?.length) {
+		// Transfer record to session placeholders
+		if (_records.rows?.length)
 			Object.entries(_records.rows[0]).forEach((key, value) => _session.placeholders.set(`@@${key}`, value.toString()));
 
-			// TODO: Render layout
-			Object.entries(_records.rows[0]).forEach((key, value) =>
-				body += `<label><span>${key}</span><input name="${key}" value="${value}"></label>`
-			);
-		}
+		body += this.layout.get(_session.lang)?.render(_req, _session);
 
 		// If the form is inside a dialog, method="dialog"
 		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : ""}">

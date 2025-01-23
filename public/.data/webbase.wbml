@@ -35,7 +35,7 @@
                     "query": "SELECT * FROM psjx_cms_role",
                     "params": "",
                     "layout": {
-                        "en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')\n t(' This is a test') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\nn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')"
+                        "en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')e\n t(' This is a test') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\nn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')e\\a('style=\"color: yellow\"')crm"
                     }
                 },
                 {
@@ -104,7 +104,8 @@
                     "query": "",
                     "params": "",
                     "layout": {
-                        "en": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\ne(';user;)\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;esite;logon;@@usr;@@pwd')"
+                        "en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')e\n t(' This is a test') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\nn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')e\\a('style=\"color: yellow\"')crm",
+                        "en-us": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\ne(';user;)\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;esite;logon;@@usr;@@pwd')"
                     }
                 },
                 {
@@ -121,12 +122,14 @@
                     },
                     "subtype": "Navigation",
                     "cssClass": null,
-                    "section": "leftSidebar",
+                    "section": "header",
                     "sequence": "4",
                     "dsn": "",
                     "query": "",
                     "params": "",
-                    "layout": { "en": "\\s('caption=\"This is a chart\" mode=\"bar\" header=\"This is the header\" footer=\"This is the footer\"')"},
+                    "layout": {
+                        "en": "\\s('caption=\"This is a chart\" mode=\"bar\" header=\"This is the header\" footer=\"This is the footer\"')"
+                    },
                     "reference": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
                 }
             ],
@@ -383,10 +386,13 @@
         "users": false,
         "editors": false
     },
-    "keywords": { "en": "stw" },
-    "description": { "en": "This site demonstrate..." },
+    "keywords": {
+        "en": "stw"
+    },
+    "description": {
+        "en": "This site demonstrate..."
+    },
     "mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
-    "lang": "en",
     "langs": [
         "en"
     ],

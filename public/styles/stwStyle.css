@@ -1,9 +1,7 @@
 :root {
 	color-scheme: light dark;
-	--background-light: white;
-	--foreground-light: black;
-	--background-dark: black;
-	--foreground-dark: white;
+
+	--min-menu-width: 10em;
 
 	--padding: 0.25em;
 	--special-color: red;
@@ -19,14 +17,6 @@ article {
 	padding: var(--padding);
 }
 
-article:hover {
-	background-color: rgba(0, 0, 0, 0.05);
-}
-
-.stwLanguages a {
-	font-size: smaller;
-}
-
 .dialog {
 	font-size: smaller;
 }
@@ -37,6 +27,10 @@ article:hover {
 
 .dialog h1::after {
 	content: "&#10006;";
+}
+
+.stwLanguages a {
+	font-size: smaller;
 }
 
 .stwForm label {
@@ -59,43 +53,70 @@ article:hover {
 	margin: 0.5em 0;
 }
 
-.stwNavigation nav {
-	list-style-type: none;
-}
-
-.stwNavigation li {
-	padding: var(--padding);
-}
-
 .stwNavigation a {
 	display: block;
-	text-overflow: ellipsis;
+	background-color: inherit;
+	color: inherit;
 }
 
-.stwHOrientation {
+.stwNavigation menu {
+	list-style-type: none;
+	margin: 0;
+	padding: 0.25em 0;
+	cursor: pointer;
+	background-color: light-dark(MenuText, Menu);
+	color: light-dark(Menu, MenuText);
+}
+
+.stwNavigation>menu {
 	display: flex;
 }
 
-@media (prefers-color-scheme: light) {
-	.stwSelected {
-		color: var(--background-dark);
-		background-color: var(--foreground-light);
-	}
-
-	.stwNavigation li:has(a):hover {
-		background-color: var(--background-dark);
-		color: var(--foreground-light);
-	}
+.stwNavigation menu li {
+	position: relative;
+	min-width: calc(var(--min-menu-width) + 0.25em);
 }
 
-@media (prefers-color-scheme: dark) {
-	.stwSelected {
-		color: var(--foreground-light);
-		background-color: var(--foreground-dark);
-	}
+.stwNavigation>menu>li {
+	min-width: 0 !important;
+}
 
-	.stwNavigation li:has(a):hover {
-		background-color: var(--background-light);
-		color: var(--foreground-dark);
-	}
+.stwNavigation menu menu>li:has(menu)::after {
+	position: absolute;
+	top: 0;
+	right: 0.125em;
+	content: "▸";
+	font-size: 1.5em;
+}
+
+.stwNavigation menu li>menu {
+	display: none;
+	position: absolute;
+	border: thin solid light-dark(Window, WindowText);
+	z-index: 1;
+}
+
+.stwNavigation menu li li>menu {
+	top: 0;
+	left: var(--min-menu-width);
+}
+
+.stwNavigation menu li>div {
+	padding: 0 1em;
+	line-height: 1.5em;
+}
+
+.stwNavigation menu li>div:hover,
+.stwNavigation menu li>div:active {
+	background-color: light-dark(Highlight, HighlightText);
+	color: light-dark(HighlightText, Highlight);
+}
+
+.stwNavigation menu li:hover>menu {
+	display: inherit;
+}
+
+.stwSelected {
+	background-color: light-dark(Highlight, HighlightText);
+	color: light-dark(HighlightText, Highlight);
 }

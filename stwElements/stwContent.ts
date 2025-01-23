@@ -54,7 +54,7 @@ export abstract class STWContent extends STWElement {
 			this.layout = new Map();
 			for (const [lang, wbll] of Object.entries(content.layout)) {
 				try {
-					this.layout.set(lang, new STWLayout(wbll));
+					this.layout.set(lang, new STWLayout(this.type, wbll));
 				} catch (error) {
 					throw SyntaxError(`${this.type} (${this.name.entries().next().value}) @${this.section}.${this.sequence} [${this._id}]\n └ Layout: ${(error as Error).message}`);
 				}
@@ -63,7 +63,7 @@ export abstract class STWContent extends STWElement {
 	}
 
 	getLayout(session: STWSession): STWLayout {
-		return this.layout.get(session.lang) || new STWLayout("");
+		return this.layout.get(session.lang) || new STWLayout(this.type, "");
 	}
 
 	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
