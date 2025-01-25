@@ -41,7 +41,7 @@ export class STWSession {
 		return this.placeholders.get(name) || "";
 	}
 	/**
-	 * Placeholders reppresent server side data accesible to contents. Each request received by the server resets the placeholder,
+	 * Placeholders reppresent server side data accessible to contents. Each request received by the server resets the placeholder,
 	 * then, the content being rendered cycles each record of the record set. 
 	 * 
 	 * @param _obj Can be a request a string or an object (a row of a record set)

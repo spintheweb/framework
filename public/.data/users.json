@@ -2,19 +2,20 @@
     {
         "user": "guest",
         "name": "Guest",
-        "password": "",
         "roles": "Guests"
     },
     {
         "user": "administrator",
         "name": "Administrator",
         "password": "administrator",
-        "roles": "Administrators,Developers"
+        "roles": "Administrators,Developers",
+        "email": "info@spintheweb.org"
     },
     {
         "user": "user",
         "name": "Test",
         "password": "test",
-        "roles": "Users"
+        "roles": "Users",
+        "email": "info@spintheweb.org"
     }
 ]

@@ -51,7 +51,7 @@ export class STWLayout {
 		const tokens: STWToken[] = [];
 		for (const expression of this.wbll.matchAll(SYNTAX)) {
 			if (expression.groups?.error !== undefined)
-				throw new SyntaxError(expression.input.slice(0, expression.index) + ' >>>' + expression.input.slice(expression.index));;
+				throw new SyntaxError(expression.input.slice(0, expression.index) + ' ⋙' + expression.input.slice(expression.index));;
 
 			const pattern = expression.filter((value, i) => (value !== undefined && i));
 
@@ -107,7 +107,7 @@ export class STWLayout {
 		 * 
 		 * session.placeholders holds the current record [field, value] pair, the field variable in the render function 
 		 * is the index that point to an entry in the placeholders Map.
-		 */ 
+		 */
 		let fn = `const type="${contentType}";let html="",field=0,df=0;`;
 		tokens.forEach(token => {
 			if (token.symbol === "a")
@@ -155,7 +155,12 @@ export class STWLayout {
 			return map.entries().reduce((attrs, attr) => attrs + ` ${attr[0]}="${attr[1]}"`, "");
 		}
 		function querystring(params: STWToken[]): string {
-			return params.reduce((params, param) => params + `${param.args[0]}=${param.args[1]}&`, "?");
+			const search = new URLSearchParams();
+			for (const param of params)
+				if (param.args[0] && param.args[1])
+					search.append(param.args[0], param.args[1]);
+			return search.toString();
+			//return params.reduce((params, param) => params + `${param.args[0]}=${param.args[1]}&`, "?");
 		}
 	}
 }

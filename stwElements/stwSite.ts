@@ -97,12 +97,12 @@ export class STWSite extends STWElement {
 	}
 
 	// Find the element given an _id or permalink
-	find(session: STWSession, resource: string): STWElement | null {
-		if (resource.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i))
-			return STWSite.index.get(resource) || null;
-		if (resource === "/")
+	find(session: STWSession, ref: string): STWElement | null {
+		if (ref.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i))
+			return STWSite.index.get(ref) || null;
+		if (ref === "/")
 			return STWSite.index.get(STWSite.#instance.mainpage) || null;
-		return STWSite.#instance.recurse(session, STWSite.#instance.children, resource.split("/"));
+		return STWSite.#instance.recurse(session, STWSite.#instance.children, ref.split("/"));
 	}
 
 	private recurse(session: STWSession, children: STWElement[], slugs: string[], i: number = 1): STWElement | null {

@@ -73,6 +73,7 @@ article {
 }
 
 .stwMenus menu li {
+	line-height: 2em;
 	position: relative;
 	min-width: calc(var(--min-menu-width) + 0.25em);
 }
@@ -121,4 +122,25 @@ article {
 .stwSelected {
 	background-color: light-dark(Highlight, HighlightText);
 	color: light-dark(HighlightText, Highlight);
+}
+
+.stwTabs {
+	position: relative;
+}
+
+.stwTabs dt {
+	position: relative;
+	display: inline-block;
+	padding: 0.25em 0.5em;
+	cursor: pointer;
+}
+
+.stwTabs dd {
+	position: absolute;
+	margin: 0;
+	display: none;
+}
+
+dt.stwSelected+dd {
+	display: inherit;
 }

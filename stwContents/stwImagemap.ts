@@ -13,6 +13,7 @@ export class STWImagemap extends STWContent {
 		super(content);
 	}
 	
+	// TODO: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area
 	override render(_req: Request, _session: STWSession): string {
 		return `TODO: Render ${this.constructor.name} for ${_session.user}`;
 	}

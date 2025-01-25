@@ -11,13 +11,17 @@ import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
 
 /**
- * The contents that use this interface are: {@linkcode STWMenu}, {@linkcode STWMenus}, {@linkcode STWTabs} and {@linkcode STWImagemap}
+ * The contents that use this interface are: {@linkcode STWMenus} and {@linkcode STWTabs}
  */
 export interface ISTWOption {
 	name: STWLocalized;
-	path?: string;
+	ref?: string;
 	target?: string;
+	data?: string;
 	options?: ISTWOption[];
+}
+export interface ISTWContentWithOptions extends ISTWContent {
+	options: ISTWOption[];
 }
 
 export interface ISTWContent extends ISTWElement {
@@ -96,13 +100,23 @@ export abstract class STWContent extends STWElement {
 			sequence: (_shortcut || this).sequence,
 			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(_shortcut || this).cssClass || "stw" + this.type}">
 				${debug}
-				${layout?.settings.get("caption") ? `<h1>${layout?.settings.get("caption")}</h1>` : ""}
-				${layout?.settings.get("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
+				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
+				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `<h1${collapsible()}>${layout?.settings.get("caption")}</h1>` : ""}
+				<div>
+				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
 				${this.render(req, session, await STWDatasources.query(session, this))}
-				${layout?.settings.get("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
+				${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
+				</div>
+				${layout?.settings.has("frame") ? "</fieldset>" : ""}
 			</article>`,
 		};
+		if (layout?.settings.get("visible") === "false")
+			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
+
+		function collapsible(): string {
+			return layout?.settings.has("collapsible") ? ` onclick="this.nextElementSybling.classList.toggle('stwInvisible')"` : "";
+		}
 	}
 
 	render(_req: Request, _session: STWSession, _record: ISTWRecords): string {

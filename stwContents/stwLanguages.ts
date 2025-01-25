@@ -9,7 +9,7 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
-export class STWLanguagebar extends STWContent {
+export class STWLanguages extends STWContent {
 	constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -26,4 +26,4 @@ export class STWLanguagebar extends STWContent {
 	}
 }
 
-STWFactory.Languagebar = STWLanguagebar;
+STWFactory.Languages = STWLanguages;
