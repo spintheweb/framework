@@ -135,9 +135,12 @@ export class STWLayout {
 			else if (token.symbol === "n") // Like text
 				fn += `html += \`${token.args[0]}\`;`;
 			else if (token.symbol === "o") {
-				fn += `const element = STWSite.get().find(session, "${token.args[0]}");
-					if (element instanceof STWContent)
-						html += element.render(req, session, record);`
+				const placeholder = crypto.randomUUID();
+				fn += `const element = session.site.find(session, "${token.args[0]}");
+					if (Object.hasOwn(element, "cssClass")) {
+						html += \`<article id="${placeholder}"></article>\`;
+						session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: "${placeholder}" }));
+					}`;
 			} else if (token.symbol === "\\n") // Content type sensitive
 				fn += "html += \`<br>\`;";
 			else if (token.symbol === "\\r")
@@ -160,7 +163,6 @@ export class STWLayout {
 				if (param.args[0] && param.args[1])
 					search.append(param.args[0], param.args[1]);
 			return search.toString();
-			//return params.reduce((params, param) => params + `${param.args[0]}=${param.args[1]}&`, "?");
 		}
 	}
 }

@@ -1,4 +1,5 @@
 import { getCookies } from "jsr:@std/http/cookie";
+import { STWSite } from "./stwElements/stwSite.ts";
 
 /**
  * Spin the Web session
@@ -13,22 +14,25 @@ export class STWSession {
 	roles: string[]; // Roles played by the user. Note: Security revolves around this aspect!
 	lang: string; // Preferred user language 
 	langs: string[]; // Accept-Language
+	placeholders: Map<string, string>;
 	timestamp: number; // Session timeout in minutes
+	private timer: number = 0;
 	dev: boolean; // If true STW Studio  enabled
 	debug: boolean; // If true and dev is true contents properties are shown
-	placeholders: Map<string, string>;
-	private timer: number = 0;
+	site: STWSite;
+	socket?: WebSocket;
 
-	constructor(sessionId: string) {
+	constructor(sessionId: string, site: STWSite) {
 		this.sessionId = sessionId;
 		this.user = "guest";
 		this.roles = ["guests", "developers"];
 		this.lang = "en";
 		this.langs = ["en"];
+		this.placeholders = new Map<string, string>;
 		this.timestamp = Date.now();
 		this.dev = true;
 		this.debug = true;
-		this.placeholders = new Map<string, string>;
+		this.site = site;
 
 		console.info(`${new Date().toISOString()}: New session [${this.sessionId}]`);
 	}

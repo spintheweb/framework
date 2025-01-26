@@ -36,8 +36,6 @@ await loadSTWElements("./stwContents");
  */
 const Sessions: Map<string, STWSession> = new Map();
 
-let Socket: WebSocket;
-
 /**
  * Spin the Web Spinner
  */
@@ -53,25 +51,29 @@ Deno.serve(
 		if (!sessionId)
 			sessionId = crypto.randomUUID();
 		if (!Sessions.has(sessionId))
-			Sessions.set(sessionId, new STWSession(sessionId)); // Create new session
-		const session = Sessions.get(sessionId) || new STWSession(sessionId);
+			Sessions.set(sessionId, new STWSession(sessionId, STWSite.get())); // Create new session
+		const session = Sessions.get(sessionId) || new STWSession(sessionId, STWSite.get());
 
 		if (request.headers.get("upgrade") === "websocket") {
 			const { socket, response } = Deno.upgradeWebSocket(request);
 
-			Socket = socket;
+			session.socket = socket;
 
-			Socket.onmessage = event => {
+			socket.onmessage = event => {
 				// deno-lint-ignore no-explicit-any
 				const data: { method: string, resource: any, options: any } = JSON.parse(event.data);
 
-				if (data.method === "HEAD") {
+				if (data.method === "PATCH")
+					data.resource = [data.resource];
+				
+				else if (data.method === "HEAD") {
 					session.langs = data.options.langs || ["en"];
 					session.lang = STWSite.get().langs.includes(data.options.lang) ? data.options.lang : session.langs.find(lang => STWSite.get().langs.includes(lang.substring(0, 2)))?.substring(0, 2) || "en";
 
 					request = new Request(new URL(request.url).origin + data.resource); // URL
 					data.resource = (STWSite.get().find(session, data.resource) as STWPage)?.contents(session) || [];
 				}
+				
 				/**
 				 * Sockets requests contents which may generate output (HTML), execute (API) or do both
 				 */
@@ -80,17 +82,18 @@ Deno.serve(
 					const content = STWSite.get().find(session, resource);
 
 					if (content instanceof STWContent) {
-						const response = await content?.serve(request, session, undefined);
+						const response = await content?.serve(request, session, data.method === "PATCH" ? content : undefined);
 						if (response.status == 200)
 							data.resource[i] = await response.json();
 						else
 							data.resource[i] = { method: "DELETE", id: content._id };
 						if (!--process)
-							send();
+							send(data.options);
 					}
 				});
 
-				function send(): void {
+				// deno-lint-ignore no-explicit-any
+				function send(options: any): void {
 					// deno-lint-ignore no-explicit-any
 					data.resource?.sort((a: any, b: any) => {
 						if (a.section == b.section)
@@ -98,12 +101,13 @@ Deno.serve(
 						return 0;
 					});
 					// deno-lint-ignore no-explicit-any
-					data.resource?.forEach((content: any) => 
-						Socket.send(JSON.stringify(content))
-					);
+					data.resource?.forEach((content: any) => {
+						content.placeholder = options.placeholder;
+						socket.send(JSON.stringify(content))
+				});
 				}
 			};
-			Socket.onerror = error => console.error(error);
+			socket.onerror = error => console.error(error);
 
 			return new Promise<Response>(resolve => resolve(response));;
 		}
@@ -120,11 +124,11 @@ Deno.serve(
 				response = serveFile(request, `./public${pathname}`);
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
 				response = element.serve(request, session, undefined); // Serve page, area or site, for areas and sites handle their mainpage
-			else if (Socket && element?.type) {
+			else if (session.socket && element?.type) {
 				const res = await element.serve(request, session, undefined);
 				if (res.status === 200) {
 					const text = await res.text();
-					Socket.send(text);
+					session.socket.send(text);
 				}
 			}
 
@@ -144,7 +148,7 @@ Deno.serve(
 				data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
 
 			// TODO: Handle data: stwOrigin and stwAction
-			Socket.send(JSON.stringify({ method: "PUT", section: "modaldialog", body: `<label>Form data</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
+			session.socket?.send(JSON.stringify({ method: "PUT", section: "modaldialog", body: `<label>Form data</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
 		}
 
 		return response;

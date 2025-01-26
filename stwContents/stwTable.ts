@@ -14,8 +14,8 @@ export class STWTable extends STWContent {
 		super(content);
 	}
 
-	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		return `TODO: Render ${this.constructor.name} for ${_session.user} <pre>${_records}</pre>`;
+	override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
+		return `TODO: Render ${this.constructor.name} for ${session.user} <pre>${_records}</pre>`;
 	}
 }
 

@@ -89,7 +89,7 @@ export abstract class STWElement {
 	isVisible(session: STWSession, recurse: boolean = false): number {
 		let ac!: number;
 
-		if (STWSite.get().mainpage === this._id)
+		if (session.site.mainpage === this._id)
 			ac = recurse ? 0b11 : 0b01; // Main site page always visible
 
 		for (let i = 0; ac != 0b01 && i < session.roles.length; ++i)

@@ -14,13 +14,13 @@ export class STWCalendar extends STWContent {
 		super(content);
 	}
 
-	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		const layout = this.layout.get(_session.lang), daysInMonth = getDaysInMonth(1, 2025);
+	override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
+		const layout = this.layout.get(session.lang), daysInMonth = getDaysInMonth(1, 2025);
 
 		// Month rendering
 		let body = `<div class="stw${layout?.settings.get("period") || "Month"}">`;
 		for (let day = 1; day <= daysInMonth; day++)
-			body += `<div data-day="${day}">${layout?.render(_req, _session)}</div>`;
+			body += `<div data-day="${day}">${layout?.render(_req, session)}</div>`;
 		return body;
 
 		function getDaysInMonth(month: number, year: number): number {

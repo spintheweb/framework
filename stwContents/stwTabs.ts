@@ -5,10 +5,8 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWSite } from "../stwElements/stwSite.ts";
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
-import { ExecuteResult } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 
 // TODO: If the permalink of an element is changed the pathname of the corresponding options needs to be updated
 export class STWTabs extends STWContent {
@@ -23,14 +21,17 @@ export class STWTabs extends STWContent {
 			});
 	}
 
-	override render(_req: Request, _session: STWSession): string {
+	override render(_req: Request, session: STWSession): string {
 		let body = "";
 		this.options.forEach(option => {
-			const element = STWSite.get().find(_session, option.ref || "");
+			const element = session.site.find(session, option.ref || "");
 
-			if (element instanceof STWContent && element.isVisible(_session)) {
-				const name = option.name.get(_session.lang) || (element ? element.localize(_session, "name") : option.ref);
-				body += `<dt>${name}</dt><dd>${element.render(_req, _session, [] as ExecuteResult)}</dd>`;
+			if (element instanceof STWContent && element.isVisible(session)) {
+				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
+
+				const placeholder = crypto.randomUUID();
+				body += `<dt>${name}</dt><dd><article id="${placeholder}"></dd>`;
+				session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: placeholder })); // Ask client to request content
 			}
 		});
 		return `<dl onclick="event.currentTarget.querySelectorAll('dt').forEach(dt => dt.classList[dt == event.target ? 'add' : 'remove']('stwSelected'))">${body}</dl>`;

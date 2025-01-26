@@ -4,7 +4,7 @@
 	--min-menu-width: 10em;
 
 	--padding: 0.25em;
-	--special-color: red;
+	--special-color: Mark;
 }
 
 body {
@@ -64,8 +64,7 @@ article {
 	margin: 0;
 	padding: 0.25em 0;
 	cursor: pointer;
-	background-color: light-dark(MenuText, Menu);
-	color: light-dark(Menu, MenuText);
+	background-color: Canvas;
 }
 
 .stwMenus nav>menu {
@@ -93,7 +92,7 @@ article {
 .stwMenus menu li>menu {
 	display: none;
 	position: absolute;
-	border: thin solid light-dark(Window, WindowText);
+	border: thin solid light-dark(CanvasText, Canvas);
 	z-index: 1;
 }
 
@@ -107,10 +106,11 @@ article {
 	line-height: 1.5em;
 }
 
+.stwSelected,
 .stwMenus menu li>div:hover,
 .stwMenus menu li>div:active {
-	background-color: light-dark(Highlight, HighlightText);
-	color: light-dark(HighlightText, Highlight);
+	background-color: light-dark(SelectedItem, SelectedItemText);
+	color: light-dark(SelectedItemText, SelectedItem);
 }
 
 .stwMenus menu li:hover>menu {
@@ -118,11 +118,6 @@ article {
 }
 
 .stwMenu
-
-.stwSelected {
-	background-color: light-dark(Highlight, HighlightText);
-	color: light-dark(HighlightText, Highlight);
-}
 
 .stwTabs {
 	position: relative;

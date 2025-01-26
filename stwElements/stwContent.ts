@@ -12,12 +12,16 @@ import { STWLayout } from "../stwContents/wbll.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenus} and {@linkcode STWTabs}
+ * 
+ * @prop name: STWLocalized
+ * @prop ref?: string
+ * @prop target?: string
+ * @prop options?: ISTWOption[]
  */
 export interface ISTWOption {
 	name: STWLocalized;
 	ref?: string;
 	target?: string;
-	data?: string;
 	options?: ISTWOption[];
 }
 export interface ISTWContentWithOptions extends ISTWContent {
@@ -79,12 +83,14 @@ export abstract class STWContent extends STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	// deno-lint-ignore no-explicit-any
-	async serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
+	async serve(req: Request, session: STWSession, _shortcut: STWContent | undefined): Promise<Response> {
 		if (!_shortcut && !this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		console.debug(`${new Date().toISOString()}: ${_shortcut ? "│└" : "├─"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		if (_shortcut)
+			console.debug(`${new Date().toISOString()}: ${_shortcut._id === this._id ? " ●" : "│└"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		else
+			console.debug(`${new Date().toISOString()}: ├─ ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
 		if (session.debug && !this.pathname(session).startsWith("/stws/")) {

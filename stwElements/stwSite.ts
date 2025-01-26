@@ -33,6 +33,8 @@ export class STWSite extends STWElement {
 		this.datasources = new Map(Object.entries(site.datasources || { name: "STW", value: "" }));
 		this.mainpage = site.mainpage;
 		this.version = site.version || `v1.0.0 ${new Date().toISOString()}`
+
+		STWSite.index.set(site._id, this);
 	}
 
 	/**

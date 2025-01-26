@@ -30,7 +30,7 @@ export class STWDatasources {
 	static async query(session: STWSession, content: STWContent): Promise<ExecuteResult> {
 		try {
 			if (!STWDatasources.datasources.size) {
-				STWDatasources.datasources.set("stw", STWSite.get()); // Webbase
+				STWDatasources.datasources.set("stw", session.site); // Webbase
 
 				// TODO: Connection pools
 				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
@@ -78,7 +78,7 @@ function fetchWebbaseData(session: STWSession, content: STWContent): Promise<Exe
 		setTimeout(() => {
 			resolve({
 				affectedRows: 1,
-				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: STWSite.get(), callback: localize })],
+				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: session.site, callback: localize })],
 			});
 		}, 1000); // Mock delay to simulate async behavior
 	});

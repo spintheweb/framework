@@ -5,67 +5,62 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWSite } from "../stwElements/stwSite.ts";
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContentWithOptions, ISTWOption } from "../stwElements/stwContent.ts";
+import { STWElement } from "../stwElements/stwElement.ts";
 
-// TODO: If the permalink of an element is changed the pathname of the corresponding options needs to be updated
 export class STWMenus extends STWContent {
 	options: ISTWOption[] = [];
 
 	constructor(content: ISTWContentWithOptions) {
 		super(content);
 
-		this.options = [
-			{
-				name: new Map([["en", "Animals"]]), ref: "/home", options: [
-					{ name: new Map([["en", "Dogs"]]), ref: "/home" },
-					{ name: new Map([["en", "Cats"]]), ref: "/home" },
-					{
-						name: new Map([["en", "Bears"]]), ref: "/home", options: [
-							{ name: new Map([["en", "Dogs"]]), ref: "/home" },
-							{ name: new Map([["en", "Cats"]]), ref: "/home" },
-							{ name: new Map([["en", "Bears"]]), ref: "/home" },
-							{ name: new Map([["en", "-"]]) },
-							{ name: new Map([["en", "Orcas"]]), ref: "/home" },
-							{ name: new Map([["en", "Whales"]]), ref: "/home" },
-						]
-					},
-					{ name: new Map([["en", "Orcas"]]), ref: "/home" },
-					{ name: new Map([["en", "Whales"]]), ref: "/home" },
-				]
-			},
-			{ name: new Map(), ref: "/profile/area/page" },
-			{ name: new Map([["en", "Spin the Web Project"]]), ref: "https://www.spintheweb.org", target: "_blank" },
-			{ name: new Map([["en", "-"]]) },
-			{ name: new Map(), ref: "https://www.keyvisions.it", target: "_blank" },
-			{ name: new Map([["en", "e"]]), ref: "/e" },
-		]
+		this.options = loadOptions(content.options || []);
+
+		function loadOptions(options: ISTWOption[]): ISTWOption[] {
+			const _options: ISTWOption[] = [];
+			options.forEach((option: ISTWOption) =>
+				_options.push({ name: new Map(Object.entries(option.name || {})), ref: option.ref || "", target: option.target, options: loadOptions(option?.options || []) })
+			);
+			return _options;
+		}
 	}
 
-	override render(_req: Request, _session: STWSession): string {
+	override render(_req: Request, session: STWSession): string {
 		let body: string = "";
 		this.options.forEach(option => subrender(option));
-		if (this.layout.get(_session.lang)?.settings.has("short"))
-			return `<nav><menu><li><div style="font-size:x-large">≣</div><menu>${body}</menu></li></menu></nav>`;	
+		if (this.layout.get(session.lang)?.settings.has("short"))
+			return `<nav><menu><li><div style="font-size:x-large">≣</div><menu>${body}</menu></li></menu></nav>`;
 		return `<nav><menu>${body}</menu></nav>`;
 
 		function subrender(option: ISTWOption, iteration: boolean = false): void {
-			const element = STWSite.get().find(_session, option.ref || "");
-			const name = option.name.get(_session.lang) || (element ? element.localize(_session, "name") : option.ref);
+			const element = session.site.find(session, option.ref || "");
+
+			let href = option.ref;
+			if (element)
+				href = element?.pathname(session);
+			const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : href);
 
 			if (name === "-")
 				body += iteration ? "<hr>" : "";
-			else if (!element || element.isVisible(_session)) {
-				body += `<li><div>${option.ref ? `<a href="${option.ref}" ${option.target ? `target="${option.target}"` : ""}>${name}</a>` : name}</div>`;
-				if (option.options) {
-					body += "<menu>", option.options.forEach(option => subrender(option, true)), body += "</menu>";
+			else if (!element || element.isVisible(session)) {
+				if (element instanceof STWContent) {
+					const placeholder = crypto.randomUUID();
+					body += `<li><article id="${placeholder}"></article></div>`;
+					session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: placeholder })); // Ask client to request content
+
+				} else if (element instanceof STWElement)
+					body += `<li><div><a href="${href}" ${option.target ? `target="${option.target}"` : ""}>${name}</a></div>`;
+
+				else {
+					body += `<li><div>${!option.options?.length && href ? `<a href="${href}" ${option.target ? `target="${option.target}"` : ""}>${name}</a>` : name}</div>`;
+					if (option.options?.length)
+						body += "<menu>", option.options.forEach(option => subrender(option, true)), body += "</menu>";
 				}
 				body += "</li>";
 			}
 		}
 	}
-
 }
 
 STWFactory.Menus = STWMenus;
