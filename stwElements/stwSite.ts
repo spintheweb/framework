@@ -18,7 +18,6 @@ interface ISTWSite extends ISTWElement {
 }
 export class STWSite extends STWElement {
 	static #instance: STWSite;
-
 	static index: Map<string, STWElement> = new Map();
 
 	langs: string[];
@@ -42,7 +41,7 @@ export class STWSite extends STWElement {
 	 * 
 	 * @returns STWSite Singleton 
 	 */
-	static get(): STWSite {
+	static get instance(): STWSite {
 		if (!STWSite.#instance) {
 			console.info(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
@@ -58,7 +57,7 @@ export class STWSite extends STWElement {
 	/**
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */
-	loadStudio(): void {
+	public loadStudio(): void {
 		console.info(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
 
 		try {
@@ -77,7 +76,7 @@ export class STWSite extends STWElement {
 		function load(webbaselet: ISTWArea) {
 			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 			if (studio)
-				STWSite.#instance.delete(studio._id);
+				STWSite.#instance.remove(studio._id);
 
 			STWSite.#instance.children.unshift(new STWArea(webbaselet));
 			STWSite.#instance.children[0].parent = STWSite.#instance;
@@ -89,17 +88,17 @@ export class STWSite extends STWElement {
 	 * 
 	 * @param _id The UUID of the element to be removed
 	 */
-	delete(_id: string): void {
+	public remove(_id: string): void {
 		const element = STWSite.index.get(_id);
 		element?.children.forEach((child, i) => {
-			this.delete(child._id);
+			this.remove(child._id);
 			STWSite.index.delete(child._id);
 			element.children.splice(i, 1);
 		});
 	}
 
 	// Find the element given an _id or permalink
-	find(session: STWSession, ref: string): STWElement | null {
+	public find(session: STWSession, ref: string): STWElement | null {
 		if (ref.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i))
 			return STWSite.index.get(ref) || null;
 		if (ref === "/")
@@ -121,18 +120,17 @@ export class STWSite extends STWElement {
 		return result;
 	}
 
-	// deno-lint-ignore no-explicit-any
-	override serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
+	public override serve(req: Request, session: STWSession): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 
-		return page?.serve(req, session, undefined) ||
+		return page?.serve(req, session) ||
 			new Promise<Response>(resolve => {
 				const response = new Response(`Site ${this.localize(session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);
 			});
 	}
 
-	override export(): string {
+	public override export(): string {
 		let fragment: string = "";
 		this.children.forEach(child => fragment += child.export());
 
@@ -144,7 +142,7 @@ export class STWSite extends STWElement {
 	}
 
 	// Build a site map (see sitemaps.org) that includes the urls of the visible pages in the site
-	sitemap(session: STWSession): Promise<Response> {
+	public sitemap(session: STWSession): Promise<Response> {
 		let fragment = "";
 		_url(this);
 

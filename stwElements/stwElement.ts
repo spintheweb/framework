@@ -36,7 +36,7 @@ export abstract class STWElement {
 	children: STWElement[] = [];
 	modified: number;
 
-	constructor(element: ISTWElement) {
+	public constructor(element: ISTWElement) {
 		this._id = element._id ? element._id : crypto.randomUUID();
 		this.type = element.type || this.constructor.name.replace("STW", "");
 		this.name = new Map(Object.entries(element.name || { "en": `New ${this.type}` }));
@@ -62,13 +62,13 @@ export abstract class STWElement {
 	 * @param session The session
 	 * @returns Return a / separated reverse chain of slugs of this element up to the root element
 	 */
-	pathname(session: STWSession): string {
+	public pathname(session: STWSession): string {
 		if (this.parent)
 			return this.parent.pathname(session) + "/" + this.localize(session, "slug");
 		return "";
 	}
 
-	localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
+	public localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
 		if (value) {
 			value = name === "slug" ? value.replace(/[^a-z0-9_]/gi, "").toLowerCase() : value;
 			this[name].set(session.lang, value);
@@ -86,7 +86,7 @@ export abstract class STWElement {
 	 * @param session The session
 	 * @returns Return a number greater than 0 if element visible
 	 */
-	isVisible(session: STWSession, recurse: boolean = false): number {
+	public isVisible(session: STWSession, recurse: boolean = false): number {
 		let ac!: number;
 
 		if (session.site.mainpage === this._id)
@@ -107,10 +107,9 @@ export abstract class STWElement {
 	}
 
 	// Export element as XML
-	export(): string {
+	public export(): string {
 		return "";
 	};
 
-	// deno-lint-ignore no-explicit-any
-	abstract serve(req: Request, session: STWSession, _shortcut: any): Promise<Response>;
+	abstract serve(req: Request, session: STWSession): Promise<Response>;
 }

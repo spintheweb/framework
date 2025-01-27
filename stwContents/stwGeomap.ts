@@ -15,11 +15,11 @@ export class STWGeomap extends STWContent {
 	// TODO: scripts should be loaded in the template, e.g. index.html
 	static scripts: string = `<script src="https://www.openlayers.org/api/OpenLayers.js"></script>`;
 
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 
-	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return `<div id="Map${this._id}"></div>
 			<script onload="stwLoadOpenLayersMap('Map${this._id}')">
 				function stwLoadOpenLayersMap(id) {

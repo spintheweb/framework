@@ -10,11 +10,11 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWTable extends STWContent {
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 
-	override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
+	public override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
 		return `TODO: Render ${this.constructor.name} for ${session.user} <pre>${_records}</pre>`;
 	}
 }

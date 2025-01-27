@@ -16,7 +16,7 @@ interface ISTWPage extends ISTWElement {
 export class STWPage extends STWElement {
 	template: string;
 
-	constructor(page: ISTWPage) {
+	public constructor(page: ISTWPage) {
 		super(page);
 		this.template = page.template || "/index.html";
 	}
@@ -28,14 +28,14 @@ export class STWPage extends STWElement {
 	 * @param _session The current session
 	 * @returns String array of contents ids
 	 */
-	contents(_session: STWSession): string[] {
-		const contents = this.children.filter(content => !(content as STWContent).section.startsWith("stwDialog") && content.isVisible(_session) & 1).map(content => content._id);
+	public contents(_session: STWSession): string[] {
+		const contents = this.children.filter(content => !(content as unknown as STWContent).section.startsWith("stwDialog") && content.isVisible(_session) & 1).map(content => content._id);
 		climb(this.parent, contents);
 		return contents;
 
 		function climb(element: STWElement, contents: string[]): void {
 			if (element) {
-				element.children.filter(content => (content as STWContent).section && content.isVisible(_session) & 1).map(content => contents.push(content._id));
+				element.children.filter(content => (content as unknown as STWContent).section && content.isVisible(_session) & 1).map(content => contents.push(content._id));
 				climb(element.parent, contents);
 			}
 		}
@@ -48,8 +48,7 @@ export class STWPage extends STWElement {
 	 * @param session The current session
 	 * @returns - A response for the request
 	 */
-	// deno-lint-ignore no-explicit-any
-	override serve(req: Request, session: STWSession, _shortcut: any): Promise<Response> {
+	public override serve(req: Request, session: STWSession): Promise<Response> {
 		console.debug(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
 
 		return serveFile(req, `./public/${this.template}`);

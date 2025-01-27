@@ -10,11 +10,11 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwDatasources.ts";
 
 export class STWCalendar extends STWContent {
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 
-	override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
+	public override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
 		const layout = this.layout.get(session.lang), daysInMonth = getDaysInMonth(1, 2025);
 
 		// Month rendering

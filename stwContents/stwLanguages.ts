@@ -9,7 +9,7 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
 export class STWLanguages extends STWContent {
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 	
@@ -20,7 +20,7 @@ export class STWLanguages extends STWContent {
 		return super.serve(_req, session, undefined);
 	}
 
-	override render(_req: Request, session: STWSession): string {
+	public override render(_req: Request, session: STWSession): string {
 		return `<nav>${session.site.langs.reduce((langs, lang) => `${langs}<a href="/stw/language/${lang}">${lang.toUpperCase()}</a> `, "")}</nav>`;
 	}
 }

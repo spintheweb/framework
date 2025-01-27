@@ -51,8 +51,8 @@ Deno.serve(
 		if (!sessionId)
 			sessionId = crypto.randomUUID();
 		if (!Sessions.has(sessionId))
-			Sessions.set(sessionId, new STWSession(sessionId, STWSite.get())); // Create new session
-		const session = Sessions.get(sessionId) || new STWSession(sessionId, STWSite.get());
+			Sessions.set(sessionId, new STWSession(sessionId, STWSite.instance)); // Create new session
+		const session = Sessions.get(sessionId) || new STWSession(sessionId, STWSite.instance);
 
 		if (request.headers.get("upgrade") === "websocket") {
 			const { socket, response } = Deno.upgradeWebSocket(request);
@@ -68,10 +68,10 @@ Deno.serve(
 				
 				else if (data.method === "HEAD") {
 					session.langs = data.options.langs || ["en"];
-					session.lang = STWSite.get().langs.includes(data.options.lang) ? data.options.lang : session.langs.find(lang => STWSite.get().langs.includes(lang.substring(0, 2)))?.substring(0, 2) || "en";
+					session.lang = STWSite.instance.langs.includes(data.options.lang) ? data.options.lang : session.langs.find(lang => STWSite.instance.langs.includes(lang.substring(0, 2)))?.substring(0, 2) || "en";
 
 					request = new Request(new URL(request.url).origin + data.resource); // URL
-					data.resource = (STWSite.get().find(session, data.resource) as STWPage)?.contents(session) || [];
+					data.resource = (STWSite.instance.find(session, data.resource) as STWPage)?.contents(session) || [];
 				}
 				
 				/**
@@ -79,7 +79,7 @@ Deno.serve(
 				 */
 				let process = data.resource.length;
 				data.resource?.forEach(async (resource: string, i: number) => {
-					const content = STWSite.get().find(session, resource);
+					const content = STWSite.instance.find(session, resource);
 
 					if (content instanceof STWContent) {
 						const response = await content?.serve(request, session, data.method === "PATCH" ? content : undefined);
@@ -115,7 +115,7 @@ Deno.serve(
 		session.setPlaceholders(request);
 
 		const pathname = new URL(request.url).pathname;
-		const element = STWSite.get().find(session, pathname);
+		const element = STWSite.instance.find(session, pathname);
 
 		let response = new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content;
 
@@ -123,9 +123,9 @@ Deno.serve(
 			if (!element && pathname.indexOf("/.") === -1) // Do not serve paths that have files or directories that begin with a dot
 				response = serveFile(request, `./public${pathname}`);
 			else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
-				response = element.serve(request, session, undefined); // Serve page, area or site, for areas and sites handle their mainpage
+				response = element.serve(request, session); // Serve page, area or site, for areas and sites handle their mainpage
 			else if (session.socket && element?.type) {
-				const res = await element.serve(request, session, undefined);
+				const res = await element.serve(request, session);
 				if (res.status === 200) {
 					const text = await res.text();
 					session.socket.send(text);

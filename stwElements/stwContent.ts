@@ -47,7 +47,7 @@ export abstract class STWContent extends STWElement {
 	parameters: string;
 	protected layout!: Map<string, STWLayout>;
 
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 
 		this.type = content.subtype;
@@ -70,11 +70,11 @@ export abstract class STWContent extends STWElement {
 		}
 	}
 
-	getLayout(session: STWSession): STWLayout {
+	public getLayout(session: STWSession): STWLayout {
 		return this.layout.get(session.lang) || new STWLayout(this.type, "");
 	}
 
-	override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
+	public override localize(session: STWSession, name: "name" | "slug" | "keywords" | "description", value: string = ""): string {
 		if (value) {
 			value = name === "slug" ? value.replace(/[^a-z0-9_]/gi, "").toLowerCase() : value;
 			this[name].set(session.lang, value);
@@ -83,18 +83,18 @@ export abstract class STWContent extends STWElement {
 		return this[name].get(session.lang) || "";
 	}
 
-	async serve(req: Request, session: STWSession, _shortcut: STWContent | undefined): Promise<Response> {
-		if (!_shortcut && !this.isVisible(session))
+	public override async serve(req: Request, session: STWSession, ref: STWContent | undefined): Promise<Response> {
+		if (!ref && !this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
-		if (_shortcut)
-			console.debug(`${new Date().toISOString()}: ${_shortcut._id === this._id ? " ●" : "│└"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		if (ref)
+			console.debug(`${new Date().toISOString()}: ${ref._id === this._id ? " ●" : "│└"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 		else
 			console.debug(`${new Date().toISOString()}: ├─ ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		let debug: string = "";
-		if (session.debug && !this.pathname(session).startsWith("/stws/")) {
-			debug = `<a class="stwInfo" href="/stws/content?_id=${(_shortcut || this)._id}" title="${(_shortcut || this).type}: ${(_shortcut || this).localize(session, "name")} §${(_shortcut || this).section}:${(_shortcut || this).sequence}">Edit</a>`;
+		if (session.dev && !this.pathname(session).startsWith("/stws/")) {
+			debug = `<a class="stwInfo" href="/stws/content?_id=${(ref || this)._id}" title="${(ref || this).type}: ${(ref || this).localize(session, "name")} §${(ref || this).section}:${(ref || this).sequence}">🛈</a>`;
 		}
 
 		const layout = this.layout?.get(session.lang);
@@ -102,9 +102,9 @@ export abstract class STWContent extends STWElement {
 		const data = {
 			method: "PUT",
 			id: this._id,
-			section: (_shortcut || this).section,
-			sequence: (_shortcut || this).sequence,
-			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(_shortcut || this).cssClass || "stw" + this.type}">
+			section: (ref || this).section,
+			sequence: (ref || this).sequence,
+			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
 				${debug}
 				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
 				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `<h1${collapsible()}>${layout?.settings.get("caption")}</h1>` : ""}
@@ -125,7 +125,7 @@ export abstract class STWContent extends STWElement {
 		}
 	}
 
-	render(_req: Request, _session: STWSession, _record: ISTWRecords): string {
+	public render(_req: Request, _session: STWSession, _record: ISTWRecords): string {
 		return `Render ${this.constructor.name}`;
 	}
 }

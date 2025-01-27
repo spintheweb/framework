@@ -9,10 +9,10 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
 export class STWBreadcrumbs extends STWContent {
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
-	override render(_req: Request, session: STWSession): string {
+	public override render(_req: Request, session: STWSession): string {
 		let body = "";
 		for (let element = session.site.find(session, new URL(_req.url).pathname); element; element = element.parent)
 			if (element.isVisible(session) & 1 && element.pathname(session))

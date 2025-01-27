@@ -11,7 +11,7 @@ import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
 import { rePlaceholders } from "./stwMiscellanea.ts";
-import { JSONPath } from "https://cdn.skypack.dev/pin/jsonpath-plus@v10.2.0-GvMkcF9wt4NgYRRcWkuH/mode=imports/optimized/jsonpath-plus.js";
+import { JSONPath } from "https://cdn.jsdelivr.net/npm/jsonpath-plus@10.2.0/dist/index-browser-esm.min.js";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 
 export type ISTWRecords = ExecuteResult;

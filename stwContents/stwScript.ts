@@ -9,11 +9,11 @@ import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
 export class STWScript extends STWContent {
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 	
-	override serve(_req: Request, _session: STWSession): Promise<Response> {
+	public override serve(_req: Request, _session: STWSession): Promise<Response> {
 		if (!this.isVisible(_session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 

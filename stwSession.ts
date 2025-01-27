@@ -10,7 +10,8 @@ import { STWSite } from "./stwElements/stwSite.ts";
 **/
 export class STWSession {
 	sessionId: string;
-	user: string // User name
+	user: string; // User name
+	name!: string; // Full name
 	roles: string[]; // Roles played by the user. Note: Security revolves around this aspect!
 	lang: string; // Preferred user language 
 	langs: string[]; // Accept-Language
@@ -18,11 +19,10 @@ export class STWSession {
 	timestamp: number; // Session timeout in minutes
 	private timer: number = 0;
 	dev: boolean; // If true STW Studio  enabled
-	debug: boolean; // If true and dev is true contents properties are shown
 	site: STWSite;
-	socket?: WebSocket;
+	socket!: WebSocket;
 
-	constructor(sessionId: string, site: STWSite) {
+	public constructor(sessionId: string, site: STWSite) {
 		this.sessionId = sessionId;
 		this.user = "guest";
 		this.roles = ["guests", "developers"];
@@ -31,7 +31,6 @@ export class STWSession {
 		this.placeholders = new Map<string, string>;
 		this.timestamp = Date.now();
 		this.dev = true;
-		this.debug = true;
 		this.site = site;
 
 		console.info(`${new Date().toISOString()}: New session [${this.sessionId}]`);

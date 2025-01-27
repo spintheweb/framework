@@ -30,7 +30,7 @@ class STWToken {
 	attrs: Map<string, string> = new Map();
 	text?: STWToken;
 
-	constructor(symbol: string, args?: string[], params?: STWToken[], attrs?: Map<string, string>, text?: STWToken) {
+	public constructor(symbol: string, args?: string[], params?: STWToken[], attrs?: Map<string, string>, text?: STWToken) {
 		this.symbol = symbol;
 		if (args) this.args = args;
 		if (params) this.params = params;
@@ -44,7 +44,7 @@ export class STWLayout {
 	settings: Map<string, string> = new Map();
 	render: (req: Request, session: STWSession) => string;
 
-	constructor(contentType: string, wbll: string) {
+	public constructor(contentType: string, wbll: string) {
 		this.wbll = wbll;
 
 		// TODO: Lex

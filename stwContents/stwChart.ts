@@ -15,11 +15,11 @@ export class STWChart extends STWContent {
 	// TODO: scripts should be loaded in the template, e.g. index.html
 	static scripts: string = `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`;
 
-	constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent) {
 		super(content);
 	}
 
-	override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return `<canvas id="Chart${this._id}"></canvas>
 			<script onload="drawGraph('Chart${this._id}')">
 				function drawGraph(id) {

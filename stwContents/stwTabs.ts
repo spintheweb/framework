@@ -12,7 +12,7 @@ import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/s
 export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];
 
-	constructor(content: ISTWContentWithOptions) {
+	public constructor(content: ISTWContentWithOptions) {
 		super(content);
 
 		if (content.options)
@@ -21,7 +21,7 @@ export class STWTabs extends STWContent {
 			});
 	}
 
-	override render(_req: Request, session: STWSession): string {
+	public override render(_req: Request, session: STWSession): string {
 		let body = "";
 		this.options.forEach(option => {
 			const element = session.site.find(session, option.ref || "");

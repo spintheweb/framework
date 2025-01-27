@@ -17,16 +17,16 @@ export interface ISTWShortcut extends ISTWContent {
 export class STWShortcut extends STWContent {
 	ref: string;
 
-	constructor(content: ISTWShortcut) {
+	public constructor(content: ISTWShortcut) {
 		super(content);
 
 		this.ref = content.ref;
 	}
 	
-	override serve(_req: Request, _session: STWSession): Promise<Response> {
+	public override serve(_req: Request, _session: STWSession): Promise<Response> {
 		const ref = STWSite.index.get(this.ref);
 
-		if (!this.isVisible(_session) || !ref || ref instanceof STWShortcut)
+		if (!(ref instanceof STWContent) || !this.isVisible(_session) || !ref || ref instanceof STWShortcut)
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
 
 		console.debug(`${new Date().toISOString()}: ├┬ ${this.type} (${this.pathname(_session)}) @${this.section}.${this.sequence} [${this._id}]`);

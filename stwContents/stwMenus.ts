@@ -12,7 +12,7 @@ import { STWElement } from "../stwElements/stwElement.ts";
 export class STWMenus extends STWContent {
 	options: ISTWOption[] = [];
 
-	constructor(content: ISTWContentWithOptions) {
+	public constructor(content: ISTWContentWithOptions) {
 		super(content);
 
 		this.options = loadOptions(content.options || []);
@@ -26,7 +26,7 @@ export class STWMenus extends STWContent {
 		}
 	}
 
-	override render(_req: Request, session: STWSession): string {
+	public override render(_req: Request, session: STWSession): string {
 		let body: string = "";
 		this.options.forEach(option => subrender(option));
 		if (this.layout.get(session.lang)?.settings.has("short"))
