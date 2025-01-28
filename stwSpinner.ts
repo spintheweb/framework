@@ -54,6 +54,9 @@ Deno.serve(
 			Sessions.set(sessionId, new STWSession(sessionId, STWSite.instance)); // Create new session
 		const session = Sessions.get(sessionId) || new STWSession(sessionId, STWSite.instance);
 
+		session.setPlaceholders(request);
+
+		// Handle ws protocol
 		if (request.headers.get("upgrade") === "websocket") {
 			const { socket, response } = Deno.upgradeWebSocket(request);
 
@@ -82,6 +85,9 @@ Deno.serve(
 					const content = STWSite.instance.find(session, resource);
 
 					if (content instanceof STWContent) {
+						// Add eventual websocket querystring parameters to session.placeholder
+						(new URL(request.url + resource)).searchParams.forEach((value, key) => session.placeholders.set(`@${key}`, value));
+
 						const response = await content?.serve(request, session, data.method === "PATCH" ? content : undefined);
 						if (response.status == 200)
 							data.resource[i] = await response.json();
@@ -108,12 +114,12 @@ Deno.serve(
 				}
 			};
 			socket.onerror = error => console.error(error);
+			socket.onclose = () => Sessions.delete(session.sessionId);
 
 			return new Promise<Response>(resolve => resolve(response));;
 		}
 
-		session.setPlaceholders(request);
-
+		// Handle http protocol
 		const pathname = new URL(request.url).pathname;
 		const element = STWSite.instance.find(session, pathname);
 

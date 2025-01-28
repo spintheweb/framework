@@ -21,8 +21,8 @@ export class STWGeomap extends STWContent {
 
 	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return `<div id="Map${this._id}"></div>
-			<script onload="stwLoadOpenLayersMap('Map${this._id}')">
-				function stwLoadOpenLayersMap(id) {
+			<script name="STWGeomap" onload="fnSTWGeomap('Map${this._id}')">
+				function fnSTWGeomap(id) {
 					if (typeof OpenLayers !== "undefined") {
 						map = new OpenLayers.Map(id);
 						map.addLayer(new OpenLayers.Layer.OSM());

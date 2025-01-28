@@ -8,6 +8,7 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { ISTWRecords } from "../stwDatasources.ts";
 import { STWSession } from "../stwSession.ts";
 
 const SYNTAX: RegExp = new RegExp([
@@ -39,10 +40,18 @@ class STWToken {
 	}
 }
 
+/**
+ *  @param wbll
+ *  @param settings
+ *  @param render()
+ */
 export class STWLayout {
 	wbll: string; // Webbase Layout Language
-	settings: Map<string, string> = new Map();
-	render: (req: Request, session: STWSession) => string;
+	settings: Map<string, string> = new Map([
+		["rows", "25"],
+		["period", "month"]
+	]);
+	render: (req: Request, session: STWSession, fields: ISTWRecords, row: number) => string;
 
 	public constructor(contentType: string, wbll: string) {
 		this.wbll = wbll;
@@ -114,11 +123,11 @@ export class STWLayout {
 				fn += `html += \`<a href="${token.args[0]}${querystring(token.params)}" ${attributes(token.attrs)}>${token.text}</a>\`;`;
 			else if (token.symbol === "b")
 				fn += `html += \`<button ${attributes(token.attrs)}>${token.args[1]}</button>\`;`; // Content sensitive
-			else if (token.symbol === "c")
+			else if ("cr".indexOf(token.symbol) != -1)
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
-			else if (token.symbol === "d")
+			else if ("ds".indexOf(token.symbol) != -1)
 				fn += `html += \`<select ${attributes(token.attrs)}><option></option></select>\`;`; // Content sensitive
-			else if (token.symbol === "e")
+			else if ("ehw".indexOf(token.symbol) != -1)
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if (token.symbol === "f")
 				fn += `html += session.placeholders.get("${token.args[0]}");`;
@@ -128,6 +137,8 @@ export class STWLayout {
 				fn += `html += \`<script>${token.args[0]}</script>\`;`;
 			else if (token.symbol === "k")
 				fn += `session.placeholders.set("${token.args[0]}", "${token.args[1]}");`;
+			else if (token.symbol === "l" && contentType == "Table")
+				fn += `html += \`<td ${attributes(token.attrs)}>${token.args[0]}>\`;`;
 			else if (token.symbol === "l")
 				fn += `html += \`<label ${attributes(token.attrs)}>${token.args[0]}</label>\`;`;
 			else if (token.symbol === "m")
@@ -141,14 +152,21 @@ export class STWLayout {
 						html += \`<article id="${placeholder}"></article>\`;
 						session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: "${placeholder}" }));
 					}`;
-			} else if (token.symbol === "\\n") // Content type sensitive
+			} else if ("xyz".indexOf(token.symbol) != -1) {
+				fn += "";
+			} else if (token.symbol === "v") {
+				fn += `html += \`${eval(token.args[0])}\`;`;
+			} else if (token.symbol === "t")
+				fn += `html += \`${token.args[0]}\`;`;
+			else if (token.symbol === "\\n") { // Content type sensitive
 				fn += "html += \`<br>\`;";
-			else if (token.symbol === "\\r")
+			} else if (token.symbol === "\\r")
 				fn += "html += \`<br>\`;";
 			else if (token.symbol === "\\t") // Content type sensitive
 				fn += "html += \`<br>\`;";
-			else if (token.symbol === "t")
-				fn += `html += \`${token.args[0]}\`;`;
+			else if (token.symbol === "u")
+				fn += `html += \`<input type="file" ${attributes(token.attrs)}>\`;`;
+
 			fn += `field += df; df = 0;`;
 		});
 		fn += "return html;";

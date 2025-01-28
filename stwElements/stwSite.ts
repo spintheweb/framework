@@ -99,11 +99,11 @@ export class STWSite extends STWElement {
 
 	// Find the element given an _id or permalink
 	public find(session: STWSession, ref: string): STWElement | null {
-		if (ref.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i))
+		if (ref.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i))
 			return STWSite.index.get(ref) || null;
 		if (ref === "/")
 			return STWSite.index.get(STWSite.#instance.mainpage) || null;
-		return STWSite.#instance.recurse(session, STWSite.#instance.children, ref.split("/"));
+		return STWSite.#instance.recurse(session, STWSite.#instance.children, ref.substring(0, ref.indexOf("?")).split("/"));
 	}
 
 	private recurse(session: STWSession, children: STWElement[], slugs: string[], i: number = 1): STWElement | null {

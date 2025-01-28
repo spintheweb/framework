@@ -78,7 +78,8 @@ function fetchWebbaseData(session: STWSession, content: STWContent): Promise<Exe
 		setTimeout(() => {
 			resolve({
 				affectedRows: 1,
-				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: session.site, callback: localize })],
+				rows: [STWSite.index.get(session.placeholders.get("@_id") || "")],
+//				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: session.site, callback: localize })],
 			});
 		}, 1000); // Mock delay to simulate async behavior
 	});

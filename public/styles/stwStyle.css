@@ -29,6 +29,12 @@ article {
 	content: "&#10006;";
 }
 
+.stwProperties {
+	font-size: x-large;
+	text-decoration: none;
+	float: left;
+}
+
 .stwLanguages a {
 	font-size: smaller;
 }
@@ -102,8 +108,12 @@ article {
 }
 
 .stwMenus menu li>div {
-	padding: 0 1em;
+	padding: 0 0.5em;
 	line-height: 1.5em;
+}
+
+.stwInvisible {
+	display: none;
 }
 
 .stwSelected,
@@ -117,25 +127,13 @@ article {
 	display: inherit;
 }
 
-.stwMenu
-
-.stwTabs {
-	position: relative;
-}
-
 .stwTabs dt {
-	position: relative;
 	display: inline-block;
 	padding: 0.25em 0.5em;
 	cursor: pointer;
 }
 
 .stwTabs dd {
-	position: absolute;
 	margin: 0;
-	display: none;
-}
-
-dt.stwSelected+dd {
-	display: inherit;
+	border-top: thin solid light-dark(CanvasText, Canvas);
 }

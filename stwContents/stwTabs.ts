@@ -8,7 +8,6 @@
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 
-// TODO: If the permalink of an element is changed the pathname of the corresponding options needs to be updated
 export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];
 
@@ -22,19 +21,39 @@ export class STWTabs extends STWContent {
 	}
 
 	public override render(_req: Request, session: STWSession): string {
-		let body = "";
+		let body = "", id = "";
+
 		this.options.forEach(option => {
 			const element = session.site.find(session, option.ref || "");
-
 			if (element instanceof STWContent && element.isVisible(session)) {
 				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-
-				const placeholder = crypto.randomUUID();
-				body += `<dt>${name}</dt><dd><article id="${placeholder}"></dd>`;
-				session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: placeholder })); // Ask client to request content
+				body += `<dt data-ref="${element._id}"${id ? "" : ' class="stwSelected"'}>${name}</dt>`;
+				id = id || element._id;
 			}
 		});
-		return `<dl onclick="event.currentTarget.querySelectorAll('dt').forEach(dt => dt.classList[dt == event.target ? 'add' : 'remove']('stwSelected'))">${body}</dl>`;
+
+		if (!id)
+			return "";
+
+		const placeholder = crypto.randomUUID();
+		body += `<dd><article id="${placeholder}"></article></dd>`;
+		session.socket?.send(JSON.stringify({ method: "PATCH", id: id, placeholder: placeholder })); // Ask client to request content
+
+		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
+		return `<dl>${body}</dl>
+			<script name="STWTabs" onload="fnSTWTabs('${this._id}')">
+				function fnSTWTabs(id) {
+					const tabs = self.document.getElementById(id);
+					tabs.querySelector("dl").addEventListener("click", event => {
+						const target = event.target;
+						if (target.tagName === "DT" && !target.classList.contains("stwSelected")) {
+							event.currentTarget.querySelectorAll('dt').forEach(dt => dt.classList[dt == target ? "add" : "remove"]("stwSelected"));
+							event.currentTarget.querySelector("dd article").id = "refreshSTWTab";
+							stwWS.send(JSON.stringify({ method: "PATCH", resource: target.getAttribute("data-ref"), options: { placeholder: "refreshSTWTab" } }));
+						}
+					});
+				}
+			</script>`;
 	}
 }
 

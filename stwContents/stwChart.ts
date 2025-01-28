@@ -21,8 +21,8 @@ export class STWChart extends STWContent {
 
 	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return `<canvas id="Chart${this._id}"></canvas>
-			<script onload="drawGraph('Chart${this._id}')">
-				function drawGraph(id) {
+			<script name="STWChart" onload="fnSTWChart('Chart${this._id}')">
+				function fnSTWChart(id) {
 					const ctx = self.document.getElementById(id);
 					new Chart(ctx, {
 						type: 'bar',

@@ -9,13 +9,14 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
  **/
 // deno-lint-ignore-file
-self.addEventListener("load", startWebsocket);
+self.addEventListener("load", stwStartWebsocket);
 
-function startWebsocket() {
-	const ws = new WebSocket(self.location.host);
+let stwWS;
+function stwStartWebsocket() {
+	stwWS = new WebSocket("");
 
-	ws.onopen = _event => {
-		ws.send(JSON.stringify({
+	stwWS.onopen = _event => {
+		stwWS.send(JSON.stringify({
 			method: "HEAD",
 			resource: self.document.location.pathname,
 			options: {
@@ -28,12 +29,12 @@ function startWebsocket() {
 		self.document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
 	};
 
-	ws.onmessage = event => {
+	stwWS.onmessage = event => {
 		// event.data = { method: "GET" | "PUT" | "PATCH" | "DELETE", id: string, section: string, sequence: number, body: string }
 		const data = JSON.parse(event.data);
 
 		if (data.method === "PATCH") {
-			ws.send(JSON.stringify({ method: "PATCH", resource: data.id, options: { placeholder: data.placeholder } }));
+			stwWS.send(JSON.stringify({ method: "PATCH", resource: data.id, options: { placeholder: data.placeholder } }));
 			return;
 		}
 
@@ -50,11 +51,11 @@ function startWebsocket() {
 			}
 
 			if (data.section === "stwDialog" || data.section === "stwDialogModal") {
+				// self.document.querySelector("dialog")?.remove();
 				self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-				if (data.section === "stwDialogModal") {
-					self.document.querySelector("dialog")?.remove();
+				if (data.section === "stwDialogModal")
 					self.document.querySelector("dialog")?.showModal();
-				} else
+				else
 					self.document.querySelector("dialog")?.show();
 
 			} else if (data.section === "stwConsole") {
@@ -74,23 +75,22 @@ function startWebsocket() {
 			}
 		}
 
-
 		// Load content script
 		const script = self.document.getElementById(data.id)?.querySelector("script[onload]");
 		if (script) {
-			const callback = script.onload, element = self.document.createElement("script");
-			element.insertAdjacentText("afterbegin", script.innerText);
-			self.document.head.append(element);
+			if (typeof window[`fn${script.getAttribute("name")}`] !== "function") {
+				const element = self.document.createElement("script");
+				element.insertAdjacentText("afterbegin", script.innerText);
+				self.document.head.append(element);
+			}
+			script.onload();
 			script.remove();
-
-			if (callback)
-				callback();
 		}
 	};
 
-	ws.onerror = err => {
+	stwWS.onerror = err => {
 		console.error(err);
-		ws = null;
-		setTimeout(startWebsocket, 5000);
+		stwWS = null;
+		setTimeout(stwStartWebsocket, 5000);
 	}
 }

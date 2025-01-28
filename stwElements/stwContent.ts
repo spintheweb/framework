@@ -58,7 +58,7 @@ export abstract class STWContent extends STWElement {
 		this.query = content.query;
 		this.parameters = content.parameters;
 
-		if (["Text", "Script", "Shortcut"].includes(this.type) == false && content.layout) {
+		if (!["Text", "Script", "Shortcut"].includes(this.type) && content.layout) {
 			this.layout = new Map();
 			for (const [lang, wbll] of Object.entries(content.layout)) {
 				try {
@@ -92,12 +92,11 @@ export abstract class STWContent extends STWElement {
 		else
 			console.debug(`${new Date().toISOString()}: ├─ ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
-		let debug: string = "";
-		if (session.dev && !this.pathname(session).startsWith("/stws/")) {
-			debug = `<a class="stwInfo" href="/stws/content?_id=${(ref || this)._id}" title="${(ref || this).type}: ${(ref || this).localize(session, "name")} §${(ref || this).section}:${(ref || this).sequence}">🛈</a>`;
-		}
-
 		const layout = this.layout?.get(session.lang);
+
+		let debug: string = "";
+		if (session.dev && !this.pathname(session).startsWith("/stws/"))
+			debug = `<span class="stwProperties" onclick="stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/content?_id=${(ref || this)._id}',options:{placeholder:''}}))">◼</span>`;
 
 		const data = {
 			method: "PUT",
@@ -121,7 +120,7 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? ` onclick="this.nextElementSybling.classList.toggle('stwInvisible')"` : "";
+			return layout?.settings.has("collapsible") ? ` class="stwCollapsible" onclick="this.nextElementSibling.classList.toggle('stwInvisible')"` : "";
 		}
 	}
 
