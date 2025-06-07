@@ -1,6 +1,7 @@
 {
   "tasks": {
     "docker:build": "docker build -t stwp-deno .",
-    "docker:run": "docker run -p 80:80 stwp-deno"
+    "docker:run": "docker run -p 80:80 stwp-deno",
+    "test": "deno test"
   }
 }
