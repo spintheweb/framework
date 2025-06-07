@@ -1,7 +1,7 @@
-<img src="https://avatars0.githubusercontent.com/u/16848901?s=460&u=acaf05c1e801337a7f6a87676ec886ccba9c641e&v=4" width="100p">
+<img src="https://github.com/keyvisions/spintheweb/blob/main/public/media/Logo-bn_128x128.png" width="100p">
 
 # Spin the Web Project
-_Technology that eases eVerse development_
+_Technology that eases web portal development_
 
 Spin the Web deals with the Webbase Markup Language (WBML). Simply put, HTML describes a web page, WBML, a web site; and, while HTML is interpreted by a client side web browser, WBML, by a server side _web spinner_. It is this project opinion that WBML is a missing component in the World Wide Web space.
 
@@ -40,5 +40,3 @@ A web spinner&mdash;a web server that understands WBML&mdash;receives a request 
 * Else it receives a resource
 * The _session context_ stores the connected user, its associated roles and locale. When a new session is established, the user is preset to _guest_ and roles to _guests_.
 
-## Spin the Web Studio
-Spin the Web Studio is a webbaselet that eases the development of a Spin the Web site. It is added to a site webbase and is accessible to developers (i.e. users with a developers role), its contents interact directly with the underlying site webbase. The latest release is available at this location https://www.spintheweb.org/resources/stwStudio.wbml.
