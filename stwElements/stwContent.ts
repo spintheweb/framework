@@ -96,15 +96,14 @@ export abstract class STWContent extends STWElement {
 
 		let debug: string = "";
 		if (session.dev && !this.pathname(session).startsWith("/stws/"))
-			debug = `<span class="stwProperties" onclick="stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/content?_id=${(ref || this)._id}',options:{placeholder:''}}))">◼</span>`;
+			debug = `title="Double-click to edit content" ondblclick="stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/content?_id=${(ref || this)._id}',options:{placeholder:''}}))"`;
 
 		const data = {
 			method: "PUT",
 			id: this._id,
 			section: (ref || this).section,
 			sequence: (ref || this).sequence,
-			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
-				${debug}
+			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}" ${debug}>
 				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
 				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `<h1${collapsible()}>${layout?.settings.get("caption")}</h1>` : ""}
 				<div>

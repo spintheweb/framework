@@ -97,3 +97,32 @@ console.clear();
 console.info(text);
 console.log(processPlaceholders2(text, placeholders));
 */
+
+/*
+function doit(event) {
+  //debugger;
+  let declarations = ""
+  document.querySelectorAll(".variable").forEach((variable) => {
+    if (variable.type === "number")
+      declarations += `const ${variable.name}=${parseFloat(variable.value) || 0.0};`
+    else
+      declarations += `const ${variable.name}="${variable.value.replace(/"/g, '\\"')}";`
+  });
+  document.getElementById("log").innerText = "";
+  document.querySelectorAll(".function").forEach((fn) => {
+    let body = fn.value.trim()
+    if (body[0] === "=") {
+      const funct = new Function(
+        `${declarations}${body.replace("=", "return ")};`,
+      )
+      log(funct.toString())
+      log(funct())
+    } else log(body)
+  });
+  
+}
+
+function log(txt) {
+  document.getElementById("log").innerText += txt + "\n";
+}
+*/

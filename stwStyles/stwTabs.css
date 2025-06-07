@@ -5,7 +5,7 @@
 .stwTabs dt {
 	position: relative;
 	display: inline-block;
-	padding: 0.25em 0.5em;
+	padding: 0.25rem 0.5rem;
 	cursor: pointer;
 }
 

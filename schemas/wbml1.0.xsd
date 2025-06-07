@@ -1,47 +1,47 @@
 <?xml version='1.0' encoding='utf-8'?>
 <xsd:schema version='1.0'
     xmlns:xsd='http://www.w3.org/2001/XMLSchema'
-    xmlns:wbdl='http://www.spintheweb.org/schemas' targetNamespace='http://www.spintheweb.org/schemas' elementFormDefault='qualified' attributeFormDefault='unqualified' xml:lang='en'>
+    xmlns:wbml='http://www.spintheweb.org/schemas' targetNamespace='http://www.spintheweb.org/schemas' elementFormDefault='qualified' attributeFormDefault='unqualified' xml:lang='en'>
     <xsd:annotation>
         <xsd:documentation><![CDATA[
-wbdl 1.0 (Webbase Description Language Schema) http://www.spintheweb.org/schemas/wbdl1.xsd
+wbml 1.0 (Webbase Markup Language Schema) http://www.spintheweb.org/schemas/wbml1.xsd
 The purpose of this schema is to formalize the description of a web site in terms of structure, navigation and contents.
 Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
 ]]>
         </xsd:documentation>
     </xsd:annotation>
-    <xsd:element name='wbdl'>
+    <xsd:element name='wbml'>
         <xsd:complexType>
             <xsd:choice>
                 <xsd:element name='webbase'>
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element name='datasources' minOccurs='0' type='wbdl:datasourcesType'>
+                            <xsd:element name='datasources' minOccurs='0' type='wbml:datasourcesType'>
                             </xsd:element>
-                            <xsd:element name='security' type='wbdl:securityType'>
+                            <xsd:element name='security' type='wbml:securityType'>
                             </xsd:element>
-                            <xsd:element name='imagemaps' type='wbdl:imagemapsType' minOccurs='0'>
+                            <xsd:element name='imagemaps' type='wbml:imagemapsType' minOccurs='0'>
                             </xsd:element>
-                            <xsd:element name='title' type='wbdl:textType' minOccurs='1'>
+                            <xsd:element name='title' type='wbml:textType' minOccurs='1'>
                             </xsd:element>
-                            <xsd:element name='description' type='wbdl:textType' minOccurs='0'>
+                            <xsd:element name='description' type='wbml:textType' minOccurs='0'>
                             </xsd:element>
-                            <xsd:element name='keywords' type='wbdl:textType' minOccurs='0'>
+                            <xsd:element name='keywords' type='wbml:textType' minOccurs='0'>
                             </xsd:element>
-                            <xsd:element name='icon' type='wbdl:textType' minOccurs='0'>
+                            <xsd:element name='icon' type='wbml:textType' minOccurs='0'>
                             </xsd:element>
-                            <xsd:element name='image' type='wbdl:textType' minOccurs='0'/>
-                            <xsd:element minOccurs='0' name='codebehind' type='wbdl:textType'/>
+                            <xsd:element name='image' type='wbml:textType' minOccurs='0'/>
+                            <xsd:element minOccurs='0' name='codebehind' type='wbml:textType'/>
                             <xsd:element name='texts'>
                                 <xsd:complexType>
                                     <xsd:sequence maxOccurs='unbounded'>
-                                        <xsd:element name='standard' type='wbdl:textType'>
+                                        <xsd:element name='standard' type='wbml:textType'>
                                         </xsd:element>
                                     </xsd:sequence>
                                 </xsd:complexType>
                             </xsd:element>
-                            <xsd:element name='authorizations' type='wbdl:authorizationsType' minOccurs='0'/>
-                            <xsd:element minOccurs='1' maxOccurs='unbounded' name='area' type='wbdl:areaType'/>
+                            <xsd:element name='authorizations' type='wbml:authorizationsType' minOccurs='0'/>
+                            <xsd:element minOccurs='1' maxOccurs='unbounded' name='area' type='wbml:areaType'/>
                         </xsd:sequence>
                         <xsd:attribute name='id' use='required' type='xsd:ID'/>
                         <xsd:attribute name='language' type='xsd:language' use='required'/>
@@ -54,14 +54,14 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
                 <xsd:element name='webbaselet'>
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element name='datasources' type='wbdl:datasourcesType' minOccurs='0'/>
-                            <xsd:element name='security' type='wbdl:securityType' minOccurs='0' maxOccurs='1'/>
-                            <xsd:element name='imagemaps' type='wbdl:imagemapsType' minOccurs='0'>
+                            <xsd:element name='datasources' type='wbml:datasourcesType' minOccurs='0'/>
+                            <xsd:element name='security' type='wbml:securityType' minOccurs='0' maxOccurs='1'/>
+                            <xsd:element name='imagemaps' type='wbml:imagemapsType' minOccurs='0'>
                             </xsd:element>
                             <xsd:choice>
-                                <xsd:element name='area' type='wbdl:areaType'/>
-                                <xsd:element name='page' type='wbdl:pageType'/>
-                                <xsd:element name='content' type='wbdl:contentType'/>
+                                <xsd:element name='area' type='wbml:areaType'/>
+                                <xsd:element name='page' type='wbml:pageType'/>
+                                <xsd:element name='content' type='wbml:contentType'/>
                             </xsd:choice>
                         </xsd:sequence>
                         <xsd:attribute name='id' use='required' type='xsd:ID'/>
@@ -75,15 +75,15 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
 
     <xsd:complexType name='areaType'>
         <xsd:sequence>
-            <xsd:element name='title' type='wbdl:textType' minOccurs='1'>
+            <xsd:element name='title' type='wbml:textType' minOccurs='1'>
             </xsd:element>
-            <xsd:element name='icon' type='wbdl:textType' minOccurs='0'/>
-            <xsd:element name='image' type='wbdl:textType' minOccurs='0'/>
-            <xsd:element minOccurs='0' name='codebehind' type='wbdl:textType'/>
-            <xsd:element minOccurs='0' name='authorizations' type='wbdl:authorizationsType'/>
+            <xsd:element name='icon' type='wbml:textType' minOccurs='0'/>
+            <xsd:element name='image' type='wbml:textType' minOccurs='0'/>
+            <xsd:element minOccurs='0' name='codebehind' type='wbml:textType'/>
+            <xsd:element minOccurs='0' name='authorizations' type='wbml:authorizationsType'/>
             <xsd:choice minOccurs='1' maxOccurs='unbounded'>
-                <xsd:element name='area' type='wbdl:areaType' minOccurs='0'/>
-                <xsd:element name='page' type='wbdl:pageType' minOccurs='0'/>
+                <xsd:element name='area' type='wbml:areaType' minOccurs='0'/>
+                <xsd:element name='page' type='wbml:pageType' minOccurs='0'/>
             </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name='id' type='xsd:ID' use='required'/>
@@ -93,21 +93,21 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
 
     <xsd:complexType name='pageType'>
         <xsd:sequence minOccurs='1'>
-            <xsd:element name='visibility' type='wbdl:textType' minOccurs='0'>
+            <xsd:element name='visibility' type='wbml:textType' minOccurs='0'>
             </xsd:element>
-            <xsd:element name='title' type='wbdl:textType' minOccurs='1'>
+            <xsd:element name='title' type='wbml:textType' minOccurs='1'>
             </xsd:element>
-            <xsd:element name='icon' type='wbdl:textType' minOccurs='0' maxOccurs='1'>
+            <xsd:element name='icon' type='wbml:textType' minOccurs='0' maxOccurs='1'>
             </xsd:element>
-            <xsd:element name='keywords' type='wbdl:textType' minOccurs='0'>
+            <xsd:element name='keywords' type='wbml:textType' minOccurs='0'>
             </xsd:element>
-            <xsd:element name='description' type='wbdl:textType' minOccurs='0'>
+            <xsd:element name='description' type='wbml:textType' minOccurs='0'>
             </xsd:element>
-            <xsd:element minOccurs='0' name='authorizations' type='wbdl:authorizationsType'/>
-            <xsd:element minOccurs='0' name='codebehind' type='wbdl:textType'/>
+            <xsd:element minOccurs='0' name='authorizations' type='wbml:authorizationsType'/>
+            <xsd:element minOccurs='0' name='codebehind' type='wbml:textType'/>
             <xsd:choice minOccurs='0' maxOccurs='unbounded'>
-                <xsd:element name='content' type='wbdl:contentType'/>
-                <xsd:element name='shortcut' type='wbdl:shortcutType'/>
+                <xsd:element name='content' type='wbml:contentType'/>
+                <xsd:element name='shortcut' type='wbml:shortcutType'/>
             </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name='id' type='xsd:ID' use='required'/>
@@ -126,16 +126,16 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
                     </xsd:simpleContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name='layout' type='wbdl:textType' minOccurs='0' maxOccurs='1'>
+            <xsd:element name='layout' type='wbml:textType' minOccurs='0' maxOccurs='1'>
             </xsd:element>
-            <xsd:element minOccurs='0' name='codebehind' type='wbdl:textType'/>
+            <xsd:element minOccurs='0' name='codebehind' type='wbml:textType'/>
             <xsd:element name='links' minOccurs='0' maxOccurs='1'>
                 <xsd:complexType>
                     <xsd:sequence maxOccurs='unbounded'>
                         <xsd:element name='link'>
                             <xsd:complexType>
                                 <xsd:sequence maxOccurs='1' minOccurs='0'>
-                                    <xsd:element name='title' type='wbdl:textType'/>
+                                    <xsd:element name='title' type='wbml:textType'/>
                                 </xsd:sequence>
                                 <xsd:attribute name='page' type='xsd:IDREF'/>
                                 <xsd:attribute name='parameters' type='xsd:normalizedString'/>
@@ -144,7 +144,7 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element minOccurs='0' name='authorizations' type='wbdl:authorizationsType'/>
+            <xsd:element minOccurs='0' name='authorizations' type='wbml:authorizationsType'/>
         </xsd:sequence>
         <xsd:attribute name='id' type='xsd:ID' use='required'/>
         <xsd:attribute name='name' type='xsd:normalizedString'/>
@@ -156,7 +156,7 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
     </xsd:complexType>
     <xsd:complexType name='shortcutType'>
         <xsd:sequence>
-            <xsd:element minOccurs='0' name='authorizations' type='wbdl:authorizationsType'/>
+            <xsd:element minOccurs='0' name='authorizations' type='wbml:authorizationsType'/>
         </xsd:sequence>
         <xsd:attribute name='id' type='xsd:ID' use='required'/>
         <xsd:attribute name='name' use='required' type='xsd:normalizedString'/>
@@ -232,7 +232,7 @@ Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
                                 <xsd:simpleContent>
                                     <xsd:extension base='xsd:normalizedString'>
                                         <xsd:attribute name='key' type='xsd:normalizedString'/>
-                                        <xsd:attribute name='shape' type='wbdl:shape'/>
+                                        <xsd:attribute name='shape' type='wbml:shape'/>
                                     </xsd:extension>
                                 </xsd:simpleContent>
                             </xsd:complexType>

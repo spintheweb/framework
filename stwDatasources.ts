@@ -11,10 +11,9 @@ import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
 import { rePlaceholders } from "./stwMiscellanea.ts";
-import { JSONPath } from "https://cdn.jsdelivr.net/npm/jsonpath-plus@10.2.0/dist/index-browser-esm.min.js";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 
-export type ISTWRecords = ExecuteResult;
+export type ISTWRecords = ExecuteResult & { fieldNames?: string[] };
 
 interface ISTWDatasource {
 	type: "stw" | "mysql" | "postgres" | "mongodb", // Datasource type
@@ -27,7 +26,7 @@ interface ISTWDatasource {
 export class STWDatasources {
 	static datasources: Map<string, STWSite | MySQLClient> = new Map();
 
-	static async query(session: STWSession, content: STWContent): Promise<ExecuteResult> {
+	static async query(session: STWSession, content: STWContent): Promise<ISTWRecords> {
 		try {
 			if (!STWDatasources.datasources.size) {
 				STWDatasources.datasources.set("stw", session.site); // Webbase
@@ -35,6 +34,8 @@ export class STWDatasources {
 				// TODO: Connection pools
 				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
 					switch (settings.type) {
+						case "api":
+							break;
 						case "mysql":
 							STWDatasources.datasources.set(settings.name, await new MySQLClient().connect({
 								hostname: settings.host,
@@ -60,7 +61,7 @@ export class STWDatasources {
 			}
 		} catch (error) {
 			console.error(error);
-//			throw error;
+			//			throw error;
 		}
 		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}
@@ -73,15 +74,14 @@ export class STWDatasources {
  * @param content The content being rendered
  * @returns The result set
  */
-function fetchWebbaseData(session: STWSession, content: STWContent): Promise<ExecuteResult> {
+function fetchWebbaseData(session: STWSession, _content: STWContent): Promise<ISTWRecords> {
 	return new Promise(resolve => {
-		setTimeout(() => {
-			resolve({
-				affectedRows: 1,
-				rows: [STWSite.index.get(session.placeholders.get("@_id") || "")],
-//				rows: [JSONPath({ path: rePlaceholders(content.query, session.placeholders), json: session.site, callback: localize })],
-			});
-		}, 1000); // Mock delay to simulate async behavior
+		const element = STWSite.index.get(session.placeholders.get("@_id") || "");
+		resolve({
+			affectedRows: 1,
+			fieldNames: Object.getOwnPropertyNames(element),
+			rows: [element]
+		})
 	});
 
 	/**

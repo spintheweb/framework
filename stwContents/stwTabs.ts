@@ -47,7 +47,7 @@ export class STWTabs extends STWContent {
 					tabs.querySelector("dl").addEventListener("click", event => {
 						const target = event.target;
 						if (target.tagName === "DT" && !target.classList.contains("stwSelected")) {
-							event.currentTarget.querySelectorAll('dt').forEach(dt => dt.classList[dt == target ? "add" : "remove"]("stwSelected"));
+							event.currentTarget.querySelectorAll("dt").forEach(dt => dt.classList[dt == target ? "add" : "remove"]("stwSelected"));
 							event.currentTarget.querySelector("dd article").id = "refreshSTWTab";
 							stwWS.send(JSON.stringify({ method: "PATCH", resource: target.getAttribute("data-ref"), options: { placeholder: "refreshSTWTab" } }));
 						}

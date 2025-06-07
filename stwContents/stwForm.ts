@@ -19,14 +19,15 @@ export class STWForm extends STWContent {
 	public override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
 		let body = "";
 
-		// Transfer record to session placeholders
+		// Merge record and session placeholders
+		const placeholders = new Map(session.placeholders);
 		if (_records.rows?.length)
-			Object.entries(_records.rows[0]).forEach((key, value) => session.placeholders.set(`@@${key}`, value.toString()));
+			Object.entries(_records.rows[0]).forEach((key, value) => placeholders.set(`@@${key}`, value.toString()));
 
-		body += this.layout.get(session.lang)?.render(_req, session);
+		body += this.layout.get(session.lang)?.render(_req, session, _records, placeholders);
 
 		// If the form is inside a dialog, method="dialog"
-		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : ""}">
+		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : "post"}">
 			<input type="hidden" name="stwOrigin" value="${this._id}">
 			${body}
 		</form>`;

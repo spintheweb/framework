@@ -103,7 +103,7 @@ export class STWSite extends STWElement {
 			return STWSite.index.get(ref) || null;
 		if (ref === "/")
 			return STWSite.index.get(STWSite.#instance.mainpage) || null;
-		return STWSite.#instance.recurse(session, STWSite.#instance.children, ref.substring(0, ref.indexOf("?")).split("/"));
+		return STWSite.#instance.recurse(session, STWSite.#instance.children, ref.indexOf("?") < 0 ? ref.split("/") : ref.substring(0, ref.indexOf("?")).split("/"));
 	}
 
 	private recurse(session: STWSession, children: STWElement[], slugs: string[], i: number = 1): STWElement | null {

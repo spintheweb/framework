@@ -16,5 +16,10 @@
         "user": "ps_ext_user",
         "password": "rN-m81&57cR",
         "database": "rs3hmqg2_pres617"
+    },
+    {
+        "name": "countries",
+        "type": "api",
+        "host": "https://restcountries.com/v3.1/all"
     }
 ]

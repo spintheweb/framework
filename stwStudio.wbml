@@ -23,25 +23,46 @@
             "visibility": {},
             "subtype": "Form",
             "cssClass": null,
-            "section": "stwDialogModal",
+            "section": "dialog",
             "sequence": "1",
             "dsn": "stw",
             "query": "$..[[?(\\@._id=='@_id')]]",
             "params": "",
             "layout": {
-                "en": "t('<label><span>Name</span><input name=\"name\" value\"@@name\"></label><label><span>Slug</span><input name=\"slug\" value\"@@slug\"></label><label><span>Section</span><input name=\"section\" value\"@@section\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\" value\"@@sequence\"></label><label><span>CSS Class</span><input name=\"cssClass\" value\"@@cssClass\"></label><br><button name=\"stwAction\" value=\"update\" formmethod=\"post\">Save</button><button formmethod=\"dialog\">Cancel</button>')"
+                "en": "\\s('caption=\"Content\" key=\"_id\" ')t('<label><span>Name</span><input name=\"name\" value\"@@name\"></label><label><span>Slug</span><input name=\"slug\" value\"@@slug\"></label><label><span>Section</span><input name=\"section\" value\"@@section\"></label><label><span>Sequence</span><input type=\"number\" name=\"sequence\" value\"@@sequence\"></label><label><span>CSS Class</span><input name=\"cssClass\" value\"@@cssClass\"></label>')b(';Save;;stw;update')t(' ')b(';Cancel;;stw;cancel')\\a('formmethod=\"dialog\"')"
             }
         },
         {
             "_id": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef",
             "type": "Page",
             "name": {
-                "en": "Elements"
+                "en": "Interface"
             },
             "slug": {
-                "en": "elements"
+                "en": "interface"
             },
             "children": [
+                {
+                    "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c5",
+                    "type": "Content",
+                    "name": {
+                        "en": "activities"
+                    },
+                    "slug": {
+                        "en": "activities"
+                    },
+                    "visibility": {},
+                    "subtype": "Text",
+                    "cssClass": null,
+                    "section": "stwSidebar",
+                    "sequence": "1",
+                    "dsn": "",
+                    "query": "",
+                    "params": "",
+                    "layout": {
+                        "en": "sidebar"
+                    }
+                },
                 {
                     "_id": "e29cfba0-2952-11ee-8a01-eb5d698979c7",
                     "type": "Content",
@@ -54,13 +75,13 @@
                     "visibility": {},
                     "subtype": "Text",
                     "cssClass": null,
-                    "section": "main",
+                    "section": "stwManubar",
                     "sequence": "1",
                     "dsn": "",
                     "query": "",
                     "params": "",
                     "layout": {
-                        "en": "<img src=\"./media/Logo-bn_128x128.png\" title=\"Spin the Web Logo\"><span>Spin the Web Project</span>"
+                        "en": "menubar"
                     }
                 },
                 {
@@ -73,21 +94,21 @@
                         "en": "element"
                     },
                     "visibility": {},
-                    "subtype": "Table",
+                    "subtype": "Text",
                     "cssClass": null,
-                    "section": "main",
+                    "section": "stwStatusbar",
                     "sequence": "1",
-                    "dsn": "stw",
-                    "query": "$.._id",
+                    "dsn": null,
+                    "query": null,
                     "params": "",
                     "layout": {
-                        "en": "\\s('caption=\"These are the elements\"')"
+                        "en": "statusbar"
                     }
                 }
             ],
             "visibility": {},
-            "contentType": "text/html",
-            "template": "index.html"
+            "contentType": null,
+            "template": null
         }
     ],
     "visibility": {

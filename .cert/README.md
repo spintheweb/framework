@@ -15,4 +15,4 @@ $ certbot certonly
 Or:
 
 $ cd .cert/
-$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj //CN=studio.spintheweb.org
+$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj //CN=sandbox.spintheweb.org

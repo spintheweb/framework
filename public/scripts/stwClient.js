@@ -50,10 +50,10 @@ function stwStartWebsocket() {
 					return;
 			}
 
-			if (data.section === "stwDialog" || data.section === "stwDialogModal") {
+			if (data.section === "stwDialog" || data.section === "dialog") {
 				// self.document.querySelector("dialog")?.remove();
 				self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-				if (data.section === "stwDialogModal")
+				if (data.section === "dialog")
 					self.document.querySelector("dialog")?.showModal();
 				else
 					self.document.querySelector("dialog")?.show();
@@ -94,3 +94,46 @@ function stwStartWebsocket() {
 		setTimeout(stwStartWebsocket, 5000);
 	}
 }
+
+window.addEventListener("keydown", event => {
+	if (event.shiftKey && event.key == "F12") {
+		event.preventDefault();
+		if (document.querySelector(".stwStudio")) {
+			const stash = document.getElementById("stwBody");
+			while (stash.firstChild)
+				document.body.appendChild(stash.firstChild);
+			document.querySelector(".stwStudio").remove();
+		} else {
+			const stash = document.createElement("div");
+			while (document.body.firstChild)
+				stash.appendChild(document.body.firstChild);
+			document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="splitter"></div><div id="stwBody"></div></div><footer id="stwStatusbar"></footer></div>`)
+			while (stash.firstChild)
+				document.getElementById("stwBody").appendChild(stash.firstChild);
+			stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: {} }));
+		}
+	}
+});
+document.addEventListener("mousedown", function (e) {
+	const splitter = e.target.closest(".splitter");
+	if (!splitter) return;
+	const container = splitter.parentElement;
+	const aside = container.querySelector("aside");
+	const startX = e.clientX;
+	const startWidth = aside.offsetWidth;
+
+	function onMouseMove(e2) {
+		const dx = e2.clientX - startX;
+		let newWidth = startWidth + dx;
+		newWidth = Math.max(100, Math.min(window.innerWidth * 0.5, newWidth));
+		container.style.gridTemplateColumns = `${newWidth}px 5px 1fr`;
+	}
+
+	function onMouseUp() {
+		document.removeEventListener("mousemove", onMouseMove);
+		document.removeEventListener("mouseup", onMouseUp);
+	}
+
+	document.addEventListener("mousemove", onMouseMove);
+	document.addEventListener("mouseup", onMouseUp);
+});

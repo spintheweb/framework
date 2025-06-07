@@ -22,7 +22,7 @@ export class STWText extends STWContent {
 			id: this._id,
 			section: this.section,
 			sequence: this.sequence,
-			body: this.layout.get(_session.lang),
+			body: this.layout?.get(_session.lang) || "...",
 		};
 		return new Promise<Response>(resolve => {
 			const response = new Response(JSON.stringify(data));

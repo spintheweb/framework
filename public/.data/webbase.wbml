@@ -304,6 +304,27 @@
 					}
 				},
 				{
+					"_id": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371",
+					"type": "Content",
+					"name": {
+						"en": "Countries"
+					},
+					"slug": {
+						"en": "countries"
+					},
+					"visibility": {},
+					"subtype": "Table",
+					"cssClass": "stwTable",
+					"section": "main",
+					"sequence": "5",
+					"dsn": "countries",
+					"query": "",
+					"params": "fields=name,capital,currencies",
+					"layout": {
+						"en": "\\s('caption=\"Countries\" rows=\"10\" ')"
+					}
+				},
+				{
 					"_id": "f20a8d00-2934-11ee-9d73-23bae420eae3",
 					"type": "Content",
 					"name": {

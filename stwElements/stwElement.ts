@@ -6,6 +6,7 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
+import { STWContent } from "./stwContent.ts";
 import { STWSite } from "./stwSite.ts";
 
 export type STWRole = string;
@@ -27,10 +28,10 @@ export interface ISTWElement {
 export abstract class STWElement {
 	_id: string;
 	type: string;
-	name: STWLocalized;
-	slug: STWLocalized;
-	keywords: STWLocalized;
-	description: STWLocalized;
+	protected name: STWLocalized;
+	protected slug: STWLocalized;
+	protected keywords: STWLocalized;
+	protected description: STWLocalized;
 	visibility!: STWVisibility;
 	parent!: STWElement;
 	children: STWElement[] = [];
@@ -108,8 +109,27 @@ export abstract class STWElement {
 
 	// Export element as XML
 	public export(): string {
-		return "";
-	};
+		let xml = `<${this.type} id="${this._id}" type="${this.type}" subtype="${this.type}" modified="${this.modified}">\n`;
+		for (const [key, value] of Object.entries(this)) {
+			if (key === "parent" || key === "children")
+				continue;
+			if (key === "visibility") {
+				xml += `\t<${key}>\n`;
+				for (const [role, visible] of Object.entries(value)) {
+					xml += `\t\t<${role} ${visible ? 'visible="true"' : 'visible="false"'} />\n`;
+				}
+				xml += `\t</${key}>\n`;
+			} else if (typeof value === "object") {
+				xml += `\t<${key}>${JSON.stringify(value)}</${key}>\n`;
+			} else {
+				xml += `\t<${key}>${value}</${key}>\n`;
+			}
+		}
 
-	abstract serve(req: Request, session: STWSession): Promise<Response>;
+		return xml + `</${this.type}>\n`;
+	}
+
+	public serve(_req: Request, _session: STWSession, _ref?: STWContent): Promise<Response> {
+		return Promise.resolve(new Response("Not implemented", { status: 501 }));
+	}
 }

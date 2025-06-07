@@ -10,11 +10,12 @@ import { STWSite } from "./stwElements/stwSite.ts";
 **/
 export class STWSession {
 	sessionId: string;
+	remoteAddr: Deno.Addr;
 	user: string; // User name
 	name!: string; // Full name
 	roles: string[]; // Roles played by the user. Note: Security revolves around this aspect!
 	lang: string; // Preferred user language 
-	langs: string[]; // Accept-Language
+	langs: string[]; // Accepted user languages (Accept-Language)
 	placeholders: Map<string, string>;
 	timestamp: number; // Session timeout in minutes
 	private timer: number = 0;
@@ -22,8 +23,9 @@ export class STWSession {
 	site: STWSite;
 	socket!: WebSocket;
 
-	public constructor(sessionId: string, site: STWSite) {
+	public constructor(sessionId: string, remoteAddr: Deno.Addr, site: STWSite) {
 		this.sessionId = sessionId;
+		this.remoteAddr = remoteAddr;
 		this.user = "guest";
 		this.roles = ["guests", "developers"];
 		this.lang = "en";

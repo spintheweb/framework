@@ -51,7 +51,7 @@ export class STWLayout {
 		["rows", "25"],
 		["period", "month"]
 	]);
-	render: (req: Request, session: STWSession, fields: ISTWRecords, row: number) => string;
+	render: (req: Request, session: STWSession, records: ISTWRecords, placeholders: Map<string, string>) => string;
 
 	public constructor(contentType: string, wbll: string) {
 		this.wbll = wbll;
@@ -114,7 +114,7 @@ export class STWLayout {
 		/**
 		 * TODO: Compiler
 		 * 
-		 * session.placeholders holds the current record [field, value] pair, the field variable in the render function 
+		 * placeholders holds the current record [field, value] pair, the field variable in the render function 
 		 * is the index that point to an entry in the placeholders Map.
 		 */
 		let fn = `const type="${contentType}";let html="",field=0,df=0;`;
@@ -130,13 +130,13 @@ export class STWLayout {
 			else if ("ehw".indexOf(token.symbol) != -1)
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if (token.symbol === "f")
-				fn += `html += session.placeholders.get("${token.args[0]}");`;
+				fn += `html += placeholders.get("${token.args[0]}");`;
 			else if (token.symbol === "i")
 				fn += `html += \`<img ${attributes(token.attrs)}>\`;`;
 			else if (token.symbol === "j")
 				fn += `html += \`<script>${token.args[0]}</script>\`;`;
 			else if (token.symbol === "k")
-				fn += `session.placeholders.set("${token.args[0]}", "${token.args[1]}");`;
+				fn += `placeholders.set("${token.args[0]}", "${token.args[1]}");`;
 			else if (token.symbol === "l" && contentType == "Table")
 				fn += `html += \`<td ${attributes(token.attrs)}>${token.args[0]}>\`;`;
 			else if (token.symbol === "l")
@@ -170,7 +170,7 @@ export class STWLayout {
 			fn += `field += df; df = 0;`;
 		});
 		fn += "return html;";
-		this.render = new Function("req", "session", fn) as (req: Request, session: STWSession) => string;
+		this.render = new Function("req", "session", "records", "placeholders", fn) as (req: Request, session: STWSession, records: ISTWRecords, placeholders: Map<string, string>) => string;
 
 		function attributes(map: Map<string, string>): string {
 			return map.entries().reduce((attrs, attr) => attrs + ` ${attr[0]}="${attr[1]}"`, "");
