@@ -104,7 +104,7 @@
 					"query": "",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')\\a('style=\"color:red\"')e\n t(' This is a test') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\n\rn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')e\\a('style=\"color: yellow\"')crm",
+						"en": "\\s('caption=\"Customers\" collapsible ')\n\\A('style=\"color:red\" ') \nl('Name')\\a('style=\"color:red\"')e\n t(' This is a test!') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\n\rn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')e\\a('style=\"color: yellow\"')crm",
 						"en-us": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\ne(';user;)\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;esite;logon;@@usr;@@pwd')"
 					}
 				},
@@ -493,9 +493,6 @@
 				},
 				{
 					"_id": "e96850b0-2934-11ee-9adf-ab38b1846e6d"
-				},
-				{
-					"_id": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef"
 				},
 				{
 					"_id": "d18e40c0-3d21-11ee-8e8f-d7e9515d7646"

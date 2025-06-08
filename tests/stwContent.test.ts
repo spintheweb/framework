@@ -1,5 +1,4 @@
 import { assertEquals } from "jsr:@std/assert";
-import { v4 } from "jsr:@std/uuid";
 import { STWText } from "../stwContents/stwText.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 
@@ -8,7 +7,7 @@ const mockSession = { lang: "en" };
 
 // Minimal site instance for parent
 const site = new STWSite({
-  _id: v4.generate(),
+  _id: crypto.randomUUID(),
   type: "Site",
   name: { en: "Test Site" },
   slug: { en: "test-site" }
@@ -16,7 +15,7 @@ const site = new STWSite({
 
 Deno.test("STWText: constructor sets properties", () => {
   const content = new STWText({
-    _id: v4.generate(),
+    _id: crypto.randomUUID(),
     type: "Text",
     name: { en: "Test Content" },
     slug: { en: "test-content" }
@@ -28,7 +27,7 @@ Deno.test("STWText: constructor sets properties", () => {
 
 Deno.test("STWText: localize returns correct value", () => {
   const content = new STWText({
-    _id: v4.generate(),
+    _id: crypto.randomUUID(),
     type: "Text",
     name: { en: "Test Content" },
     slug: { en: "test-content" }
@@ -40,7 +39,7 @@ Deno.test("STWText: localize returns correct value", () => {
 
 Deno.test("STWText: localize sets and returns new value", () => {
   const content = new STWText({
-    _id: v4.generate(),
+    _id: crypto.randomUUID(),
     type: "Text",
     name: { en: "Test Content" },
     slug: { en: "test-content" }

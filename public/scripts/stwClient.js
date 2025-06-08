@@ -95,6 +95,8 @@ function stwStartWebsocket() {
 	}
 }
 
+// Toggle studio mode with Shift+F12
+// This allows the user to toggle a studio interface that provides a sidebar and status bar
 window.addEventListener("keydown", event => {
 	if (event.shiftKey && event.key == "F12") {
 		event.preventDefault();
@@ -110,7 +112,7 @@ window.addEventListener("keydown", event => {
 			document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="splitter"></div><div id="stwBody"></div></div><footer id="stwStatusbar"></footer></div>`)
 			while (stash.firstChild)
 				document.getElementById("stwBody").appendChild(stash.firstChild);
-			stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: {} }));
+			stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: { recurse: false } }));
 		}
 	}
 });

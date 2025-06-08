@@ -19,10 +19,14 @@ export function handleWebSocket(request: Request, session: STWSession): Response
         // deno-lint-ignore no-explicit-any
         const data: { method: string, resource: any, options: any } = JSON.parse(event.data);
 
-        if (data.method === "PATCH")
-            data.resource = [data.resource];
-
-        else if (data.method === "HEAD") {
+        if (data.method === "PATCH") {
+            const element = STWSite.instance.find(session, data.resource);
+            if (element instanceof STWPage)
+                data.resource = element.contents(session, typeof(data.options.recurse) == undefined ? true : data.options.recurse) || [];
+            else
+                data.resource = [data.resource];
+            
+        } else if (data.method === "HEAD") {
             session.langs = data.options.langs || ["en"];
             session.lang = STWSite.instance.langs.includes(data.options.lang)
                 ? data.options.lang
@@ -33,30 +37,23 @@ export function handleWebSocket(request: Request, session: STWSession): Response
         }
 
         let process = data.resource.length;
-        data.resource?.forEach((resource: string, i: number) => {
-            const element = STWSite.instance.find(session, resource);
-
-            const elements: STWContent[] = [];
-            if (element instanceof STWContent)
-                elements.push(element);
-            else {
-                element?.children.filter(child => {
-                    if (child instanceof STWContent) elements.push(child)
-                });
-                process = elements.length;
+        data.resource?.forEach(async (resource: string, i: number) => {
+            const found = STWSite.instance.find(session, resource);
+            if (!found) {
+                data.resource[i] = { method: "DELETE", id: resource };
+                if (!--process) send(data.options);
+                return;
             }
-
+            const content = found as STWContent; // Optionally add a type check here
             (new URL(request.url + resource)).searchParams.forEach((value, key) => session.placeholders.set(`@${key}`, value));
 
-            elements.forEach(async content => {
-                const response = await content?.serve(request, session, data.method === "PATCH" ? content : undefined);
-                if (response.status == 200)
-                    data.resource[i] = await response.json();
-                else
-                    data.resource[i] = { method: "DELETE", id: content._id };
-                if (!--process)
-                    send(data.options);
-            });
+            const response = await content?.serve(request, session, data.method === "PATCH" ? content : undefined);
+            if (response.status == 200)
+                data.resource[i] = await response.json();
+            else
+                data.resource[i] = { method: "DELETE", id: content._id };
+            if (!--process)
+                send(data.options);
         });
 
         function send(options: any): void {

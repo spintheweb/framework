@@ -1,27 +1,27 @@
-<img src="https://github.com/keyvisions/spintheweb/blob/main/public/media/Logo-bn_128x128.png" width="100p">
+<img src="./public/media/Logo-bn_128x128.png" width="100p">
 
 # Spin the Web Project
-_Technology that eases web portal development_
+_Technology that eases webs developments_
 
-Spin the Web deals with the Webbase Markup Language (WBML). Simply put, HTML describes a web page, WBML, a web site; and, while HTML is interpreted by a client side web browser, WBML, by a server side _web spinner_. It is this project opinion that WBML is a missing component in the World Wide Web space.
+Spin the Web introduces the Webbase Markup Language (WBML). While HTML describes a single web page and is interpreted by client-side browsers, WBML describes an entire website and is interpreted by a server-side component called a web spinner. This project proposes that WBML fills a crucial gap in the World Wide Web ecosystem.
 
-It must be stressed that WBML does not replace any technology, it coordinates technologies; it focuses on _contents_ (rendered data pages), defining what they are, how they are organized, and where, how and when they are rendered. Web spinners output contents on request.
+WBML is not intended to replace existing technologies, but rather to coordinate them. Its focus is on contents (rendered data pages): defining what they are, how they are organized, and where, how, and when they are rendered. Web spinners generate and deliver these contents on demand.
 
-WBML can describe web sites, intranets, extranets, portals, web apps, web services, here collectively referred to as _internet sites_. It is a fundamental language for Content Management Systems (CMS). 
+WBML can be used to describe websites, intranets, extranets, portals, web apps, and web services—collectively referred to as internet sites. It serves as a foundational language for Content Management Systems (CMS).
 
-The term _webbase_ was first used in 1998, a name given to a relational database whose schema defined a site: its structure, content, layout, localization, navigation and security aspects. Later, to ease portability, the webbase was formalized into the XML based Webbase Markup Language (WBML), this introduced also the term _webbaselet_, a webbase fragment. Today WBML is also described in JSON.
+The term webbase was first coined in 1998 to describe a relational database whose schema defined a site's structure, content, layout, localization, navigation, and security. To improve portability, the webbase concept evolved into the XML-based Webbase Markup Language (WBML), introducing the idea of a webbaselet—a fragment of a webbase. Today, WBML is also available in JSON format.
 
 ## Features
-* Content centered
-* Role Based Access Control
-* Multilingual & Multinational (localized)
-* Templated
-* WebSocket based
+* Content-centric architecture
+* Role-Based Access Control
+* Multilingual & Multinational (localization support)
+* Templating system
+* WebSocket-based communication
 
 ## Elements
-Spin the Web addresses three issues to ease web develpments: describe, interpret and build. It is based on pillars of web development, HTML (SVG), CSS, Javascript, to name a few, it is not for the faint of heart, a good dose of know-how is necessary, full stack development know-how.
+Spin the Web addresses three core challenges in web development: description, interpretation, and construction. It builds upon the pillars of web development—HTML (and SVG), CSS, and JavaScript. This framework is designed for experienced developers with full-stack expertise.
 
-A _webbase_ is an hierachically organized structure of three base elements: _areas_, _pages_ and _contents_; at the root of the hierarchy there is a special area, the _site_. The file system analogy may be of help: the _site_ is the drive, _areas_ are folders, _pages_ are files and _contents_ are things inside files! Like the file system, a webbase also addresses security, a security based on a simple, inherited role based visibility paradigm.
+A webbase is a hierarchical structure composed of three primary elements: areas, pages, and contents. At the root is a special area called the site. You can think of the webbase like a file system: the site is the drive, areas are folders, pages are files, and contents are the items within those files. Like a file system, a webbase also incorporates security, using a simple, inherited, role-based visibility model.
 
 ## Contents
 _Contents_ are central, they come in four flavors: _navigational_, _organizational_, _presentational_ and _special_. The purpose of contents is to allow _interaction_ with data of any kind, they request data, provide data, they can be simple microservices, dashbords that are described macroscopically by (WBML) Webbase Markup Language and microscopically (WBLL) Webbase Layout Language
@@ -34,7 +34,7 @@ _Contents_ are central, they come in four flavors: _navigational_, _organization
 ## Paradigm
 A web spinner&mdash;a web server that understands WBML&mdash;receives a request from a client, these are the logical steps that follow: 
 * If the request is the first request sent by the client, a session is established thus defining a unique _session context_
-* The web spinner determines from the resquest if the WDBL requested is already loaded, if not, it is loaded
+* The web spinner determines from the resquest if the WBML requested is already loaded, if not, it is loaded
 * The web spinner, subject to the session context, consults the WBML file and responds with either: a list of REST calls the client should make or a resource
 * If the client receives a list of REST calls, it sends requests for each of them asynchronously via websockets
 * Else it receives a resource

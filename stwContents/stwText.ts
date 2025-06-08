@@ -7,27 +7,43 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
+import { rePlaceholders } from "../stwMiscellanea.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {
 		super(content);
 	}
-	
-	public override serve(_req: Request, _session: STWSession): Promise<Response> {
-		if (!this.isVisible(_session))
+
+	public override async serve(req: Request, session: STWSession, ref: STWContent | undefined): Promise<Response> {
+		if (!ref && !this.isVisible(session))
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+
+		if (ref)
+			console.debug(`${new Date().toISOString()}: ${ref._id === this._id ? " ●" : "│└"} Text (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
+		else
+			console.debug(`${new Date().toISOString()}: ├─ Text (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
 
 		const data = {
 			method: "PUT",
 			id: this._id,
-			section: this.section,
-			sequence: this.sequence,
-			body: this.layout?.get(_session.lang) || "...",
+			section: (ref || this).section,
+			sequence: (ref || this).sequence,
+			body: this.render(req, session, await STWDatasources.query(session, this))
 		};
-		return new Promise<Response>(resolve => {
-			const response = new Response(JSON.stringify(data));
-			resolve(response);
-		});
+		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
+	}
+
+	public override render(_req: Request, session: STWSession, records: ISTWRecords): string {
+		const layoutValue = this.layout?.get(session.lang);
+		const layoutText = typeof layoutValue === "string" ? layoutValue : (layoutValue?.toString?.() ?? "");
+		if (records?.rows?.length) {
+			return records.rows.map(row => {
+				const merged = { ...Object.fromEntries(session.placeholders), ...row };
+				return rePlaceholders(layoutText, merged);
+			}).join("");
+		}
+		return rePlaceholders(layoutText, new Map(session.placeholders));
 	}
 }
 

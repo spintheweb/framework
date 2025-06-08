@@ -28,15 +28,16 @@ export class STWPage extends STWElement {
 	 * @param _session The current session
 	 * @returns String array of contents ids
 	 */
-	public contents(_session: STWSession): string[] {
+	public contents(_session: STWSession, recurse: boolean = true): string[] {
 		const contents = this.children.filter(content => !(content as unknown as STWContent).section.startsWith("stwDialog") && content.isVisible(_session) & 1).map(content => content._id);
-		climb(this.parent, contents);
+		if (recurse)
+			climb(this.parent, contents, recurse);
 		return contents;
 
-		function climb(element: STWElement, contents: string[]): void {
+		function climb(element: STWElement, contents: string[], recurse: boolean): void {
 			if (element) {
 				element.children.filter(content => (content as unknown as STWContent).section && content.isVisible(_session) & 1).map(content => contents.push(content._id));
-				climb(element.parent, contents);
+				climb(element.parent, contents, recurse);
 			}
 		}
 	}

@@ -157,4 +157,29 @@ export class STWSite extends STWElement {
 				fragment += `<url><loc>${element.pathname(session)}</loc><lastmod>${element.modified}</lastmod><priority>0.5</priority></url>\n`;
 		}
 	}
+
+	// Watch the webbase file for changes and reload it if modified
+	// This is useful for development, so you don't have to restart the server every time you change the webbase
+	static #watcherStarted = false;
+	static watchWebbase() {
+		if (this.#watcherStarted) return;
+		this.#watcherStarted = true;
+
+		const webbasePath = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
+		let reloadTimeout: number | undefined;
+
+		(async () => {
+			for await (const event of Deno.watchFs(webbasePath)) {
+				if (event.kind === "modify" || event.kind === "create") {
+					if (reloadTimeout) clearTimeout(reloadTimeout);
+					reloadTimeout = setTimeout(() => {
+						console.info(`${new Date().toISOString()}: Detected change in webbase, reloading...`);
+						STWSite.#instance = undefined as unknown as STWSite;
+						STWSite.index.clear();
+						// Optionally reload immediately here
+					}, 200); // Wait 200ms for changes to settle
+				}
+			}
+		})();
+	}
 }

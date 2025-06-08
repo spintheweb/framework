@@ -29,6 +29,7 @@ async function loadSTWElements(path: string) {
 }
 await loadSTWElements("./stwElements");
 await loadSTWElements("./stwContents");
+STWSite.watchWebbase(); // Start watching for changes
 
 /**
  * Contains presently active sessions {@linkcode STWSession} 

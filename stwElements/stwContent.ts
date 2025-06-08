@@ -67,7 +67,8 @@ export abstract class STWContent extends STWElement {
 					throw SyntaxError(`${this.type} (${this.name.entries().next().value}) @${this.section}.${this.sequence} [${this._id}]\n └ Layout: ${(error as Error).message}`);
 				}
 			}
-		}
+		} else if (content.layout)
+			this.layout = new Map<string, STWLayout>(Object.entries(content.layout || {}));
 	}
 
 	public getLayout(session: STWSession): STWLayout {
