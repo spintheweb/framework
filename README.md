@@ -1,13 +1,13 @@
 <img src="./public/media/Logo-bn_128x128.png" width="100p">
 
 # Spin the Web Project
-_Technology that eases webs developments_
+_Technology that eases web application developments_
 
-Spin the Web introduces the Webbase Markup Language (WBML). While HTML describes a single web page and is interpreted by client-side browsers, WBML describes an entire website and is interpreted by a server-side component called a web spinner. This project proposes that WBML fills a crucial gap in the World Wide Web ecosystem.
+Spin the Web introduces the Webbase Markup Language (WBML). While HTML describes a single web page and is interpreted by client-side browsers, WBML describes an entire web site and is interpreted by a server-side component called a web spinner. This project proposes that WBML fills a crucial gap in the World Wide Web ecosystem.
 
-WBML is not intended to replace existing technologies, but rather to coordinate them. Its focus is on contents (rendered data pages): defining what they are, how they are organized, and where, how, and when they are rendered. Web spinners generate and deliver these contents on demand.
+WBML is not intended to replace existing technologies, but rather to coordinate them. Its focus is on _contents_ (data handling widgets): defining what they are, how they are organized, and where, how, and when they are rendered. Web spinners generate and deliver these contents on demand.
 
-WBML can be used to describe websites, intranets, extranets, portals, web apps, and web services—collectively referred to as internet sites. It serves as a foundational language for Content Management Systems (CMS).
+WBML can be used to describe web sites, intranets, extranets, portals, web apps, and web services—here collectively referred to as web applications. It serves as a foundational language for Content Management Systems (CMS).
 
 The term webbase was first coined in 1998 to describe a relational database whose schema defined a site's structure, content, layout, localization, navigation, and security. To improve portability, the webbase concept evolved into the XML-based Webbase Markup Language (WBML), introducing the idea of a webbaselet—a fragment of a webbase. Today, WBML is also available in JSON format.
 
