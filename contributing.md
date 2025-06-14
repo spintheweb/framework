@@ -1,6 +1,6 @@
 # Contributing to The Spin the Web Project
 
-Thank you for considering contributing to The Spin the Web Project! We welcome contributions from everyone. This document provides guidelines for contributing to our project.
+Thank you for considering contributing to The Spin the Web Project! Contributions are welcomed from everyone. This document provides guidelines for contributing to this project.
 
 ## Table of Contents
 
