@@ -1,3 +1,20 @@
-.stwForm {
-    /* Content-specific styles using global color variables */
+.stwForm label {
+	display: inline-grid;
+	font-weight: bolder;
 }
+
+.stwForm label>span {
+	font-size: smaller;
+}
+
+.stwForm label>input {
+	padding: var(--padding);
+	margin: var(--padding) var(--padding) var(--padding) 0;
+}
+
+.stwForm button {
+	padding: 0.5rem;
+	min-width: 7rem;
+	margin: 0.5rem 0;
+}
+

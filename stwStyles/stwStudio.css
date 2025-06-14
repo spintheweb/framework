@@ -1,0 +1,32 @@
+.stwStudio {
+	position: absolute;
+	display: grid;
+	grid-template-rows: 2rem auto 2rem;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+}
+
+.stwStudio>div {
+	display: grid;
+	grid-template-columns: 1fr var(--padding) 3fr;
+}
+
+#stwMenubar,
+#stwSidebar,
+#stwStatusbar {
+	background-color: var(--bg-faint)
+}
+
+.stwSplitter {
+	cursor: col-resize;
+	width: var(--thickness);
+}
+
+.stwSplitter:hover,
+.stwTree li>div:hover {
+	background-color: var(--special);
+	color: var(--on-special);
+}

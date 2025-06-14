@@ -1,25 +1,11 @@
-.stwTabs {
-	position: relative;
-}
-
 .stwTabs dt {
-	position: relative;
 	display: inline-block;
 	padding: 0.25rem 0.5rem;
 	cursor: pointer;
 }
 
 .stwTabs dd {
-	position: absolute;
 	margin: 0;
-	display: none;
+	border-top: thin solid var(--special);
 }
 
-.stwTabs dt.stwSelected {
-	color: white;
-	background-color: black;
-}
-
-dt.stwSelected+dd {
-	display: inherit;
-}

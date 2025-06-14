@@ -105,26 +105,6 @@ article {
 	font-size: smaller;
 }
 
-.stwForm label {
-	display: inline-grid;
-	font-weight: bolder;
-}
-
-.stwForm label>span {
-	font-size: smaller;
-}
-
-.stwForm label>input {
-	padding: var(--padding);
-	margin: var(--padding) var(--padding) var(--padding) 0;
-}
-
-.stwForm button {
-	padding: 0.5rem;
-	min-width: 7rem;
-	margin: 0.5rem 0;
-}
-
 .stwHide {
 	display: none;
 }
@@ -141,46 +121,3 @@ article {
 	display: inherit;
 }
 
-.stwTabs dt {
-	display: inline-block;
-	padding: 0.25rem 0.5rem;
-	cursor: pointer;
-}
-
-.stwTabs dd {
-	margin: 0;
-	border-top: thin solid var(--special);
-}
-
-.stwStudio {
-	position: absolute;
-	display: grid;
-	grid-template-rows: 2rem auto 2rem;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	overflow: hidden;
-}
-
-.stwStudio>div {
-	display: grid;
-	grid-template-columns: 1fr var(--padding) 3fr;
-}
-
-#stwMenubar,
-#stwSidebar,
-#stwStatusbar {
-	background-color: var(--bg-faint)
-}
-
-.stwSplitter {
-	cursor: col-resize;
-	width: var(--thickness);
-}
-
-.stwSplitter:hover,
-.stwTree li>div:hover {
-	background-color: var(--special);
-	color: var(--on-special);
-}

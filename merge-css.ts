@@ -1,7 +1,7 @@
 // Deno script: watches stwStyles, merges and minifies all .css files into stwStyle.css on change
 
 const folder = "./stwStyles";
-const output = `${folder}/stwStyle.css`;
+const output = "./public/styles/stwStyle.css";
 
 function minifyCSS(css: string): string {
 	return css
