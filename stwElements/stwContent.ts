@@ -106,7 +106,7 @@ export abstract class STWContent extends STWElement {
 			sequence: (ref || this).sequence,
 			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}" ${debug}>
 				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
-				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `<h1${collapsible()}>${layout?.settings.get("caption")}</h1>` : ""}
+				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
 				<div>
 				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
 				${this.render(req, session, await STWDatasources.query(session, this))}
@@ -120,7 +120,7 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? ` class="stwCollapsible" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('stwHide')"` : "";
+			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('stwHide')"><i class="fa-solid fa-fw fa-angle-down"></i>` : "<h1>";
 		}
 	}
 

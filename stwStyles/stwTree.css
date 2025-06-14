@@ -2,18 +2,15 @@
     list-style-type: none;
     padding-left: 0;
 }
+
+.stwTree li {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
 .stwTree li > div:hover {
   background-color: var(--special);
   color: var(--on-special);
   transition: background-color 0.3s ease;
 }
 
-.stwTree .stwCollapsed {
-    cursor: pointer;
-    user-select: none;
-    margin-right: 4px;
-}
-
-.stw-tree-root i {
-    margin-right: 4px;
-}

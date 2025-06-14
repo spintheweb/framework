@@ -81,7 +81,7 @@
                     "query": "($tree:=function($node){{\"_id\":_id,\"slug\":$node.slug.en?$node.slug.en:\"\",\"type\":$node.subtype?$node.subtype:$node.type,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
                     "params": "",
                     "layout": {
-                        "en": "\\s('caption=\"Webbase\" collapsible=\"true\" mode=\"tree\"')\\A('id=\"@@_id\" onclick=\"\\stwPopup\"')ff"
+                        "en": "\\s('caption=\"Webbase\"')\\A('id=\"@@_id\" onclick=\"\\stwPopup\"')ff"
                     }
                 },
                 {

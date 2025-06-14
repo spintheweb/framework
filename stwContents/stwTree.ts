@@ -17,13 +17,13 @@ export class STWTree extends STWContent {
 	public override render(req: Request, session: STWSession, records: ISTWRecords): string {
 		const layout = this.layout.get(session.lang);
 
-		const renderNode = (node: any): string => {
+		const renderNode = (node: any, depth: number = 0): string => {
 			const placeholders = new Map(session.placeholders);
 			Object.entries(node).forEach(([key, value]) => placeholders.set(`@@${key}`, String(value))); // Merge record and session placeholders
 
 			const hasChildren = node.children?.length > 0;
-			const toggle = hasChildren ? `<i class=\"fa-solid fa-angle-down\"></i>` : "";
-			const children = hasChildren ? `<ul>${node.children.map(renderNode).join("")}</ul>` : "";
+			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-solid fa-angle-down" style="width:1rem"></i>` : ""}`;
+			const children = hasChildren ? `<ul>${node.children.map((child: any) => renderNode(child, depth + 1)).join("")}</ul>` : "";
 
 			return `<li><div>${toggle} ${layout?.render(req, session, records, placeholders)}</div>${children}</li>`;
 		};
@@ -34,8 +34,9 @@ export class STWTree extends STWContent {
 			<script name="STWTree" onload="fnSTWTree('${this._id}')">
 				function fnSTWTree(id) {
 					self.document.getElementById(id).addEventListener("click", event => {
-						debugger;
 						const li = event.target.closest("li"), i = li.querySelector("i");
+						event.currentTarget.querySelector("div.stwSelected")?.classList.remove("stwSelected");
+						li.firstElementChild?.classList.add("stwSelected");
 						if (i) {
 							event.preventDefault();
 							li.querySelector("ul").style.display = i.classList.contains("fa-angle-down") ? "none" : "block";

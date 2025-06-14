@@ -1,6 +1,3 @@
-/**
- * CSS Standard for stwMenus content
-*/
 .stwMenus a {
 	display: block;
 	background-color: inherit;
@@ -53,5 +50,9 @@
 .stwMenus menu li>div {
 	padding: 0 0.5rem;
 	line-height: 1.5rem;
+}
+
+.stwMenus menu li:hover>menu {
+	display: inherit;
 }
 

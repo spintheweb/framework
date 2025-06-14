@@ -9,3 +9,8 @@
 	border-top: thin solid var(--special);
 }
 
+.stwTabs dt:hover
+{
+	background-color: var(--special) !important;
+	color: var(--on-special) !important;
+}

@@ -1,5 +1,5 @@
 /**
- * Spin the Web Tabs content
+ * Spin the Web Accordion content
  * 
  * Language: TypeScript for Deno
  * 
@@ -31,7 +31,7 @@ export class STWAccordion extends STWContent {
 
 				const placeholder = crypto.randomUUID();
 				body += `<dd><article id="${placeholder}"></article></dd>`;
-				session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: placeholder })); // Ask client to request content
+				session.socket?.send(JSON.stringify({ method: "PATCH", id: option.ref, placeholder: placeholder })); // Ask client to request content
 			}
 		});
 
@@ -54,4 +54,4 @@ export class STWAccordion extends STWContent {
 	}
 }
 
-STWFactory.Tabs = STWAccordion;
+STWFactory.Accordion = STWAccordion;
