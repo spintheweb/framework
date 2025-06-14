@@ -21,7 +21,7 @@ import { handleWebSocket } from "./stwWebSocket.ts";
  */
 async function loadSTWElements(path: string) {
 	for (const dirEntry of Deno.readDirSync(path))
-		if (dirEntry.isFile) {
+		if (dirEntry.isFile && dirEntry.name.endsWith(".ts")) {
 			const module = await import(`${path}/${dirEntry.name}`);
 			const element = Object.keys(module).find(key => key.startsWith("STW") && key !== "STWLayout");
 			if (element) new module[element]({});
@@ -29,7 +29,7 @@ async function loadSTWElements(path: string) {
 }
 await loadSTWElements("./stwElements");
 await loadSTWElements("./stwContents");
-STWSite.watchWebbase(); // Start watching for changes
+STWSite.watchWebbases(); // Watch for changes
 
 /**
  * Contains presently active sessions {@linkcode STWSession} 

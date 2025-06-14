@@ -22,23 +22,22 @@ export class STWTable extends STWContent {
 		if (_records.rows?.length) {
 			let row: number = 0;
 
-			// Merge record and session placeholders
 			const placeholders = new Map(_session.placeholders);
-			Object.entries(_records.rows[0]).forEach((key, value) => placeholders.set(`@@${key}`, value.toString()));
-			
+			Object.entries(_records.rows[row]).forEach(([key, value]) => placeholders.set(`@@${key}`, String(value))); // Merge record and session placeholders
+
 			body = `<table><thead><tr>${layout?.render(_req, _session, _records, placeholders)}</tr></thead><tbody>`;
 			while (true) {
 				body += `<tr>${layout?.render(_req, _session, _records, placeholders)}</tr>`;
-				if (++row > _records.rows.length || row > parseInt(layout?.settings.get("rows") || "25"))
+				if (++row >= _records.rows.length || row >= parseInt(layout?.settings.get("rows") || "25"))
 					break;
-				Object.entries(_records.rows[row]).forEach((key, value) => placeholders.set(`@@${key}`, value.toString()));
+				Object.entries(_records.rows[row]).forEach(([key, value]) => placeholders.set(`@@${key}`, String(value)));
 			}
 			body += "</tbody></table>";
 		}
 		return body;
 	}
 
-	private renderrow(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	private renderRecord(_req: Request, _session: STWSession, _records: ISTWRecords): string {
 		return "";
 	}
 }

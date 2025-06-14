@@ -1,0 +1,27 @@
+:root {
+	color-scheme: light dark;
+
+	--bg: hsl(0, 0%, 98%);
+	--bg-faint: hsl(0, 0%, 92%);
+	--text: hsl(220, 15%, 20%);
+	--special: hsl(200, 80%, 45%);
+	--on-special: hsl(0, 0%, 98%);
+
+	--padding: 0.5rem;
+	--thickness: 0.25rem
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: hsl(220, 15%, 15%);
+		--bg-faint: hsl(220, 15%, 22%);
+		--text: hsl(0, 0%, 98%);
+		--special: hsl(200, 80%, 60%);
+		--on-special: hsl(220, 15%, 15%);
+	}
+}
+
+body {
+	background: var(--bg);
+	color: var(--text);
+}

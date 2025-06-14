@@ -12,6 +12,7 @@ import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
 import { rePlaceholders } from "./stwMiscellanea.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
+import jsonata from "https://esm.sh/jsonata";
 
 export type ISTWRecords = ExecuteResult & { fieldNames?: string[] };
 
@@ -61,7 +62,7 @@ export class STWDatasources {
 			}
 		} catch (error) {
 			console.error(error);
-			//			throw error;
+			// throw error;
 		}
 		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}
@@ -74,25 +75,16 @@ export class STWDatasources {
  * @param content The content being rendered
  * @returns The result set
  */
-function fetchWebbaseData(session: STWSession, _content: STWContent): Promise<ISTWRecords> {
-	return new Promise(resolve => {
-		const element = STWSite.index.get(session.placeholders.get("@_id") || "");
-		resolve({
-			affectedRows: 1,
-			fieldNames: Object.getOwnPropertyNames(element),
-			rows: [element]
-		})
-	});
+async function fetchWebbaseData(session: STWSession, content: STWContent): Promise<ISTWRecords> {
+	const query = content.query ? rePlaceholders(content.query, session.placeholders) : `$[?(@._id=="${session.placeholders.get("@_id")}")]`;
+	const expr = jsonata(query);
+	let result = expr.evaluate(STWSite.wbml);
+	if (result instanceof Promise)
+		result = await result;
 
-	/**
-	 * Given the session language include all the element locale neutral properties and only the localized versions of those localized
-	 * 
-	 * @param value 
-	 * @param type 
-	 * @param payload 
-	 */
-	// deno-lint-ignore no-explicit-any
-	function localize(_value: any, _type: any, _payload: any) {
-		console.info(_value, _type);
-	}
+	return new Promise<ISTWRecords>(resolve => resolve({
+		affectedRows: 1,
+		fields: result && typeof result === "object" && !Array.isArray(result) ? Object.getOwnPropertyNames(result).map(name => ({ name })) : [],
+		rows: Array.isArray(result) ? result : [result]
+	}));
 }

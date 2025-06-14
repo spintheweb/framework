@@ -17,6 +17,7 @@ interface ISTWSite extends ISTWElement {
 	version: string;
 }
 export class STWSite extends STWElement {
+	static #wbml: ISTWSite;
 	static #instance: STWSite;
 	static index: Map<string, STWElement> = new Map();
 
@@ -46,14 +47,19 @@ export class STWSite extends STWElement {
 			console.info(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
 			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
-			STWSite.#instance = new STWSite(JSON.parse(Deno.readTextFileSync(webbase)));
+			this.#wbml = JSON.parse(Deno.readTextFileSync(webbase));
+			STWSite.#instance = new STWSite(this.#wbml);
 			if (!STWSite.#instance)
 				throw new Error(`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
 			STWSite.#instance.loadStudio();
 		}
 		return STWSite.#instance;
 	}
-	
+
+	static get wbml(): ISTWSite {
+		return this.#wbml;
+	}
+
 	/**
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */
@@ -158,14 +164,17 @@ export class STWSite extends STWElement {
 		}
 	}
 
-	// Watch the webbase file for changes and reload it if modified
-	// This is useful for development, so you don't have to restart the server every time you change the webbase
+	// Watch webbase files for changes and reload when they are modified. In production this code should not be used.
+	// It is useful for development purposes to see changes in real time.
 	static #watcherStarted = false;
-	static watchWebbase() {
+	static watchWebbases() {
 		if (this.#watcherStarted) return;
 		this.#watcherStarted = true;
 
-		const webbasePath = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
+		const webbasePath = [
+			Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml",
+			Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml"
+		];
 		let reloadTimeout: number | undefined;
 
 		(async () => {
@@ -173,10 +182,9 @@ export class STWSite extends STWElement {
 				if (event.kind === "modify" || event.kind === "create") {
 					if (reloadTimeout) clearTimeout(reloadTimeout);
 					reloadTimeout = setTimeout(() => {
-						console.info(`${new Date().toISOString()}: Detected change in webbase, reloading...`);
+						console.info(`${new Date().toISOString()}: Webbase changed...`);
 						STWSite.#instance = undefined as unknown as STWSite;
 						STWSite.index.clear();
-						// Optionally reload immediately here
 					}, 200); // Wait 200ms for changes to settle
 				}
 			}

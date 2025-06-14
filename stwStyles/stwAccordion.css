@@ -1,0 +1,23 @@
+.stwAccordion dl {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.stwAccordion dt {
+	border-top: thin solid;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.stwAccordion dd {
+	margin: 0 0 0 var(--margin);
+	overflow-y: auto;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+}
+
+.stwAccordion dt span {
+	width: var(--margin);
+	display: inline-block;
+}

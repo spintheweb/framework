@@ -101,7 +101,7 @@ window.addEventListener("keydown", event => {
 	if (event.shiftKey && event.key == "F12") {
 		event.preventDefault();
 		if (document.querySelector(".stwStudio")) {
-			const stash = document.getElementById("stwBody");
+			const stash = document.getElementById("stwSite");
 			while (stash.firstChild)
 				document.body.appendChild(stash.firstChild);
 			document.querySelector(".stwStudio").remove();
@@ -109,19 +109,22 @@ window.addEventListener("keydown", event => {
 			const stash = document.createElement("div");
 			while (document.body.firstChild)
 				stash.appendChild(document.body.firstChild);
-			document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="splitter"></div><div id="stwBody"></div></div><footer id="stwStatusbar"></footer></div>`)
+			document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="stwSplitter"></div><div id="stwSite"></div></div><footer id="stwStatusbar"></footer></div>`)
 			while (stash.firstChild)
-				document.getElementById("stwBody").appendChild(stash.firstChild);
+				document.getElementById("stwSite").appendChild(stash.firstChild);
 			stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: { recurse: false } }));
 		}
 	}
 });
-document.addEventListener("mousedown", function (e) {
-	const splitter = e.target.closest(".splitter");
+
+// Handle resizing of the sidebar in studio mode
+// This allows the user to resize the sidebar by dragging the splitter
+document.addEventListener("mousedown", function (event) {
+	const splitter = event.target.closest(".stwSplitter");
 	if (!splitter) return;
 	const container = splitter.parentElement;
 	const aside = container.querySelector("aside");
-	const startX = e.clientX;
+	const startX = event.clientX;
 	const startWidth = aside.offsetWidth;
 
 	function onMouseMove(e2) {
@@ -138,4 +141,23 @@ document.addEventListener("mousedown", function (e) {
 
 	document.addEventListener("mousemove", onMouseMove);
 	document.addEventListener("mouseup", onMouseUp);
+});
+
+// Handle navigation inside the webbase
+// This allows the user to navigate inside the webbase without reloading the page
+document.addEventListener("DOMContentLoaded", () => {
+	document.body.addEventListener("click", function (event) {
+		const target = event.target.closest("a[href]");
+		if (target && target.getAttribute("href").startsWith("/")) {
+			event.preventDefault();
+			const href = target.getAttribute("href");
+			history.pushState({}, "", href);
+			stwWS.send(JSON.stringify({ method: "PATCH", resource: href, options: {} }));
+		}
+	});
+});
+
+// Optional: handle browser back/forward navigation
+window.addEventListener("popstate", function () {
+	stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
 });

@@ -126,9 +126,9 @@ export class STWLayout {
 			else if ("cr".indexOf(token.symbol) != -1)
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if ("ds".indexOf(token.symbol) != -1)
-				fn += `html += \`<select ${attributes(token.attrs)}><option></option></select>\`;`; // Content sensitive
+				fn += `html += \`<select ${attributes(token.attrs)} name="${token.args[0]}"><option></option></select>\`;`; // Content sensitive
 			else if ("ehw".indexOf(token.symbol) != -1)
-				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
+				fn += `html += \`<input ${attributes(token.attrs)} name="${token.args[0]}">\`;`; // Content sensitive
 			else if (token.symbol === "f")
 				fn += `html += placeholders.get("${token.args[0]}");`;
 			else if (token.symbol === "i")
@@ -138,11 +138,11 @@ export class STWLayout {
 			else if (token.symbol === "k")
 				fn += `placeholders.set("${token.args[0]}", "${token.args[1]}");`;
 			else if (token.symbol === "l" && contentType == "Table")
-				fn += `html += \`<td ${attributes(token.attrs)}>${token.args[0]}>\`;`;
+				fn += `html += \`<th ${attributes(token.attrs)}>${token.args[0]}</th>\`;`;
 			else if (token.symbol === "l")
 				fn += `html += \`<label ${attributes(token.attrs)}>${token.args[0]}</label>\`;`;
 			else if (token.symbol === "m")
-				fn += `html += \`<textarea ${attributes(token.attrs)}">${token.args[0]}</textarea>\`;`; // Content sensitive
+				fn += `html += \`<textarea ${attributes(token.attrs)}" name="${token.args[0]}">${token.args[0]}</textarea>\`;`; // Content sensitive
 			else if (token.symbol === "n") // Like text
 				fn += `html += \`${token.args[0]}\`;`;
 			else if (token.symbol === "o") {

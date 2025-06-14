@@ -1,15 +1,54 @@
 :root {
 	color-scheme: light dark;
 
-	--min-menu-width: 10rem;
+	--bg: hsl(0, 0%, 98%);
+	--bg-faint: hsl(0, 0%, 92%);
+	--text: hsl(220, 15%, 20%);
+	--special: hsl(200, 80%, 45%);
+	--on-special: hsl(0, 0%, 98%);
 
-	--padding: 0.25rem;
-	--special-color: Mark;
+	--padding: 0.5rem;
+	--thickness: 0.25rem
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: hsl(220, 15%, 15%);
+		--bg-faint: hsl(220, 15%, 22%);
+		--text: hsl(0, 0%, 98%);
+		--special: hsl(200, 80%, 60%);
+		--on-special: hsl(220, 15%, 15%);
+	}
 }
 
 body {
-	font-family: sans-serif;
-	font-size: 12pt;
+	background: var(--bg);
+	color: var(--text);
+}
+
+.stw,
+.stwStudio,
+.stwMenus menu,
+.stwTabs dd {
+	background: var(--bg);
+	color: var(--text);
+}
+
+.stwMenus menu li,
+.stwTabs dt,
+.stwForm button {
+	background: var(--bg-faint);
+	color: var(--text);
+}
+
+h1 {
+	color: var(--special);
+	border-bottom: thin solid var(--special);
+}
+
+a,
+.stwSpecial {
+	color: var(--special);
 }
 
 .stw {
@@ -50,7 +89,7 @@ body {
 }
 
 .dialog h1 {
-	border-bottom: thin solid var(--special-color);
+	border-bottom: thin solid var(--special);
 }
 
 .dialog h1::after {
@@ -86,68 +125,16 @@ article {
 	margin: 0.5rem 0;
 }
 
-.stwMenus a {
-	display: block;
-	background-color: inherit;
-	color: inherit;
-}
-
-.stwMenus menu {
-	list-style-type: none;
-	margin: 0;
-	padding: 0.25rem 0;
-	cursor: pointer;
-	background-color: Canvas;
-}
-
-.stwMenus nav>menu {
-	display: flex;
-}
-
-.stwMenus menu li {
-	line-height: 2rem;
-	position: relative;
-	min-width: calc(var(--min-menu-width) + 0.25rem);
-}
-
-.stwMenus nav>menu>li {
-	min-width: 0 !important;
-}
-
-.stwMenus menu menu>li:has(menu)::after {
-	position: absolute;
-	top: 0;
-	right: 0.125rem;
-	content: "▸";
-	font-size: 1.5rem;
-}
-
-.stwMenus menu li>menu {
-	display: none;
-	position: absolute;
-	border: thin solid light-dark(CanvasText, Canvas);
-	z-index: 1;
-}
-
-.stwMenus menu li li>menu {
-	top: 0;
-	left: var(--min-menu-width);
-}
-
-.stwMenus menu li>div {
-	padding: 0 0.5rem;
-	line-height: 1.5rem;
-}
-
-.stwInvisible {
+.stwHide {
 	display: none;
 }
 
 .stwSelected,
 .stwMenus menu li>div:hover,
-.stwMenus menu li>div:active {
-	background-color: light-dark(SelectedItem, SelectedItemText);
-	color: light-dark(SelectedItemText, SelectedItem);
+.stwTabs dt:hover,
+.stwTree li>div:hover {
+	background-color: var(--special) !important;
+	color: var(--on-special) !important;
 }
 
 .stwMenus menu li:hover>menu {
@@ -162,20 +149,38 @@ article {
 
 .stwTabs dd {
 	margin: 0;
-	border-top: thin solid light-dark(CanvasText, Canvas);
+	border-top: thin solid var(--special);
 }
 
 .stwStudio {
 	position: absolute;
 	display: grid;
 	grid-template-rows: 2rem auto 2rem;
-	top: 0; left: 0; bottom: 0; right: 0;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
 	overflow: hidden;
 }
+
 .stwStudio>div {
 	display: grid;
-	grid-template-columns: 1fr 0.5rem 3fr;
+	grid-template-columns: 1fr var(--padding) 3fr;
 }
-#stwMenubar, #stwSidebar, #stwStatusbar {
-	background-color: rgba(127, 127, 127, 0.5);
+
+#stwMenubar,
+#stwSidebar,
+#stwStatusbar {
+	background-color: var(--bg-faint)
+}
+
+.stwSplitter {
+	cursor: col-resize;
+	width: var(--thickness);
+}
+
+.stwSplitter:hover,
+.stwTree li>div:hover {
+	background-color: var(--special);
+	color: var(--on-special);
 }

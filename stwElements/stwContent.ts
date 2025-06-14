@@ -97,7 +97,7 @@ export abstract class STWContent extends STWElement {
 
 		let debug: string = "";
 		if (session.dev && !this.pathname(session).startsWith("/stws/"))
-			debug = `title="Double-click to edit content" ondblclick="stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/content?_id=${(ref || this)._id}',options:{placeholder:''}}))"`;
+			debug = `title="Shift-click to edit content" onclick="if (event.shiftKey) { event.preventDefault(); stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/editcontent?_id=${(ref || this)._id}',options:{placeholder:''}})) }"`;
 
 		const data = {
 			method: "PUT",
@@ -120,7 +120,7 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? ` class="stwCollapsible" onclick="this.nextElementSibling.classList.toggle('stwInvisible')"` : "";
+			return layout?.settings.has("collapsible") ? ` class="stwCollapsible" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('stwHide')"` : "";
 		}
 	}
 

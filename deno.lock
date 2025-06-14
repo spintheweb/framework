@@ -112,7 +112,8 @@
     }
   },
   "redirects": {
-    "https://deno.land/x/emit/mod.ts": "https://deno.land/x/emit@0.40.0/mod.ts"
+    "https://deno.land/x/emit/mod.ts": "https://deno.land/x/emit@0.40.0/mod.ts",
+    "https://esm.sh/jsonata": "https://esm.sh/jsonata@2.0.6"
   },
   "remote": {
     "https://deno.land/std@0.104.0/_util/assert.ts": "2f868145a042a11d5ad0a3c748dcf580add8a0dbc0e876eaa0026303a5488f58",
@@ -230,6 +231,8 @@
     "https://deno.land/x/mysql@v2.12.1/src/util.ts": "83d38e87cc3901da00ac44bfcd53c0e8d24525262f5c7647c912dccf3ed2dbb5",
     "https://deno.land/x/sql_builder@v1.9.1/util.ts": "b9855dc435972704cf82655019f4ec168ac83550ab4db596c5f6b6d201466384",
     "https://deno.land/x/wasmbuild@0.15.1/cache.ts": "9d01b5cb24e7f2a942bbd8d14b093751fa690a6cde8e21709ddc97667e6669ed",
-    "https://deno.land/x/wasmbuild@0.15.1/loader.ts": "8c2fc10e21678e42f84c5135d8ab6ab7dc92424c3f05d2354896a29ccfd02a63"
+    "https://deno.land/x/wasmbuild@0.15.1/loader.ts": "8c2fc10e21678e42f84c5135d8ab6ab7dc92424c3f05d2354896a29ccfd02a63",
+    "https://esm.sh/jsonata@2.0.6": "be80060c777d5d401345b99a5396c0749b631512e0fef4a2b59043be8fce4112",
+    "https://esm.sh/jsonata@2.0.6/denonext/jsonata.mjs": "2b0a477589d89ca2afe7abcc4df416fd826572dd1f2a9f48ddb651ba224a60f7"
   }
 }
