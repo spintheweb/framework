@@ -9,7 +9,7 @@ WBML is not intended to replace existing technologies, but rather to coordinate 
 
 WBML can be used to describe web sites, intranets, extranets, portals, web apps, and web services—here collectively referred to as web applications. It serves as a foundational language for Content Management Systems (CMS).
 
-The term webbase was first coined in 1998 to describe a relational database whose schema defined a site's structure, content, layout, localization, navigation, and security. To improve portability, the webbase concept evolved into the XML-based Webbase Markup Language (WBML), introducing the idea of a webbaselet—a fragment of a webbase. Today, WBML is also available in JSON format.
+The term webbase was first coined in 1998 to describe a relational database whose schema defined a site's structure, content, layout, localization, navigation, and security. To improve portability, the webbase concept evolved into the XML-based Webbase Markup Language (WBML), introducing the idea of a _webbaselet_—a fragment of a webbase. Today, WBML is also available in JSON format.
 
 ## Features
 * Content-centric architecture
@@ -40,3 +40,56 @@ A web spinner&mdash;a web server that understands WBML&mdash;receives a request 
 * Else it receives a resource
 * The _session context_ stores the connected user, its associated roles and locale. When a new session is established, the user is preset to _guest_ and roles to _guests_.
 
+# Spin the Web Studio
+
+Spin the Web Studio is the visual and interactive environment for building, managing, and customizing Spin the Web sites and applications. It provides a user-friendly interface for both developers and content editors to design layouts, manage content, configure data sources, and preview changes in real time.
+
+## Key Features
+
+- **Visual Content Editing:**  
+  Drag-and-drop interface for arranging content blocks, menus, trees, forms, and other components.
+
+- **Live Preview:**  
+  Instantly see how changes affect the site, with support for multiple languages and user roles.
+
+- **Data Source Management:**  
+  Configure and connect to various data sources (webbase, SQL, etc.), and visually map queries to content.
+
+- **Layout Designer:**  
+  Edit and preview WBLL (Webbase Layout Language) templates, manage placeholders, and control responsive layouts.
+
+- **Tree and Navigation Management:**  
+  Organize site structure, breadcrumbs, and navigation menus with intuitive tree views.
+
+- **Calendar and Scheduling:**  
+  Manage events and time-based content using integrated calendar views.
+
+- **Localization Tools:**  
+  Easily manage translations and localized content for multilingual sites.
+
+- **Custom Scripting and Extensions:**  
+  Add custom scripts, styles, and logic to extend site functionality directly from the studio.
+
+## Workflow
+
+1. **Design:**  
+   Use the visual designer to arrange content and navigation.
+2. **Configure:**  
+   Set up data sources, queries, and dynamic content.
+3. **Preview:**  
+   Instantly see changes as they would appear to end users.
+4. **Publish:**  
+   Deploy updates to the live site with a single click.
+
+## Who Is It For?
+
+- **Developers:**  
+  Rapidly prototype and extend site features with code and visual tools.
+- **Content Editors:**  
+  Manage and update site content without technical knowledge.
+- **Site Administrators:**  
+  Oversee structure, permissions, and localization from a central dashboard.
+
+---
+
+Spin the Web Studio streamlines the entire site-building process, making it accessible, efficient, and
