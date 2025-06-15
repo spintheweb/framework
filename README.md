@@ -40,34 +40,3 @@ A web spinner&mdash;a web server that understands WBML&mdash;receives a request 
 * Else it receives a resource
 * The _session context_ stores the connected user, its associated roles and locale. When a new session is established, the user is preset to _guest_ and roles to _guests_.
 
-# Spin the Web Studio
-
-Spin the Web Studio is a webbaselet for building Spin the Web applications. It provides a user-friendly interface for developers and administrators to structure the web application, manage contents, configure data sources, and preview changes in real time.
-
-## Key Features
-
-- **Live Preview:**  
-  Instantly see how changes affect the site, with support for multiple languages and user roles.
-
-- **Data Source Management:**  
-  Configure and connect to various data sources (webbase, SQL, API, etc.).
-
-- **Layout Designer:**  
-  Edit and preview WBLL (Webbase Layout Language) templates, manage placeholders, and control responsive layouts.
-
-- **Tree and Navigation Management:**  
-  Organize site structure.
-
-- **Localization Tools:**  
-  Easily manage translations and localized content for multilingual sites.
-
-## Who Is It For?
-
-- **Developers:**  
-  Rapidly prototype and extend site features with code and visual tools.
-- **Site Administrators:**  
-  Oversee structure, permissions, and localization from a central dashboard.
-
----
-
-Spin the Web Studio streamlines the entire site-building process, making it accessible, efficient, and
