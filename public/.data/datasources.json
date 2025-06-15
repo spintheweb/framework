@@ -18,8 +18,9 @@
         "database": "rs3hmqg2_pres617"
     },
     {
-        "name": "countries",
+        "name": "objects",
         "type": "api",
-        "host": "https://restcountries.com/v3.1/all"
+        "host": "https://api.restful-api.dev/objects",
+        "contentType": "application/json"
     }
 ]

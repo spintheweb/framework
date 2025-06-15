@@ -27,7 +27,7 @@ export class STWSession {
 		this.sessionId = sessionId;
 		this.remoteAddr = remoteAddr;
 		this.user = "guest";
-		this.roles = ["guests", "developers"];
+		this.roles = ["guests","developers"]; // Default roles
 		this.lang = "en";
 		this.langs = ["en"];
 		this.placeholders = new Map<string, string>;

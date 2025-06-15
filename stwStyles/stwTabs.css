@@ -1,16 +1,36 @@
-.stwTabs dt {
+.stwHTabs {
+	display: flex;
+	flex-direction: column;
+}
+
+.stwVTabs {
+	display: grid;
+	grid-template-columns: auto 1fr;
+}
+
+.stwHTabs > div {
+	border-bottom: thin solid var(--border);
+}
+
+.stwVTabs > div {
+	border-right: thin solid var(--border);
+}
+
+.stwHTabs dt {
 	display: inline-block;
-	padding: 0.25rem 0.5rem;
+	padding: var(--thickness) var(--padding);
+	cursor: pointer;
+}
+
+.stwVTabs dt {
+	padding: var(--padding);
 	cursor: pointer;
 }
 
 .stwTabs dd {
-	margin: 0;
-	border-top: thin solid var(--special);
+	margin: 0
 }
 
-.stwTabs dt:hover
-{
-	background-color: var(--special) !important;
-	color: var(--on-special) !important;
+.stwTabs dd>article {
+	padding: 0;
 }

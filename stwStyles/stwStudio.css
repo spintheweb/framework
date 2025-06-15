@@ -11,13 +11,26 @@
 
 .stwStudio>div {
 	display: grid;
-	grid-template-columns: 1fr var(--padding) 3fr;
+	grid-template-columns: auto var(--padding) 3fr;
 }
 
 #stwMenubar,
 #stwSidebar,
 #stwStatusbar {
-	background-color: var(--bg-faint)
+	background-color: var(--bg-faint);
+}
+
+#stwMenubar {
+	border-bottom: thin solid var(--border);
+}
+
+#stwSidebar {
+	border-right: thin solid var(--border);
+	overflow: auto;
+}
+
+#stwStatusbar {
+	border-top: thin solid var(--border);
 }
 
 .stwSplitter {
@@ -25,8 +38,7 @@
 	width: var(--thickness);
 }
 
-.stwSplitter:hover,
-.stwTree li>div:hover {
+.stwSplitter:hover {
 	background-color: var(--special);
 	color: var(--on-special);
 }

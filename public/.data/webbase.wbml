@@ -25,14 +25,14 @@
 						"en": "customers"
 					},
 					"visibility": {
-						"guests": true
+						"guests": false
 					},
 					"subtype": "Table",
 					"cssClass": "stwTable",
 					"section": "main",
 					"sequence": "1",
 					"dsn": "mysqlsample",
-					"query": "SELECT * FROM customers LIMIT 10",
+					"query": "SELECT * FROM customers LIMIT 3",
 					"params": "",
 					"layout": {
 						"en": "\\s('caption=\"Customers\" ')lflflflflf"
@@ -104,8 +104,7 @@
 					"query": "",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Customer\" ')\n\\A('style=\"color:red\" ') \nl('Name')\\a('style=\"color:red\"')e\n t(' This is a test!') \\r    \n a('sales')p('fufi;1')pf('yyyyMMdd')f\nl('Ext.')f\nl('Email')a('mailto:@@Email')f // This is an inline comment\n\rn('1;a;b;c;d') /* This is a multiline comment\n that continues\n*/ opppf a('https://www.keyvisions.it')p('foo;@@ciao')pf\\a('style=\"color:red\"')e\\a('style=\"color: yellow\"')crm",
-						"en-us": "\\s('caption=\"Welcome to Spin the Web Playground\" ')\ne(';user;)\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;esite;logon;@@usr;@@pwd')"
+						"en": "\\s('caption=\"Welcome to Spin the Web Playground\" collapsible')\ne(';user;')\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;stw;logon;@@usr;@@pwd')"
 					}
 				},
 				{
@@ -118,7 +117,7 @@
 						"en": "info"
 					},
 					"visibility": {
-						"guests": true
+						"guests": false
 					},
 					"subtype": "Menus",
 					"cssClass": null,
@@ -234,15 +233,15 @@
 					"_id": "92a2ced0-be64-11ee-90a9-c195cb5cfc71",
 					"type": "Content",
 					"name": {
-						"en": "Accordion"
+						"en": "Tabs"
 					},
 					"slug": {
-						"en": "accordion"
+						"en": "tabs"
 					},
 					"visibility": {
 						"guests": true
 					},
-					"subtype": "Accordion",
+					"subtype": "Tabs",
 					"cssClass": null,
 					"section": "main",
 					"sequence": "10",
@@ -250,18 +249,15 @@
 					"query": "",
 					"params": "",
 					"layout": {
-						"en": ""
+						"en": "\\s('orientation=\"horizontal\"')"
 					},
 					"options": [
 						{
-							"name": null,
+							"name": { "en": "Products" },
 							"ref": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
 						},
 						{
-							"name": {
-								"en": "Spin the Web Project"
-							},
-							"ref": "4afeeae0-2a4e-11ee-9a5d-8ff6b23b06b9"
+							"ref": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371"
 						}
 					]
 				}
@@ -296,32 +292,32 @@
 					"cssClass": "stwTable",
 					"section": "",
 					"sequence": "1",
-					"dsn": "xmysqlsample",
-					"query": "select * from products limit 10",
+					"dsn": "mysqlsample",
+					"query": "select * from products limit 3",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Product\" rows=\"10\" ')lflflflf"
+						"en": "\\s('caption=\"Products\" rows=\"10\" ')lflflflf"
 					}
 				},
 				{
 					"_id": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371",
 					"type": "Content",
 					"name": {
-						"en": "Countries"
+						"en": "Objects"
 					},
 					"slug": {
-						"en": "countries"
+						"en": "objects"
 					},
 					"visibility": {},
 					"subtype": "Table",
-					"cssClass": "stwTable",
-					"section": "main",
+					"cssClass": "",
+					"section": "",
 					"sequence": "5",
-					"dsn": "countries",
-					"query": "",
-					"params": "fields=name,capital,currencies",
+					"dsn": "objects",
+					"query": "{name: name, color: data.color}",
+					"params": "id=3&id=5&id=10",
 					"layout": {
-						"en": "\\s('caption=\"Countries\" rows=\"10\" ')"
+						"en": "\\s('caption=\"Objects\" rows=\"3\" ')lflf"
 					}
 				},
 				{
@@ -335,7 +331,7 @@
 					},
 					"visibility": {},
 					"subtype": "Table",
-					"cssClass": "stwTable",
+					"cssClass": "",
 					"section": "main",
 					"sequence": "1",
 					"dsn": "mysqlsample",
@@ -409,30 +405,6 @@
 			"mainpage": ""
 		},
 		{
-			"_id": "d18e40c0-3d21-11ee-8e8f-d7e9515d7646",
-			"type": "Page",
-			"name": {
-				"en": "<i class=\"fa-kit fa-light-cloud-pen\" title=\"Toggle STW Studio (CTRL+F12)\" onclick=\"stwToggleStudio()\"></i>"
-			},
-			"slug": {
-				"en": "stwstudio"
-			},
-			"children": [],
-			"visibility": {
-				"users": false,
-				"administrators": false,
-				"developers": true
-			},
-			"keywords": {
-				"en": ""
-			},
-			"description": {
-				"en": ""
-			},
-			"contentType": "text/html",
-			"template": "."
-		},
-		{
 			"_id": "14061700-400d-11ee-861d-b761bb0ba80e",
 			"type": "Page",
 			"name": {
@@ -458,7 +430,7 @@
 				"en": "breadcrumbs"
 			},
 			"visibility": {
-				"guests": true
+				"guests": false
 			},
 			"subtype": "Breadcrumbs",
 			"cssClass": "stwBreadcrumbs",
@@ -475,7 +447,7 @@
 				"en": "menu"
 			},
 			"visibility": {
-				"guests": true
+				"guests": false
 			},
 			"subtype": "Menu",
 			"cssClass": "stwMenu",
@@ -518,12 +490,7 @@
 		}
 	],
 	"visibility": {
-		"administrators": true,
-		"developers": true,
-		"translators": false,
-		"guests": false,
-		"users": false,
-		"editors": false
+		"administrators": true
 	},
 	"keywords": {
 		"en": "stw"

@@ -1,3 +1,24 @@
-.stwTable {
-    /* Content-specific styles using global color variables */
+.stwTable table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.stwTable th,
+.stwTable td {
+    padding: var(--padding);
+    border: thin solid var(--bg-faint);
+}
+
+.stwTable th {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.stwTable tr:nth-child(even) {
+    background: var(--bg-faint);
+}
+
+.stwTable tr:hover {
+    background: var(--special);
+    color: var(--on-special);
 }

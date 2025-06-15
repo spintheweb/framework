@@ -1,4 +1,5 @@
-// Deno script: watches stwStyles, merges and minifies all .css files into stwStyle.css on change
+// Watches stwStyles, merges and minifies all .css files into stwStyle.css on change
+// Usage: deno run --allow-read --allow-write tasks/merge-css.ts
 
 const folder = "./stwStyles";
 const output = "./public/styles/stwStyle.css";

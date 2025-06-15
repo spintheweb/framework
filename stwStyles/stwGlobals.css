@@ -3,6 +3,7 @@
 
 	--bg: hsl(0, 0%, 98%);
 	--bg-faint: hsl(0, 0%, 92%);
+	--border: hsl(0, 0%, 85%);
 	--text: hsl(220, 15%, 20%);
 	--special: hsl(200, 80%, 45%);
 	--on-special: hsl(0, 0%, 98%);
@@ -29,15 +30,11 @@ body {
 
 h1 {
 	color: var(--special);
-	border-bottom: thin solid var(--special);
+	border-bottom: thin solid var(--border);
 }
 
 dialog {
 	font-size: smaller;
-}
-
-dialog h1 {
-	border-bottom: thin solid var(--special);
 }
 
 dialog h1::after {
@@ -46,7 +43,6 @@ dialog h1::after {
 
 article {
 	position: relative;
-	padding: var(--padding);
 }
 
 a,

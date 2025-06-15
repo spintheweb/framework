@@ -42,51 +42,29 @@ A web spinner&mdash;a web server that understands WBML&mdash;receives a request 
 
 # Spin the Web Studio
 
-Spin the Web Studio is the visual and interactive environment for building, managing, and customizing Spin the Web sites and applications. It provides a user-friendly interface for both developers and content editors to design layouts, manage content, configure data sources, and preview changes in real time.
+Spin the Web Studio is a webbaselet for building Spin the Web applications. It provides a user-friendly interface for developers and administrators to structure the web application, manage contents, configure data sources, and preview changes in real time.
 
 ## Key Features
-
-- **Visual Content Editing:**  
-  Drag-and-drop interface for arranging content blocks, menus, trees, forms, and other components.
 
 - **Live Preview:**  
   Instantly see how changes affect the site, with support for multiple languages and user roles.
 
 - **Data Source Management:**  
-  Configure and connect to various data sources (webbase, SQL, etc.), and visually map queries to content.
+  Configure and connect to various data sources (webbase, SQL, API, etc.).
 
 - **Layout Designer:**  
   Edit and preview WBLL (Webbase Layout Language) templates, manage placeholders, and control responsive layouts.
 
 - **Tree and Navigation Management:**  
-  Organize site structure, breadcrumbs, and navigation menus with intuitive tree views.
-
-- **Calendar and Scheduling:**  
-  Manage events and time-based content using integrated calendar views.
+  Organize site structure.
 
 - **Localization Tools:**  
   Easily manage translations and localized content for multilingual sites.
-
-- **Custom Scripting and Extensions:**  
-  Add custom scripts, styles, and logic to extend site functionality directly from the studio.
-
-## Workflow
-
-1. **Design:**  
-   Use the visual designer to arrange content and navigation.
-2. **Configure:**  
-   Set up data sources, queries, and dynamic content.
-3. **Preview:**  
-   Instantly see changes as they would appear to end users.
-4. **Publish:**  
-   Deploy updates to the live site with a single click.
 
 ## Who Is It For?
 
 - **Developers:**  
   Rapidly prototype and extend site features with code and visual tools.
-- **Content Editors:**  
-  Manage and update site content without technical knowledge.
 - **Site Administrators:**  
   Oversee structure, permissions, and localization from a central dashboard.
 

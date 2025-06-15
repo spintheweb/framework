@@ -35,7 +35,7 @@ export interface ISTWContent extends ISTWElement {
 	sequence: number;
 	dsn: string;
 	query: string;
-	parameters: string;
+	params: string;
 	layout: object;
 }
 export abstract class STWContent extends STWElement {
@@ -44,10 +44,10 @@ export abstract class STWContent extends STWElement {
 	sequence: number;
 	dsn: string;
 	query: string;
-	parameters: string;
+	params: string;
 	protected layout!: Map<string, STWLayout>;
 
-	public constructor(content: ISTWContent) {
+	public constructor(content: ISTWContent, _settings?: { [key: string]: string }) {
 		super(content);
 
 		this.type = content.subtype;
@@ -56,7 +56,7 @@ export abstract class STWContent extends STWElement {
 		this.sequence = content.sequence || 0.0;
 		this.dsn = content.dsn;
 		this.query = content.query;
-		this.parameters = content.parameters;
+		this.params = content.params;
 
 		if (!["Text", "Script", "Shortcut"].includes(this.type) && content.layout) {
 			this.layout = new Map();
@@ -95,16 +95,12 @@ export abstract class STWContent extends STWElement {
 
 		const layout = this.layout?.get(session.lang);
 
-		let debug: string = "";
-		if (session.dev && !this.pathname(session).startsWith("/stws/"))
-			debug = `title="Shift-click to edit content" onclick="if (event.shiftKey) { event.preventDefault(); stwWS.send(JSON.stringify({method:'PATCH',resource:'/stws/editcontent?_id=${(ref || this)._id}',options:{placeholder:''}})) }"`;
-
 		const data = {
 			method: "PUT",
 			id: this._id,
 			section: (ref || this).section,
 			sequence: (ref || this).sequence,
-			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}" ${debug}>
+			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
 				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
 				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
 				<div>
@@ -120,7 +116,7 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('stwHide')"><i class="fa-solid fa-fw fa-angle-down"></i>` : "<h1>";
+			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="stwToggleCollapse(event)"><i class="fa-solid fa-fw fa-angle-down"></i>` : "<h1>";
 		}
 	}
 

@@ -31,7 +31,7 @@ export class STWAccordion extends STWContent {
 
 				const placeholder = crypto.randomUUID();
 				body += `<dd><article id="${placeholder}"></article></dd>`;
-				session.socket?.send(JSON.stringify({ method: "PATCH", id: option.ref, placeholder: placeholder })); // Ask client to request content
+//				session.socket?.send(JSON.stringify({ method: "PATCH", id: option.ref, placeholder: placeholder })); // Ask client to request content
 			}
 		});
 

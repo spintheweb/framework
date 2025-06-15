@@ -169,7 +169,7 @@ BEGIN
 						, C.fRenderAs as [subtype]
 						, (select fName from dbo.eSiteDataSources where fId = C.fDataSource) as [dsn]
 						, C.fQuery as [query]
-						, C.fParameters as [parameters]
+						, C.fParameters as [params]
 						, JSON_QUERY(dbo.fnSTWLanguage(C.fId, 0)) as [layout]
 						, JSON_QUERY(dbo.fnSTWVisibility('C', C.fId)) as [visibility]
 					from eSiteContents C where P.fId = C.fPageId for json path, INCLUDE_NULL_VALUES) as children

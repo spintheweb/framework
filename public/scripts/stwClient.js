@@ -95,10 +95,19 @@ function stwStartWebsocket() {
 	}
 }
 
-// Toggle studio mode with Shift+F12
-// This allows the user to toggle a studio interface that provides a sidebar and status bar
+function stwToggleCollapse(event) {
+	event.preventDefault();
+	const el = event.currentTarget;
+	el.querySelector("i.fa-solid").classList.toggle("fa-angle-down");
+	if (el.querySelector("i.fa-solid").classList.toggle("fa-angle-right"))
+		el.nextElementSibling.classList.add("stwHide");
+	else
+		el.nextElementSibling.classList.remove("stwHide");
+}
+
+// Toggle studio mode with Alt+F12
 window.addEventListener("keydown", event => {
-	if (event.shiftKey && event.key == "F12") {
+	if (event.altKey && event.key == "F12") {
 		event.preventDefault();
 		if (document.querySelector(".stwStudio")) {
 			const stash = document.getElementById("stwSite");
@@ -118,7 +127,6 @@ window.addEventListener("keydown", event => {
 });
 
 // Handle resizing of the sidebar in studio mode
-// This allows the user to resize the sidebar by dragging the splitter
 document.addEventListener("mousedown", function (event) {
 	const splitter = event.target.closest(".stwSplitter");
 	if (!splitter) return;
@@ -143,6 +151,15 @@ document.addEventListener("mousedown", function (event) {
 	document.addEventListener("mouseup", onMouseUp);
 });
 
+// Open content properties when studio mode is enabled with Alt+click
+window.addEventListener("click", function (e) {
+	const article = e.target.closest("article[id]");
+	if (document.querySelector(".stwStudio") && article && e.altKey) {
+		e.preventDefault();
+		stwWS.send(JSON.stringify({ method: 'PATCH', resource: `/stws/editcontent?_id=${article.id}`, options: { placeholder: '' } }));
+	}
+});
+
 // Handle navigation inside the webbase
 // This allows the user to navigate inside the webbase without reloading the page
 document.addEventListener("DOMContentLoaded", () => {
@@ -161,3 +178,4 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("popstate", function () {
 	stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
 });
+

@@ -7,12 +7,13 @@
 **/
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
+import { STWLayout } from "./wbll.ts";
 
 export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];
 
 	public constructor(content: ISTWContentWithOptions) {
-		super(content);
+		super(content, { orientation: "horizontal" });
 
 		if (content.options)
 			content.options.forEach((option: ISTWOption) => {
@@ -21,7 +22,9 @@ export class STWTabs extends STWContent {
 	}
 
 	public override render(_req: Request, session: STWSession): string {
-		let body = "", id = "";
+		const layout = this.layout.get(session.lang) as STWLayout;
+
+		let body = "<div>", id = "";
 
 		this.options.forEach(option => {
 			const element = session.site.find(session, option.ref || "");
@@ -36,18 +39,19 @@ export class STWTabs extends STWContent {
 			return "";
 
 		const placeholder = crypto.randomUUID();
-		body += `<dd><article id="${placeholder}"></article></dd>`;
+		body += `</div><dd><article data-id="${placeholder}"></article></dd>`;
 		session.socket?.send(JSON.stringify({ method: "PATCH", id: id, placeholder: placeholder })); // Ask client to request content
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
-		return `<dl>${body}</dl>
+		return `<dl class="stw${layout.settings.get("orientation")[0].toUpperCase()}Tabs">${body}</dl>
 			<script name="STWTabs" onload="fnSTWTabs('${this._id}')">
 				function fnSTWTabs(id) {
 					const tabs = self.document.getElementById(id);
 					tabs.querySelector("dl").addEventListener("click", event => {
-						const target = event.target;
-						if (target.tagName === "DT" && !target.classList.contains("stwSelected")) {
-							event.currentTarget.querySelectorAll("dt").forEach(dt => dt.classList[dt == target ? "add" : "remove"]("stwSelected"));
+						const target = event.target.closest("dt");
+						if (target && !target.classList.contains("stwSelected")) {
+							event.currentTarget.querySelector("dt.stwSelected").classList.remove("stwSelected");
+							target.classList.add("stwSelected");
 							event.currentTarget.querySelector("dd article").id = "refreshSTWTab";
 							stwWS.send(JSON.stringify({ method: "PATCH", resource: target.getAttribute("data-ref"), options: { placeholder: "refreshSTWTab" } }));
 						}

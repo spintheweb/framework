@@ -85,6 +85,11 @@ export class STWLayout {
 					token.attrs.set("type", ["hidden", "checkbox", "radiobox", "password", ""].at("hcrw".indexOf(token.symbol)) || "");
 					if (token.attrs.get("type") === "")
 						token.attrs.delete("type");
+					if ("eE".indexOf(token.symbol) != -1)
+						token.attrs.set("name", token.args[1] || "@@");
+					else if ("cdDhmMrsSu".indexOf(token.symbol) != -1)
+						token.attrs.set("name", token.args[0] || "@@");
+					token.attrs.set("value", token.args[2] || "@@");
 				}
 
 				if (pattern[2]?.match("^[<>p]")) {
@@ -126,9 +131,9 @@ export class STWLayout {
 			else if ("cr".indexOf(token.symbol) != -1)
 				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if ("ds".indexOf(token.symbol) != -1)
-				fn += `html += \`<select ${attributes(token.attrs)} name="${token.args[0]}"><option></option></select>\`;`; // Content sensitive
+				fn += `html += \`<select ${attributes(token.attrs)}><option></option></select>\`;`; // Content sensitive
 			else if ("ehw".indexOf(token.symbol) != -1)
-				fn += `html += \`<input ${attributes(token.attrs)} name="${token.args[0]}">\`;`; // Content sensitive
+				fn += `html += \`<input ${attributes(token.attrs)}>\`;`; // Content sensitive
 			else if (token.symbol === "f")
 				fn += `html += placeholders.get("${token.args[0]}");`;
 			else if (token.symbol === "i")
@@ -142,7 +147,7 @@ export class STWLayout {
 			else if (token.symbol === "l")
 				fn += `html += \`<label ${attributes(token.attrs)}>${token.args[0]}</label>\`;`;
 			else if (token.symbol === "m")
-				fn += `html += \`<textarea ${attributes(token.attrs)}" name="${token.args[0]}">${token.args[0]}</textarea>\`;`; // Content sensitive
+				fn += `html += \`<textarea ${attributes(token.attrs)}">${token.args[0]}</textarea>\`;`; // Content sensitive
 			else if (token.symbol === "n") // Like text
 				fn += `html += \`${token.args[0]}\`;`;
 			else if (token.symbol === "o") {
