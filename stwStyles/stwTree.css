@@ -14,3 +14,10 @@
   transition: background-color 0.3s ease;
 }
 
+.stwTree li:focus-within .stwSelected {
+  background-color: initial; /* Default color */
+}
+
+.stwTree .stwSelected {
+  background-color: gray !important; /* Gray when the article isn't focused */
+}

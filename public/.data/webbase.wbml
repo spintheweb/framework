@@ -314,7 +314,7 @@
 					"section": "",
 					"sequence": "5",
 					"dsn": "objects",
-					"query": "{name: name, color: data.color}",
+					"query": "$.({\"name\":name,\"color\":data.color})",
 					"params": "id=3&id=5&id=10",
 					"layout": {
 						"en": "\\s('caption=\"Objects\" rows=\"3\" ')lflf"

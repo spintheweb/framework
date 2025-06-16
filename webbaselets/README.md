@@ -1,10 +1,10 @@
 # Webbaselets
 
-Webbaselets are webbases without a root site element. They can be viewed as functionalities that can be incorporated in a webbase.
+Webbaselets are modular web applications designed to be embedded within a webbase. Unlike traditional webbases, they do not include a root site element, allowing them to integrate seamlessly as components or features within larger webbase projects.
 
 ## Spin the Web Studio (stwStudio.wbml)
 
-Spin the Web Studio is a webbaselet for building Spin the Web applications. It provides a user-friendly interface integrated with the web application being developed, it's for developers and administrators to structure the web application, manage contents, configure data sources, and authorizations while previewing changes in real time.
+Spin the Web Studio is a webbaselet designed for building and managing Spin the Web applications. It offers an intuitive interface that integrates directly with your project, enabling developers and administrators to organize application structure, manage content, configure data sources, and set up authorizations—all while previewing changes in real time.
 
 ### Key Features
 

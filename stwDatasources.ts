@@ -65,8 +65,11 @@ export class STWDatasources {
 					return await datasource.execute(rePlaceholders(content.query, session.placeholders));
 			}
 		} catch (error) {
-			console.error(error);
-			// throw error;
+            if (error instanceof Error) {
+                console.error(error.message);
+            } else {
+                console.error(String(error));
+            }
 		}
 		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
 	}

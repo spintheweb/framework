@@ -100,7 +100,7 @@ export abstract class STWContent extends STWElement {
 			id: this._id,
 			section: (ref || this).section,
 			sequence: (ref || this).sequence,
-			body: `<article id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
+			body: `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
 				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
 				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
 				<div>
