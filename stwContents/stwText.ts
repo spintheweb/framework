@@ -8,7 +8,7 @@
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
-import { rePlaceholders } from "../stwMiscellanea.ts";
+import { rePlaceholders } from "../stwUtilities.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {

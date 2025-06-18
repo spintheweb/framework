@@ -9,7 +9,7 @@
 /**
  * Given text sprinkeled with placeholders, a placeholder is a variable prefixed with \@, \@@ or \@@@, replace the placeholders applying these rules:
  * * Replace the placeholder with its value
- * * If the placeholder has no value and is inside square brackets ([]): remove everything within and including the square brackets and the first word next to the closing bracket (]) or the first word preceeding the opening bracket ([) 
+ * * If the placeholder has no value and is inside square brackets ([]): remove everything within, including the square brackets and the first word next to the closing bracket (]) if not present the first word preceeding the opening bracket ([) 
  * * If the placeholder has a value and is inside square brackets simply remove the square brackets
  * * Braces ({}) confine the behavior of square brackets, and are removed
  * * If a placeholder is surronded by single (') or double quotes ("), double all single or double quotes in the value
@@ -79,50 +79,3 @@ export function rePlaceholders(text: string, placeholders: Map<string, string>):
 	text = text.replaceAll("<stwNA>", "");
 	return text.replaceAll("<stwAT>", "@");
 }
-
-/*
-const placeholders = new Map([
-	["@a", "fufi'"], 
-	["@@@hello", "buh"],
-	["@pluto", "1\",2,3"]
-]);
-
-const text = `this is very nice
-{more[...this is \\@'hello @a' [@a] [test]]}
-{[...@b this is @a test @@@hello] [well @x]}
-@@@hello "@pluto"...
-info\\@keyvisions.it`;
-
-console.clear();
-console.info(text);
-console.log(processPlaceholders2(text, placeholders));
-*/
-
-/*
-function doit(event) {
-  //debugger;
-  let declarations = ""
-  document.querySelectorAll(".variable").forEach((variable) => {
-    if (variable.type === "number")
-      declarations += `const ${variable.name}=${parseFloat(variable.value) || 0.0};`
-    else
-      declarations += `const ${variable.name}="${variable.value.replace(/"/g, '\\"')}";`
-  });
-  document.getElementById("log").innerText = "";
-  document.querySelectorAll(".function").forEach((fn) => {
-    let body = fn.value.trim()
-    if (body[0] === "=") {
-      const funct = new Function(
-        `${declarations}${body.replace("=", "return ")};`,
-      )
-      log(funct.toString())
-      log(funct())
-    } else log(body)
-  });
-  
-}
-
-function log(txt) {
-  document.getElementById("log").innerText += txt + "\n";
-}
-*/

@@ -15,7 +15,27 @@ export class STWList extends STWContent {
 	}
 
 	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		return `TODO: Render ${this.constructor.name} <pre>${_records}</pre>`;
+		const layout = this.layout.get(_session.lang);
+
+		let body = "";
+		if (_records.rows?.length) {
+			let row: number = 0;
+
+			const placeholders = new Map(_session.placeholders);
+			for (const [name, value] of Object.entries(_records.rows[0]))
+				placeholders.set(`@@${name}`, String(value));
+
+			body = `<ul>`;
+			while (true) {
+				body += `<li>${layout?.render(this.type, _req, _session, _records, placeholders)}</li>`;
+				if (++row >= _records.rows.length || row >= parseInt(layout?.settings.get("rows") || "25"))
+					break;
+				for (const [name, value] of Object.entries(_records.rows[row]))
+					placeholders.set(`@@${name}`, String(value));
+			}
+			body += "</ul>";
+		}
+		return body;
 	}
 }
 

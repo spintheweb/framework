@@ -44,12 +44,9 @@ export class STWMenus extends STWContent {
 			if (name === "-")
 				body += iteration ? "<hr>" : "";
 			else if (!element || element.isVisible(session)) {
-				if (element instanceof STWContent) {
-					const placeholder = crypto.randomUUID();
-					body += `<li><article id="${placeholder}"></article></div>`;
-					session.socket?.send(JSON.stringify({ method: "PATCH", id: element._id, placeholder: placeholder })); // Ask client to request content
-
-				} else if (element instanceof STWElement)
+				if (element instanceof STWContent)
+					body += `<li><article id="${crypto.randomUUID()}" href="${element._id}${(new URL(_req.url)).search}"></article></div>`;
+				else if (element instanceof STWElement)
 					body += `<li><div><a href="${href}" ${option.target ? `target="${option.target}"` : ""}>${name}</a></div>`;
 
 				else {

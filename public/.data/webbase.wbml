@@ -100,8 +100,8 @@
 					"cssClass": "stwForm",
 					"section": "main",
 					"sequence": "2.1",
-					"dsn": "",
-					"query": "",
+					"dsn": "json",
+					"query": "{\"name\":\"spinner\",\"pwd\":\"spunned\"}",
 					"params": "",
 					"layout": {
 						"en": "\\s('caption=\"Welcome to Spin the Web Playground\" collapsible')\ne(';user;')\\a('placeholder=\"user name\"')t(' ')w('pwd')\\a('placeholder=\"password\"')t(' ')b(';Sign in;;stw;logon;@@usr;@@pwd')"
@@ -239,7 +239,7 @@
 						"en": "tabs"
 					},
 					"visibility": {
-						"guests": true
+						"guests": false
 					},
 					"subtype": "Tabs",
 					"cssClass": null,

@@ -38,9 +38,7 @@ export class STWTabs extends STWContent {
 		if (!id)
 			return "";
 
-		const placeholder = crypto.randomUUID();
-		body += `</div><dd><article data-id="${placeholder}"></article></dd>`;
-		session.socket?.send(JSON.stringify({ method: "PATCH", id: id, placeholder: placeholder })); // Ask client to request content
+		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"></article></dd>`;
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
 		return `<dl class="stw${layout.settings.get("orientation")[0].toUpperCase()}Tabs">${body}</dl>

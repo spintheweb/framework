@@ -27,15 +27,11 @@ export class STWAccordion extends STWContent {
 			const element = session.site.find(session, option.ref || "");
 			if (element instanceof STWContent && element.isVisible(session)) {
 				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-				body += `<dt data-ref="${element._id}"><i class="fa-solid fa-fw fa-angle-down"></i>${name}</dt>`;
-
-				const placeholder = crypto.randomUUID();
-				body += `<dd><article id="${placeholder}"></article></dd>`;
-//				session.socket?.send(JSON.stringify({ method: "PATCH", id: option.ref, placeholder: placeholder })); // Ask client to request content
+				body += `<dt data-ref="${element._id}"><i class="fa-solid fa-fw fa-angle-down"></i>${name}</dt><dd><article id="${crypto.randomUUID()}" href="${option.ref}${(new URL(_req.url)).search}"></article></dd>`;
 			}
 		});
 
-		if (body === "") 
+		if (body === "")
 			return "";
 
 		// The STWAccordion script selects the clicked accordion and requests from the spinner the accordion content

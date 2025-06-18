@@ -75,6 +75,12 @@ function stwStartWebsocket() {
 			}
 		}
 
+		// Load articles
+		document.querySelectorAll("article[href]").forEach(article => {
+			stwWS.send(JSON.stringify({ method: "PATCH", resource: article.getAttribute("href"), options: { placeholder: article.id } }));
+			article.removeAttribute("href");
+		});
+
 		// Load content script
 		const script = self.document.getElementById(data.id)?.querySelector("script[onload]");
 		if (script) {
@@ -92,9 +98,8 @@ function stwStartWebsocket() {
 		console.error(err);
 		stwWS = null;
 		setTimeout(stwStartWebsocket, 5000);
-	}
+	};
 }
-
 function stwToggleCollapse(event) {
 	event.preventDefault();
 	const el = event.currentTarget;

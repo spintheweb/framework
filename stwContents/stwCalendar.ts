@@ -19,8 +19,8 @@ export class STWCalendar extends STWContent {
 
 		// Month rendering
 		let body = `<div class="stw${layout?.settings.get("period") || "Month"}">`;
-		for (let day = 1; day <= daysInMonth; day++)
-			body += `<div data-day="${day}">${layout?.render(_req, session)}</div>`;
+		for (let day = 1; day <= daysInMonth; day++) 
+			body += `<div data-day="${day}">${layout?.render(this.type, _req, session, _records, new Map())}</div>`;
 		return body;
 
 		function getDaysInMonth(month: number, year: number): number {

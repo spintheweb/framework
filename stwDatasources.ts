@@ -10,14 +10,14 @@
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
-import { rePlaceholders } from "./stwMiscellanea.ts";
+import { rePlaceholders } from "./stwUtilities.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata";
 
-export type ISTWRecords = ExecuteResult & { fieldNames?: string[] };
+export type ISTWRecords = ExecuteResult;
 
 interface ISTWDatasource {
-	type: "stw" | "api" | "mysql" | "postgres" | "mongodb", // Datasource type
+	type: "stw" | "json" | "api" | "mysql" | "postgres" | "mongodb", // Datasource type
 	host: string, // Server hostname
 	port: number, // Server port
 	user: string, // Username
@@ -57,6 +57,13 @@ export class STWDatasources {
 
 			if (content.dsn && content.query) {
 				const datasource = STWDatasources.datasources.get(content.dsn);
+				if (content.dsn === "json") {
+					const json = JSON.parse(content.query);
+					return new Promise<ISTWRecords>(resolve => resolve({
+						affectedRows: 1,
+						fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name })) : [],
+						rows: Array.isArray(json) ? json : [json]
+					}));}
 				if (datasource?.type === "api")
 					return await fetchAPIData(session, content, datasource);
 				if (datasource instanceof STWSite)
@@ -65,13 +72,13 @@ export class STWDatasources {
 					return await datasource.execute(rePlaceholders(content.query, session.placeholders));
 			}
 		} catch (error) {
-            if (error instanceof Error) {
-                console.error(error.message);
-            } else {
-                console.error(String(error));
-            }
+			if (error instanceof Error) {
+				console.error(error.message);
+			} else {
+				console.error(String(error));
+			}
 		}
-		return new Promise<ExecuteResult>(resolve => resolve({ rows: [] }));
+		return new Promise<ExecuteResult>(resolve => resolve({ affectedRows: 0, fields: [], rows: [] }));
 	}
 }
 
