@@ -1,24 +1,47 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/assert_equals.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
-import { rePlaceholders } from "../stwUtilities.ts";
 
-Deno.test("STWLayout renders static text", () => {
-	const layout = new STWLayout("t('Hello World')");
-	const html = layout.render("text", {} as any, {} as any, { rows: [{}] }, new Map(), rePlaceholders);
-	assertEquals(html, "Hello World");
-});
+const Placeholders = new Map<string, string>([
+	["@session", "123"],
+	["@email", "john.doe@email.com"],
+]);
 
-Deno.test("STWLayout renders with placeholders", () => {
-	const layout = new STWLayout("t('Hello, @@name!')");
-	const placeholders = new Map([["@@name", "Alice"]]);
-	const html = layout.render("text", {} as any, {} as any, { rows: [{}] }, placeholders, rePlaceholders);
-	assertEquals(html, "Hello, Alice!");
-});
+const Records = {
+	affectedRows: 3,
+	fields: [{ name: "nome" }, { name: "altezza" }, { name: "dataDiNascita" }],
+	rows: [
+		{ nome: "Mario Rossi", altezza: 1.78, dataDiNascita: "1985-04-12" },
+		{ nome: "Luca Bianchi", altezza: 1.82, dataDiNascita: "1990-09-23" },
+		{ nome: "Giulia Verdi", altezza: 1.65, dataDiNascita: "1995-01-30" }
+	]
+};
 
-Deno.test("STWLayout supports attributes", () => {
-	const layout = new STWLayout("\\A('class=\"greeting\"')t('Hi')");
-	const html = layout.render("text", {} as any, {} as any, { rows: [{}] }, new Map(), rePlaceholders);
-	// Should include the class attribute in the output
-	assertEquals(html.includes('class="greeting"'), true);
-	assertEquals(html.includes("Hi"), true);
+const Examples = [
+	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi">` },
+	{ wbll: `lt(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">` },
+	{ wbll: `a('http://www.keyvisions.it')pt('Click here')`, html: `<a href="http://www.keyvisions.it?nome=Mario+Rossi">Click here</a>` },
+];
+
+Deno.test("examples", async () => {
+	let fails = 0;
+
+	let log = `wbll test failures: ${new Date().toISOString()}\n\nPlaceholders:\n`;
+	for (const [key, value] of Placeholders)
+		log += `\t${key}: ${value || "EMPTY"}\n`;
+	log += "\nFailures:\n";
+
+	for (const [_i, ex] of Examples.entries()) {
+		const placeholders = new Map(Placeholders);
+		for (const [name, value] of Object.entries(Records.rows[0]))
+			placeholders.set(`@@${name}`, String(value));
+
+		const layout = new STWLayout(ex.wbll);
+		const html = layout.render("Text", {} as any, {} as any, Records.fields as any, placeholders);
+		if (html != ex.html) {
+			++fails;
+			log += `WBLL:   "${ex.wbll}"\nHTML:   "${ex.html}"\nActual: "${html}"\n\n`;
+		}
+	}
+	await Deno.writeTextFile("./tests/wbll.test.log", log + (fails ? "" : "All tests passed!\n"));
+	assertEquals(fails, 0, `${fails} test(s) failed!`);
 });

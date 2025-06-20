@@ -8,7 +8,7 @@
 import { STWFactory, STWSession } from "../stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
-import { rePlaceholders } from "../stwUtilities.ts";
+import { wbpl } from "../stwUtilities.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -40,10 +40,10 @@ export class STWText extends STWContent {
 		if (records?.rows?.length) {
 			return records.rows.map(row => {
 				const merged = { ...Object.fromEntries(session.placeholders), ...row };
-				return rePlaceholders(layoutText, merged);
+				return wbpl(layoutText, merged);
 			}).join("");
 		}
-		return rePlaceholders(layoutText, new Map(session.placeholders));
+		return wbpl(layoutText, new Map(session.placeholders));
 	}
 }
 

@@ -10,7 +10,7 @@
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { STWContent } from "./stwElements/stwContent.ts";
-import { rePlaceholders } from "./stwUtilities.ts";
+import { wbpl } from "./stwUtilities.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata";
 
@@ -69,7 +69,7 @@ export class STWDatasources {
 				if (datasource instanceof STWSite)
 					return await fetchWebbaseData(session, content);
 				if (datasource instanceof MySQLClient)
-					return await datasource.execute(rePlaceholders(content.query, session.placeholders));
+					return await datasource.execute(wbpl(content.query, session.placeholders));
 			}
 		} catch (error) {
 			if (error instanceof Error) {
@@ -90,7 +90,7 @@ export class STWDatasources {
  * @returns The result set
  */
 async function fetchWebbaseData(session: STWSession, content: STWContent): Promise<ISTWRecords> {
-	const query = content.query ? rePlaceholders(content.query, session.placeholders) : `$[?(@._id=="${session.placeholders.get("@_id")}")]`;
+	const query = content.query ? wbpl(content.query, session.placeholders) : `$[?(@._id=="${session.placeholders.get("@_id")}")]`;
 	const expr = jsonata(query);
 	let result = expr.evaluate(STWSite.wbml);
 	if (result instanceof Promise)
@@ -112,10 +112,10 @@ async function fetchWebbaseData(session: STWSession, content: STWContent): Promi
  * @returns The result set
  */
 async function fetchAPIData(session: STWSession, content: STWContent, datasource: any): Promise<ISTWRecords> {
-	const query = rePlaceholders(content.query, session.placeholders)
+	const query = wbpl(content.query, session.placeholders)
 	const expr = jsonata(query);
 
-	const response = await fetch(`${datasource.host}?${rePlaceholders(content.params, session.placeholders)}`,
+	const response = await fetch(`${datasource.host}?${wbpl(content.params, session.placeholders)}`,
 		{ headers: { "Content-Type": datasource.contentType || "application/json" } });
 	let json = await response.json();
 
