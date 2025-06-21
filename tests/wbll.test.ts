@@ -17,29 +17,37 @@ const Records = {
 };
 
 const Examples = [
-	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi">` },
-	{ wbll: `lt(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">` },
+	{ wbll: `l('Nome')t(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">` },
+	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi"><label>altezza</label><input name="altezza" value="1.78"><label>dataDiNascita</label><input name="dataDiNascita" value="1985-04-12">` },
 	{ wbll: `a('http://www.keyvisions.it')pt('Click here')`, html: `<a href="http://www.keyvisions.it?nome=Mario+Rossi">Click here</a>` },
 ];
 
 Deno.test("examples", async () => {
 	let fails = 0;
 
-	let log = `wbll test failures: ${new Date().toISOString()}\n\nPlaceholders:\n`;
-	for (const [key, value] of Placeholders)
-		log += `\t${key}: ${value || "EMPTY"}\n`;
+	let log = `wbll test failures: ${new Date().toISOString()}\n\n`;
 	log += "\nFailures:\n";
 
 	for (const [_i, ex] of Examples.entries()) {
-		const placeholders = new Map(Placeholders);
-		for (const [name, value] of Object.entries(Records.rows[0]))
-			placeholders.set(`@@${name}`, String(value));
+		try {
+			const placeholders = new Map(Placeholders);
+			for (const [name, value] of Object.entries(Records.rows[0]))
+				placeholders.set(`@@${name}`, String(value));
 
-		const layout = new STWLayout(ex.wbll);
-		const html = layout.render("Text", {} as any, {} as any, Records.fields as any, placeholders);
-		if (html != ex.html) {
+			const layout = new STWLayout(ex.wbll);
+			const html = layout.render("Text", {} as any, {} as any, Records.fields as any, placeholders);
+
+			if (html != ex.html) {
+				++fails;
+
+				log += `Placeholders:\n`
+				for (const [key, value] of placeholders)
+					log += `\t${key}: ${value || "EMPTY"}\n`;
+				log += `WBLL:   "${ex.wbll}"\nHTML:   "${ex.html}"\nActual: "${html}"\n\n`;
+			}
+		} catch (error) {
 			++fails;
-			log += `WBLL:   "${ex.wbll}"\nHTML:   "${ex.html}"\nActual: "${html}"\n\n`;
+			log += `Error in WBLL: "${ex.wbll}"\n${error}\n\n`;
 		}
 	}
 	await Deno.writeTextFile("./tests/wbll.test.log", log + (fails ? "" : "All tests passed!\n"));

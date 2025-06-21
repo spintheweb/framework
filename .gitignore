@@ -1,2 +1,4 @@
 /.vscode
 /.cert/*.pem
+/tests/*.log
+

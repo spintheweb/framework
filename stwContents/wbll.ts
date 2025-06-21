@@ -46,20 +46,22 @@ class STWToken {
  *  @param render
  */
 export class STWLayout {
-	private wbll: string; // Webbase Layout Language
-	private tokens: STWToken[] = []; // Tokenized layout
-	private _render?: (subtype: string, req: Request, session: STWSession, fields: string[], placeholders: Map<string, string>, wbpl: (text: string, placeholders: Map<string, string>) => string) => string;
+	private wbll: string;
+	private tokens: STWToken[] = [];
+	private tokenHandlers: Map<string, (token: STWToken) => string>;
 
-	// Default settings for the layout, these can be overridden by the \s token
+	private _render?: (subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
+
 	settings: Map<string, string> = new Map([
 		["rows", "25"],
 		["period", "month"]
 	]);
 
-	// The constructor is a Lexer, it checks for syntax errors and tokenizes the layout
 	public constructor(wbll: string) {
 		this.wbll = wbll;
+		this.tokenHandlers = this.initializeHandlers();
 
+		// The constructor is a Lexer, it checks for syntax errors and tokenizes the layout
 		for (const expression of this.wbll.matchAll(SYNTAX)) {
 			if (expression.groups?.error !== undefined)
 				throw new SyntaxError(expression.input.slice(0, expression.index) + ' ⋙' + expression.input.slice(expression.index));;
@@ -119,115 +121,119 @@ export class STWLayout {
 		}
 	}
 
-	public render(subtype: string, req: Request, session: STWSession, fields: string[], placeholders: Map<string, string>): string {
-		// Compile Layout on first use, this has a couple of advantages: Faster rendering and reduced memory usage.
+	public render(subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
 		if (!this._render) {
 			const fn: string = this.compileRenderFunction();
-			this._render = new Function("subtype", "req", "session", "fields", "placeholders", "wbpl", fn) as (subtype: string, req: Request, session: STWSession, fields: string[], placeholders: Map<string, string>, wbplFn: (text: string, placeholders: Map<string, string>) => string) => string;
+			this._render = new Function("subtype", "req", "session", "fields", "ph", "wbpl", fn) as (subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbplFn: (text: string, ph: Map<string, string>) => string) => string;
 		}
-		return this._render(subtype, req, session, fields, placeholders, wbpl);
+		return this._render(subtype, req, session, fields, ph, wbpl);
 	}
 
-	private compileRenderFunction(): string {
-		let fn = `let html="",field=0,df=0,fieldName,fieldValue;\n`;
+	// Token handlers are functions that take a token and return a string of JavaScript code
+	// that will be executed to render the token into HTML.
+	private initializeHandlers(): Map<string, (token: STWToken) => string> {
+		const handlers = new Map<string, (token: STWToken) => string>();
 
-		let field = 0; // Field index, used to generate unique fieldNames for fields
-		this.tokens.forEach(token => {
-			fn +=
-				'if (fields[field]?.name) { fieldName = fields[field]?.name; df = 1; } else { fieldName = "stwFld"+field; }' +
-				`if (fieldName) { fieldValue = placeholders.get("@@" + fieldName); } else { fieldName = ""; }\n`;
-
-			if (token.symbol === "a") {
-				token.attrs.set("href", `${token.args[0]}${querystring(token.params) || ""}`);
-				fn += `html += '<a${attributes(token)}>${token.text}</a>';\n`;
-
-			} else if (token.symbol === "b") {
-				fn += `html += \`<button${attributes(token)}>${token.args[1]}</button>\`;\n`; // Content sensitive
-
-			} else if ("cr".indexOf(token.symbol) != -1) {
-				token.attrs.set("name", token.attrs.get("name") || token.args[0] || `fld${++field}`);
-				token.attrs.set("checked", `@@${token.args[1] || "checked"}`);
-				fn += `html += \`<input${attributes(token)}>\`;\n`; // Content sensitive
-
-			} else if ("ds".indexOf(token.symbol) != -1) {
-				fn += `html += \`<select ${attributes(token)}><option></option></select>\`;\n`; // Content sensitive
-
-			} else if ("e".indexOf(token.symbol) != -1) {
-				token.attrs.set("name", "' + (\"" + (token.args[1] ? token.args[1] : "") + "\" || fieldName) + '");
-				token.attrs.set("value", `' + (fieldValue || wbpl("${token.args[2] ? token.args[2] : ""}", placeholders)) + '`);
-				fn += `html += '<input${attributes(token)}>';`; // Content sensitive
-				fn += 'field += df; df = 0;'; // Increment field index only if the field is used
-
-			} else if (token.symbol === "l") {
-				fn += `html += '<label${attributes(token)}>' + ("` + (token.args[0] ? token.args[0] : "") + `" || fieldName) + '</label>';\n`;
-
-			} else if ("hw".indexOf(token.symbol) != -1) {
-				token.attrs.set("name", "' + (\"" + (token.args[0] ? token.args[0] : "") + "\" || fieldName) + '");
-				token.attrs.set("value", `' + (fieldValue || wbpl("${token.args[1] ? token.args[1] : ""}", placeholders)) + '`);
-				fn += `html += '<input${attributes(token)}>';\n`; // Content sensitive
-
-			} else if (token.symbol === "f")
-				fn += `html += fieldValue;++df;\n`;
-
-			else if (token.symbol === "i")
-				fn += `html += \`<img${attributes(token)}>\`;\n`;
-
-			else if (token.symbol === "j")
-				fn += `html += \`<script>${token.args[0]}</script>\`;\n`;
-
-			else if (token.symbol === "k")
-				fn += `placeholders.set("${token.args[0]}", "${token.args[1]}");\n`;
-
-			else if (token.symbol === "m") {
-				token.attrs.set("name", token.attrs.get("name") || token.args[0] || `fld${++field}`);
-				fn += `html += \`<textarea${attributes(token)}">${token.args[1]}</textarea>\`;\n`; // Content sensitive
-
-			} else if (token.symbol === "n") // Like text
-				fn += `html += \`${token.args[0]}\`;\n`;
-
-			else if (token.symbol === "o") {
-				token.attrs.set("id", crypto.randomUUID());
-				token.attrs.set("href", token.args[0] + querystring(token.params));
-				fn += `html += \`<article${attributes(token)}></article>\`;\n`;
-
-			} else if ("xyz".indexOf(token.symbol) != -1)
-				fn += "";
-
-			else if (token.symbol === "v")
-				fn += `html += \`${eval(token.args[0])}\`;\n`;
-
-			else if (token.symbol === "t")
-				fn += `html += \`${token.args[0]}\`;\n`;
-
-			else if (token.symbol === "\\r")
-				fn += "html += \`<br>\`;";
-
-			else if (token.symbol === "\\n") // Content type sensitive
-				fn += "html += \`<br>\`;";
-
-			else if (token.symbol === "\\t") // Content type sensitive
-				fn += "html += \`<br>\`;";
-
-			else if (token.symbol === "u")
-				fn += `html += \`<input type="file" ${attributes(token)}>\`;\n`;
-
-			fn += `field+=df;df=0;\n`;
-		});
-		fn += "return html;";
-
-		return fn;
-
-		function attributes(token: STWToken): string {
-			return token.attrs.entries().reduce((attrs, attr) => attrs + (attr[1] === "@@" ? "" : ` ${attr[0]}="${attr[1]}"`), "");
-
-			// return token.attrs.entries().reduce((attrs, attr) => attrs + ` ${attr[0]}="${attr[1]}"`, "");
+		const fieldCursor = (df: number = 1): string => {
+			return `fld+=${df}; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length-1; fieldName=fields[fld].name ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";`;
 		}
-		function querystring(params: STWToken[]): string {
+
+		const attributes = (token: STWToken): string =>
+			[...token.attrs.entries()].map(([k, v]) => ` ${k}="\${${v}}"`).join("");
+
+		const querystring = (params: STWToken[]): string => {
 			const search = new URLSearchParams();
 			for (const param of params)
 				if (param.args[0] && param.args[1])
 					search.append(param.args[0], param.args[1]);
-			return search.toString();
-		}
+			return search.toString() ? `?${search.toString()}` : "";
+		};
+
+		const fieldInputHandler = (token: STWToken) => {
+			const nameArg = token.symbol === 'e' ? token.args[1] : token.args[0];
+			const valueArg = token.symbol === 'e' ? token.args[2] : token.args[1];
+
+			token.attrs.set("name", `"${nameArg || ''}" || fieldName`);
+			token.attrs.set("value", `fieldValue || wbpl("${valueArg ?? ''}", ph)`);
+
+			return `html += \`<input${attributes(token)}>\`;${!nameArg ? `{${fieldCursor()}}` : ''}`;
+		};
+		handlers.set("e", fieldInputHandler);
+		handlers.set("h", fieldInputHandler);
+		handlers.set("w", fieldInputHandler);
+
+		handlers.set("a", (token) => {
+			token.attrs.set("href", `\${"${token.args[0]}" + "${querystring(token.params)}"}`);
+			const textContent = token.text ? this.tokenHandlers.get(token.text.symbol)?.(token.text) || '' : '';
+			return `html += \`<a${attributes(token)}>\` + (() => { let html = ''; ${textContent} return html; })() + \`</a>\`;`;
+		});
+
+		handlers.set("b", (token) => `html += \`<button${attributes(token)}>${token.args[1]}</button>\`;`);
+
+		const checkboxRadioHandler = (token: STWToken) => {
+			token.attrs.set("name", `\${"${token.args[0] || ''}" || fieldName}`);
+			token.attrs.set("checked", `\${ph.get("@@${token.args[1]}") ? "checked" : ""}`);
+			return `html += \`<input${attributes(token)}>\`;${!token.args[0] ? `{${fieldCursor()}}` : ''}`;
+		};
+		handlers.set("c", checkboxRadioHandler);
+		handlers.set("r", checkboxRadioHandler);
+
+		handlers.set("d", (token) => `html += \`<select ${attributes(token)}><option></option></select>\`;`);
+		handlers.set("s", handlers.get("d")!);
+
+		handlers.set("f", () => `html += fieldValue; ${fieldCursor()}`);
+
+		handlers.set("i", (token) => `html += \`<img${attributes(token)}>\`;`);
+
+		handlers.set("j", (token) => `html += \`<script>${token.args[0] ?? ''}</script>\`;`);
+		handlers.set("v", (token) => `html += \`${eval(token.args[0]) ?? ''}\`;`);
+
+		handlers.set("k", (token) => `if ("${token.args[0] ?? ''}") ph.set("${token.args[0]}", "${token.args[1] ?? ''}");`);
+
+		handlers.set("l", (token) => `html += \`<label${attributes(token)}>\${"${token.args[0] ?? ''}" || fieldName}</label>\`;`);
+
+		handlers.set("m", (token) => {
+			const nameArg = token.args[0];
+			const valueArg = token.args[1];
+			token.attrs.set("name", `\${"${nameArg || ''}" || fieldName}`);
+			return `html += \`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`; if ("${nameArg ?? ''}") {${fieldCursor()}}`;
+		});
+
+		handlers.set("n", (token) => `html += \`${token.args[0]}\`;`);
+		handlers.set("t", handlers.get("n")!); // 't' is an alias for 'n'
+
+		handlers.set("o", (token) => {
+			token.attrs.set("id", crypto.randomUUID());
+			token.attrs.set("href", `\${"${token.args[0]}" + "${querystring(token.params)}"}`);
+			return `html += \`<article${attributes(token)}></article>\`;`;
+		});
+
+		handlers.set("u", (token) => `html += \`<input type="file"${attributes(token)}>\`;`);
+
+		const brHandler = () => `html += \`<br>\`;`;
+		handlers.set("\\r", brHandler);
+		handlers.set("\\n", brHandler);
+		handlers.set("\\t", brHandler);
+
+		// Tokens that do nothing
+		const noOpHandler = () => ``;
+		handlers.set("x", noOpHandler);
+		handlers.set("y", noOpHandler);
+		handlers.set("z", noOpHandler);
+
+		return handlers;
+	}
+
+	private compileRenderFunction(): string {
+		let fn = `let html="",fld=0,df=0,fieldName=(fields[0]?.name ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "";`;
+
+		this.tokens.forEach(token => {
+			const handler = this.tokenHandlers.get(token.symbol);
+			if (handler)
+				fn += handler(token);
+		});
+
+		fn += "return html;";
+		return fn;
 	}
 }
