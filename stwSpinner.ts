@@ -9,10 +9,10 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
  **/
 import { getCookies } from "jsr:@std/http/cookie";
-import { STWSession } from "./stwSession.ts";
+import { STWSession } from "./stwComponents/stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
-import { handleHttp } from "./stwHttpHandler.ts";
-import { handleWebSocket } from "./stwWebSocket.ts";
+import { handleHttp } from "./stwComponents/stwHttpHandler.ts";
+import { handleWebSocket } from "./stwComponents/stwWebSocket.ts";
 
 /**
  * Preload {@linkcode STWFactory} with the Spin the Web elements

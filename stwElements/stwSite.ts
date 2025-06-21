@@ -5,7 +5,7 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWSession } from "../stwSession.ts";
+import { STWSession } from "../stwComponents/stwSession.ts";
 import { ISTWArea, STWArea } from "./stwArea.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
 

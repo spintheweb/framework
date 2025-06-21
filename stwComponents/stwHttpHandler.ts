@@ -7,7 +7,7 @@
 **/
 import { serveFile } from "jsr:@std/http/file-server";
 import { getCookies, setCookie } from "jsr:@std/http/cookie";
-import { STWSite } from "./stwElements/stwSite.ts";
+import { STWSite } from "../stwElements/stwSite.ts";
 import { STWSession } from "./stwSession.ts";
 
 export async function handleHttp(request: Request, session: STWSession, sessionId: string): Promise<Response> {

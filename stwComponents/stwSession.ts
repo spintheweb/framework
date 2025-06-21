@@ -1,5 +1,5 @@
 import { getCookies } from "jsr:@std/http/cookie";
-import { STWSite } from "./stwElements/stwSite.ts";
+import { STWSite } from "../stwElements/stwSite.ts";
 
 /**
  * Spin the Web session

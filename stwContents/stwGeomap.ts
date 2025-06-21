@@ -7,9 +7,9 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWFactory, STWSession } from "../stwSession.ts";
+import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "../stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWGeomap extends STWContent {
 	// TODO: scripts should be loaded in the template, e.g. index.html

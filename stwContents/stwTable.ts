@@ -5,9 +5,9 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWFactory, STWSession } from "../stwSession.ts";
+import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "../stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWTable extends STWContent {
 	public constructor(content: ISTWContent) {

@@ -9,8 +9,8 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { tee } from "https://deno.land/std@0.104.0/async/tee.ts";
-import { STWSession } from "../stwSession.ts";
-import { wbpl } from "../stwUtilities.ts";
+import { STWSession } from "../stwComponents/stwSession.ts";
+import { wbpl } from "../stwComponents/stwUtilities.ts";
 
 const SYNTAX: RegExp = new RegExp([
 	/(\\[aAs])(?:\('([^]+?)'\))/,

@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/assert_equals.ts";
-import { wbpl } from "../stwUtilities.ts";
+import { wbpl } from "../stwComponents/stwUtilities.ts";
 
 const placeholders: Map<string, string> = new Map([
 	["@user", "alice"],

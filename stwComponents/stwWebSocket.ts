@@ -5,9 +5,9 @@
  * 
  * MIT License. Copyright (c) 2025 Giancarlo Trevisan
 **/
-import { STWSite } from "./stwElements/stwSite.ts";
-import { STWPage } from "./stwElements/stwPage.ts";
-import { STWContent } from "./stwElements/stwContent.ts";
+import { STWSite } from "../stwElements/stwSite.ts";
+import { STWPage } from "../stwElements/stwPage.ts";
+import { STWContent } from "../stwElements/stwContent.ts";
 import { STWSession } from "./stwSession.ts";
 
 export function handleWebSocket(request: Request, session: STWSession): Response {

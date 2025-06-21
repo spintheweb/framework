@@ -5,10 +5,10 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { STWFactory, STWSession } from "../stwSession.ts";
+import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
-import { wbpl } from "../stwUtilities.ts";
+import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
+import { wbpl } from "../stwComponents/stwUtilities.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {

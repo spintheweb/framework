@@ -5,8 +5,8 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
-import { ISTWRecords, STWDatasources } from "../stwDatasources.ts";
-import { STWSession } from "../stwSession.ts";
+import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
+import { STWSession } from "../stwComponents/stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
 

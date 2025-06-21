@@ -6,7 +6,7 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { serveFile } from "jsr:@std/http/file-server";
-import { STWFactory, STWSession } from "../stwSession.ts";
+import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWElement, ISTWElement } from "./stwElement.ts";
 import { STWContent } from "./stwContent.ts";
 
