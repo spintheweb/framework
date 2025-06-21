@@ -8,6 +8,7 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { tee } from "https://deno.land/std@0.104.0/async/tee.ts";
 import { STWSession } from "../stwSession.ts";
 import { wbpl } from "../stwUtilities.ts";
 
@@ -131,76 +132,100 @@ export class STWLayout {
 
 	// Token handlers are functions that take a token and return a string of JavaScript code
 	// that will be executed to render the token into HTML.
-	private initializeHandlers(): Map<string, (token: STWToken) => string> {
+	private initializeHandlers(): Map<string, (token: STWToken, inline: boolean) => string> {
 		const handlers = new Map<string, (token: STWToken) => string>();
 
-		const fieldCursor = (df: number = 1): string => {
-			return `fld+=${df}; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length-1; fieldName=fields[fld].name ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";`;
-		}
-
 		const attributes = (token: STWToken): string =>
-			[...token.attrs.entries()].map(([k, v]) => ` ${k}="\${${v}}"`).join("");
+            [...token.attrs.entries()].map(([k, v]) => ` ${k}="\${${v}}"`).join("");
 
-		const querystring = (params: STWToken[]): string => {
-			const search = new URLSearchParams();
-			for (const param of params)
-				if (param.args[0] && param.args[1])
-					search.append(param.args[0], param.args[1]);
-			return search.toString() ? `?${search.toString()}` : "";
+        /**
+         * Generates a block of JavaScript code that will, at render time,
+         * build a URL and its query string using the URL and URLSearchParams APIs.
+         * @param baseUrl The base URL for the link.
+         * @param params The list of parameter tokens (p).
+         * @returns A string of JavaScript code.
+         */
+        const querystring = (baseUrl: string, params: STWToken[]): string => {
+            let code = `let url = new URL(\`${baseUrl}\` || '/'), p_name, p_val;`;
+            for (const param of params) {
+                const nameArg = `"${param.args[0] || ''}" || fieldName`;
+                const valueArg = param.args[1] ? `wbpl("${param.args[1]}", ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
+                code += `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) url.searchParams.set(p_name, p_val);`;
+                if (!param.args[0])
+                    code += `fldCursor();\n`;
+            }
+            code += `href = url.href + url.search;`;
+            return code;
+        };
+
+        handlers.set("a", (token) => {
+            token.attrs.delete("value");
+            token.attrs.delete("href");
+
+            // Get the code for the link's text content. This will be executed inside a closure.
+            const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
+            const textHandler = this.tokenHandlers.get(innerToken.symbol);
+            const textCode = textHandler ? textHandler(innerToken) : "";
+
+            // We generate an IIFE (Immediately Invoked Function Expression) to create a private scope
+            // for building the href and text content before adding the final <a> tag to the main html string.
+            return `
+                let href = ""; ${querystring(token.args[0] || "", token.params)}
+                const textContent = (() => { let html=""; ${textCode} return html; })();
+                html += \`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
+            `;
+        });
+
+        handlers.set("b", (token) => `html += \`<button${attributes(token)}>${token.args[1]}</button>\`;`);
+
+		const checkboxRadioHandler = (token: STWToken) => {
+			token.attrs.set("name", `\${"${token.args[0] || ''}" || fieldName}`);
+			token.attrs.set("checked", `\${ph.get("@@${token.args[1]}") ? "checked" : ""}`);
+			return `html += \`<input${attributes(token)}>\`;${!token.args[0] ? 'fldCursor()' : ''}`;
 		};
+		handlers.set("c", checkboxRadioHandler);
 
-		const fieldInputHandler = (token: STWToken) => {
+		handlers.set("d", (token) => `html += \`<select ${attributes(token)}><option></option></select>\`;`);
+
+		const fieldInputHandler = (token: STWToken, _recurse: boolean = false) => {
 			const nameArg = token.symbol === 'e' ? token.args[1] : token.args[0];
 			const valueArg = token.symbol === 'e' ? token.args[2] : token.args[1];
 
 			token.attrs.set("name", `"${nameArg || ''}" || fieldName`);
 			token.attrs.set("value", `fieldValue || wbpl("${valueArg ?? ''}", ph)`);
 
-			return `html += \`<input${attributes(token)}>\`;${!nameArg ? `{${fieldCursor()}}` : ''}`;
+			return `html += \`<input${attributes(token)}>\`;${!nameArg ? 'fldCursor();' : ''}`;
 		};
 		handlers.set("e", fieldInputHandler);
+
+		handlers.set("f", () => `html += fieldValue; fldCursor();`);
+
 		handlers.set("h", fieldInputHandler);
-		handlers.set("w", fieldInputHandler);
 
-		handlers.set("a", (token) => {
-			token.attrs.set("href", `\${"${token.args[0]}" + "${querystring(token.params)}"}`);
-			const textContent = token.text ? this.tokenHandlers.get(token.text.symbol)?.(token.text) || '' : '';
-			return `html += \`<a${attributes(token)}>\` + (() => { let html = ''; ${textContent} return html; })() + \`</a>\`;`;
+		handlers.set("i", (token) => {
+			token.attrs.delete("value");
+			token.attrs.set("src", `\${"${token.args[0] || ''}" || ''}`);
+			return `html += \`<img${attributes(token)}>\`;`;
 		});
-
-		handlers.set("b", (token) => `html += \`<button${attributes(token)}>${token.args[1]}</button>\`;`);
-
-		const checkboxRadioHandler = (token: STWToken) => {
-			token.attrs.set("name", `\${"${token.args[0] || ''}" || fieldName}`);
-			token.attrs.set("checked", `\${ph.get("@@${token.args[1]}") ? "checked" : ""}`);
-			return `html += \`<input${attributes(token)}>\`;${!token.args[0] ? `{${fieldCursor()}}` : ''}`;
-		};
-		handlers.set("c", checkboxRadioHandler);
-		handlers.set("r", checkboxRadioHandler);
-
-		handlers.set("d", (token) => `html += \`<select ${attributes(token)}><option></option></select>\`;`);
-		handlers.set("s", handlers.get("d")!);
-
-		handlers.set("f", () => `html += fieldValue; ${fieldCursor()}`);
-
-		handlers.set("i", (token) => `html += \`<img${attributes(token)}>\`;`);
 
 		handlers.set("j", (token) => `html += \`<script>${token.args[0] ?? ''}</script>\`;`);
 		handlers.set("v", (token) => `html += \`${eval(token.args[0]) ?? ''}\`;`);
 
 		handlers.set("k", (token) => `if ("${token.args[0] ?? ''}") ph.set("${token.args[0]}", "${token.args[1] ?? ''}");`);
 
-		handlers.set("l", (token) => `html += \`<label${attributes(token)}>\${"${token.args[0] ?? ''}" || fieldName}</label>\`;`);
+		handlers.set("l", (token) => {
+			token.attrs.delete("value");
+			return `html += \`<label${attributes(token)}>\${"${token.args[0] ?? ''}" || fieldName}</label>\`;`;
+		});
 
 		handlers.set("m", (token) => {
 			const nameArg = token.args[0];
 			const valueArg = token.args[1];
 			token.attrs.set("name", `\${"${nameArg || ''}" || fieldName}`);
-			return `html += \`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`; if ("${nameArg ?? ''}") {${fieldCursor()}}`;
+			return `html += \`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`; if ("${nameArg ?? ''}") fldCursor();`;
 		});
 
 		handlers.set("n", (token) => `html += \`${token.args[0]}\`;`);
-		handlers.set("t", handlers.get("n")!); // 't' is an alias for 'n'
 
 		handlers.set("o", (token) => {
 			token.attrs.set("id", crypto.randomUUID());
@@ -208,24 +233,29 @@ export class STWLayout {
 			return `html += \`<article${attributes(token)}></article>\`;`;
 		});
 
+		handlers.set("r", checkboxRadioHandler);
+		handlers.set("s", handlers.get("d")!);
+		handlers.set("t", (token, inline = false) => inline ? token.args[0] : `html += \`${token.args[0]}\`;`);
+
 		handlers.set("u", (token) => `html += \`<input type="file"${attributes(token)}>\`;`);
+
+		handlers.set("w", fieldInputHandler);
+
+		const noOpHandler = () => ``;
+		handlers.set("x", noOpHandler);
+		handlers.set("y", noOpHandler);
+		handlers.set("z", noOpHandler);
 
 		const brHandler = () => `html += \`<br>\`;`;
 		handlers.set("\\r", brHandler);
 		handlers.set("\\n", brHandler);
 		handlers.set("\\t", brHandler);
 
-		// Tokens that do nothing
-		const noOpHandler = () => ``;
-		handlers.set("x", noOpHandler);
-		handlers.set("y", noOpHandler);
-		handlers.set("z", noOpHandler);
-
 		return handlers;
 	}
 
 	private compileRenderFunction(): string {
-		let fn = `let html="",fld=0,df=0,fieldName=(fields[0]?.name ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "";`;
+		let fn = `let html="",fld=0,df=0,fieldName=(fields[0]?.name ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "",fldCursor=(df=1)=>{fld+=df; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length-1; fieldName=fields[fld].name ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";return "";};`;
 
 		this.tokens.forEach(token => {
 			const handler = this.tokenHandlers.get(token.symbol);

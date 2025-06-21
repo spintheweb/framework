@@ -19,7 +19,9 @@ const Records = {
 const Examples = [
 	{ wbll: `l('Nome')t(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">` },
 	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi"><label>altezza</label><input name="altezza" value="1.78"><label>dataDiNascita</label><input name="dataDiNascita" value="1985-04-12">` },
-	{ wbll: `a('http://www.keyvisions.it')pt('Click here')`, html: `<a href="http://www.keyvisions.it?nome=Mario+Rossi">Click here</a>` },
+	{ wbll: `a('http://www.keyvisions.it')ppt('Click here')`, html: `<a href="http://www.keyvisions.it/?nome=Mario+Rossi&altezza=1.78?nome=Mario+Rossi&altezza=1.78">Click here</a>` },
+	{ wbll: `t('<b>Bold Text</b>')`, html: `<b>Bold Text</b>` },
+	{ wbll: `i('/logo.png')\\a('alt="logo"')`, html: `<img src="/logo.png" alt="logo">` },
 ];
 
 Deno.test("examples", async () => {
