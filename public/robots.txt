@@ -1,0 +1,6 @@
+# Allow all web crawlers to access all content
+User-agent: *
+Allow: /
+
+# You can also specify the location of your sitemap, if you have one.
+# Sitemap: /sitemap
