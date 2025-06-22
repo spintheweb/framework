@@ -14,28 +14,33 @@ export class STWTable extends STWContent {
 		super(content);
 	}
 
-	// TODO: Render
-	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		const layout = this.layout.get(_session.lang);
+	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
+		const layout = this.getLayout(_session);
+		if (!layout || !_records.rows?.length) return "";
 
 		let body = "";
-		if (_records.rows?.length) {
-			let row: number = 0;
+		let row = 0;
+		const placeholders = new Map(_session.placeholders);
+		const fields = _records.fields?.map(f => f.name) || Object.keys(_records.rows[0] || {});
 
-			const placeholders = new Map(_session.placeholders);
-			for (const [name, value] of Object.entries(_records.rows[0]))
-				placeholders.set(`@@${name}`, String(value));
-
-			body = `<table><thead><tr>${layout?.render("TableH", _req, _session, _records.fields as any, placeholders)}</tr></thead><tbody>`;
-			while (true) {
-				body += `<tr>${layout?.render(this.type, _req, _session, _records.fields as any, placeholders)}</tr>`;
-				if (++row >= _records.rows.length || row >= parseInt(layout?.settings.get("rows") || "25"))
-					break;
-				for (const [name, value] of Object.entries(_records.rows[row]))
-					placeholders.set(`@@${name}`, String(value));
-			}
-			body += "</tbody></table>";
+		for (const [name, value] of Object.entries(_records.rows[0])) {
+			placeholders.set(`@@${name}`, String(value));
 		}
+
+		const header = await layout.render("TableH", _req, _session, fields, placeholders);
+		body = `<table><thead><tr>${header}</tr></thead><tbody>`;
+
+		while (true) {
+			body += `<tr>${await layout.render(this.type, _req, _session, fields, placeholders)}</tr>`;
+			if (++row >= _records.rows.length || row >= parseInt(layout.settings.get("rows") || "25")) {
+				break;
+			}
+			for (const [name, value] of Object.entries(_records.rows[row])) {
+				placeholders.set(`@@${name}`, String(value));
+			}
+		}
+		body += "</tbody></table>";
+
 		return body;
 	}
 }

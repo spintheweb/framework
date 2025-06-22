@@ -71,6 +71,8 @@ export function handleWebSocket(request: Request, session: STWSession): Response
     socket.onerror = error => console.error(error);
     socket.onclose = () => {
         // Optionally clean up session here
+        console.debug("WebSocket closed for session:", session.id);
+        session.socket = undefined;
     };
     return response;
 }

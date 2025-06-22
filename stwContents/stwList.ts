@@ -14,27 +14,31 @@ export class STWList extends STWContent {
 		super(content);
 	}
 
-	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		const layout = this.layout.get(_session.lang);
+	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
+		const layout = this.getLayout(_session);
+		if (!layout || !_records.rows?.length) return "";
 
 		let body = "";
-		if (_records.rows?.length) {
-			let row: number = 0;
+		let row = 0;
+		const placeholders = new Map(_session.placeholders);
+		const fields = _records.fields?.map(f => f.name) || Object.keys(_records.rows[0] || {});
 
-			const placeholders = new Map(_session.placeholders);
-			for (const [name, value] of Object.entries(_records.rows[0]))
-				placeholders.set(`@@${name}`, String(value));
-
-			body = `<ul>`;
-			while (true) {
-				body += `<li>${layout?.render(this.type, _req, _session, _records.fields as any, placeholders)}</li>`;
-				if (++row >= _records.rows.length || row >= parseInt(layout?.settings.get("rows") || "25"))
-					break;
-				for (const [name, value] of Object.entries(_records.rows[row]))
-					placeholders.set(`@@${name}`, String(value));
-			}
-			body += "</ul>";
+		for (const [name, value] of Object.entries(_records.rows[0])) {
+			placeholders.set(`@@${name}`, String(value));
 		}
+
+		body = `<ul>`;
+		while (true) {
+			body += `<li>${await layout.render(this.type, _req, _session, fields, placeholders)}</li>`;
+			if (++row >= _records.rows.length || row >= parseInt(layout.settings.get("rows") || "25")) {
+				break;
+			}
+			for (const [name, value] of Object.entries(_records.rows[row])) {
+				placeholders.set(`@@${name}`, String(value));
+			}
+		}
+		body += "</ul>";
+
 		return body;
 	}
 }

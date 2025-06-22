@@ -105,7 +105,7 @@ export abstract class STWContent extends STWElement {
 				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
 				<div>
 				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
-				${this.render(req, session, await STWDatasources.query(session, this))}
+				${await this.render(req, session, await STWDatasources.query(session, this))}
 				${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
 				</div>
 				${layout?.settings.has("frame") ? "</fieldset>" : ""}
@@ -120,7 +120,7 @@ export abstract class STWContent extends STWElement {
 		}
 	}
 
-	public render(_req: Request, _session: STWSession, _record: ISTWRecords): string {
-		return `Render ${this.constructor.name}`;
+	public async render(_req: Request, _session: STWSession, _record: ISTWRecords): Promise<string> {
+		return Promise.resolve(`Render ${this.constructor.name}`);
 	}
 }

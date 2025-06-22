@@ -1,18 +1,32 @@
 # Certificate folder
 
-This folder contains the site private key and SSL certificate, these should be added to .env
+This folder contains the site private key and SSL certificate, these should be added to .env file.
 
-Use the following openssl commands to generate them:
+Step 1: Install `mkcert`
 
-$ openssl genrsa -out key.pem // Generate private key
-$ openssl req -new -key key.pem -out csr.pem // Create certificate signin request
-$ openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem // Generate SSL certificate (del csr.pem)
+[Download mkcert directly from the mkcert GitHub releases page](https://github.com/FiloSottile/mkcert/releases)
 
-As an alternative use:
+Step 2: Create a Local Certificate Authority (CA)
 
-$ certbot certonly
+$ `mkcert -install`
 
-Or:
+Step 3: Generate the Certificate Files
 
-$ cd .cert/
-$ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj //CN=sandbox.spintheweb.org
+$ `cd .cert`
+
+In my case I use sandbox.spintheweb.org
+
+$ `mkcert sandbox.spintheweb.org`
+
+This will create two files in your .cert directory:
+- sandbox.spintheweb.org.pem (the certificate)
+- sandbox.spintheweb.org-key.pem (the private key)
+
+Edit your .env file:
+
+```
+HOST=sandbox.spintheweb.org
+PORT=443
+CERTFILE=.cer/sandbox.spintheweb.org.pem
+KEYFILE=.cer/sandbox.spintheweb.org-key.pem
+```

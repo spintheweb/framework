@@ -6,6 +6,29 @@
 	},
 	"children": [
 		{
+			"_id": "c1a3b5e0-31c1-11ef-a798-bf5561fd79c7",
+			"type": "Content",
+			"name": {
+				"en": "Password Recovery"
+			},
+			"slug": {
+				"en": "forgotpassword"
+			},
+			"visibility": {
+				"users": "guests"
+			},
+			"subtype": "Form",
+			"cssClass": "stwForm",
+			"section": "dialog",
+			"sequence": "3",
+			"dsn": "json",
+			"query": "{\"email\":\"\"}",
+			"params": "",
+			"layout": {
+				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';Send Reset Link;;stw;requestPasswordReset')"
+			}
+		},
+		{
 			"_id": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
 			"type": "Page",
 			"name": {
@@ -101,10 +124,10 @@
 					"section": "main",
 					"sequence": "2.1",
 					"dsn": "json",
-					"query": "{\"name\":\"spinner\",\"pwd\":\"spunned\"}",
+					"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
 					"params": "",
 					"layout": {
-						"en": "hwl('Fufi')e\\a('placeholder=\"user name\" onclick=\"alert()\"')"
+						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';Logon;;stw;logon')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
 					}
 				},
 				{
@@ -253,7 +276,9 @@
 					},
 					"options": [
 						{
-							"name": { "en": "Products" },
+							"name": {
+								"en": "Products"
+							},
 							"ref": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
 						},
 						{
