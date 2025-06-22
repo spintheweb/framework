@@ -27,6 +27,6 @@ Edit your .env file:
 ```
 HOST=sandbox.spintheweb.org
 PORT=443
-CERTFILE=.cer/sandbox.spintheweb.org.pem
-KEYFILE=.cer/sandbox.spintheweb.org-key.pem
+CERTFILE=.cert/sandbox.spintheweb.org.pem
+KEYFILE=.cert/sandbox.spintheweb.org-key.pem
 ```
