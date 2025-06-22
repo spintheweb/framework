@@ -1,7 +1,7 @@
 <img src="./public/media/Logo-bn_128x128.png" width="100p">
 
 # Spin the Web Project
-_Technology that eases web application developments_
+_A precise (π) yet fuzzy (σ) technology that eases web application developments_
 
 Spin the Web introduces the Webbase Markup Language (WBML). While HTML describes a single web page and is interpreted by client-side browsers, WBML describes an entire web site and is interpreted by a server-side component called a web spinner. This project proposes that WBML fills a crucial gap in the World Wide Web ecosystem.
 
