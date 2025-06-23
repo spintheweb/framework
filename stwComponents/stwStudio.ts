@@ -7,7 +7,7 @@
  * @license MIT
  * @version 1.0.0
  */
-import { serveFile } from "https://deno.land/std@0.224.0/http/file_server.ts";
+import { serveFile } from "@std/http/file-server";
 
 async function listDirRecursive(dir: string, base = ""): Promise<any[]> {
   const entries: any[] = [];

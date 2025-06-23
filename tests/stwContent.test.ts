@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals } from "@std/assert";
 import { STWText } from "../stwContents/stwText.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 

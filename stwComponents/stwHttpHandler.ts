@@ -5,8 +5,8 @@
  * 
  * MIT License. Copyright (c) 2025 Giancarlo Trevisan
 **/
-import { serveFile } from "jsr:@std/http/file-server";
-import { getCookies, setCookie } from "jsr:@std/http/cookie";
+import { serveFile } from "@std/http/file-server";
+import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWSession } from "./stwSession.ts";
 

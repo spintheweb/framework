@@ -8,12 +8,13 @@
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
  **/
-import { getCookies } from "https://deno.land/std/http/cookie.ts";
-import { load } from "https://deno.land/std/dotenv/mod.ts";
+import { getCookies } from "@std/http/cookie";
+import { load } from "@std/dotenv";
 import { STWSession } from "./stwComponents/stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { handleHttp } from "./stwComponents/stwHttpHandler.ts";
 import { handleWebSocket } from "./stwComponents/stwWebSocket.ts";
+import project from "./deno.json" with { type: "json" };
 
 const env = await load();
 
@@ -45,23 +46,21 @@ const stwSessions: Map<string, STWSession> = new Map();
 let serverOptions: Deno.ServeInit;
 
 if (env["CERTFILE"] && env["KEYFILE"]) {
-    // Assign a complete HTTPS options object.
     serverOptions = {
         hostname: env["HOST"] || "127.0.0.1",
         port: parseInt(env["PORT"] || "443"),
         cert: await Deno.readTextFile(env["CERTFILE"]),
         key: await Deno.readTextFile(env["KEYFILE"]),
-        onListen: ({ hostname, port }) => {
-            console.debug(`Spin the Web listening on https://${hostname || 'localhost'}:${port}`);
+        onListen: () => {
+            console.log(`${new Date().toISOString()}: Spin the Web v${project.version} listening on https://${env["HOST"]}:${env["PORT"]}`);
         }
     };
 } else {
-    // Assign a complete HTTP options object.
     serverOptions = {
         hostname: env["HOST"] || "127.0.0.1",
         port: parseInt(env["PORT"] || "8000"),
-        onListen: ({ hostname, port }) => {
-            console.debug(`Spin the Web listening on http://${hostname || 'localhost'}:${port}`);
+        onListen: () => {
+            console.log(`${new Date().toISOString()}: Spin the Web v${project.version} listening on http://${env["HOST"]}:${env["PORT"]}`);
         }
     };
 }
@@ -71,14 +70,19 @@ Deno.serve(serverOptions, async (request: Request, info: Deno.ServeHandlerInfo):
     if (!sessionId)
         sessionId = crypto.randomUUID();
 
-    if (JSON.stringify(stwSessions.get(sessionId)?.remoteAddr) !== JSON.stringify(info.remoteAddr))
-        stwSessions.set(sessionId, new STWSession(sessionId, info.remoteAddr, STWSite.instance));
-    const session = stwSessions.get(sessionId) || new STWSession(sessionId, info.remoteAddr, STWSite.instance);
+    let session = stwSessions.get(sessionId);
+
+    if (!session || session.remoteAddr.hostname !== info.remoteAddr.hostname) {
+        if (session)
+            console.log(`${new Date().toISOString()}: IP address changed for session [${sessionId}]. A new session will be created.`);
+        session = new STWSession(sessionId, info.remoteAddr, STWSite.instance);
+        stwSessions.set(sessionId, session);
+    }
 
     session.setPlaceholders(request);
 
     if (request.headers.get("upgrade") === "websocket") {
-        return handleWebSocket(request, session);
+        return handleWebSocket(request, session, stwSessions);
     } else {
         return await handleHttp(request, session, sessionId);
     }

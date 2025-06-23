@@ -1,4 +1,4 @@
-import { getCookies } from "jsr:@std/http/cookie";
+import { getCookies } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
 
 /**
@@ -21,7 +21,7 @@ export class STWSession {
 	private timer: number = 0;
 	dev: boolean; // If true STW Studio  enabled
 	site: STWSite;
-	socket!: WebSocket;
+	socket!: WebSocket | undefined; // WebSocket connection, if any
 
 	public constructor(sessionId: string, remoteAddr: Deno.Addr, site: STWSite) {
 		this.sessionId = sessionId;
@@ -35,7 +35,7 @@ export class STWSession {
 		this.dev = true;
 		this.site = site;
 
-		console.info(`${new Date().toISOString()}: New session [${this.sessionId}]`);
+		console.log(`${new Date().toISOString()}: New session [${this.sessionId}]`);
 	}
 
 	/**
@@ -74,7 +74,7 @@ export class STWSession {
 
 	protected timeout(timer: number) {
 		clearTimeout(timer);
-		console.info(`${new Date().toISOString()}: Want to keep the session [${this.sessionId}] alive?`);
+		console.log(`${new Date().toISOString()}: Want to keep the session [${this.sessionId}] alive?`);
 
 		this.timer = setTimeout(() => this.timeout(this.timer), parseInt(Deno.env.get("TIMEOUT") || "15") * 60000); // Session timeout
 	}

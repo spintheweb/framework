@@ -44,7 +44,7 @@ export class STWSite extends STWElement {
 	 */
 	static get instance(): STWSite {
 		if (!STWSite.#instance) {
-			console.info(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
+			console.log(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
 			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
 			this.#wbml = JSON.parse(Deno.readTextFileSync(webbase));
@@ -64,7 +64,7 @@ export class STWSite extends STWElement {
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */
 	public loadStudio(): void {
-		console.info(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
+		console.log(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
 
 		try {
 			if (URL.parse(Deno.env.get("STUDIO_WEBBASE") || "")) {
@@ -182,7 +182,7 @@ export class STWSite extends STWElement {
 				if (event.kind === "modify" || event.kind === "create") {
 					if (reloadTimeout) clearTimeout(reloadTimeout);
 					reloadTimeout = setTimeout(() => {
-						console.info(`${new Date().toISOString()}: Webbase changed...`);
+						console.log(`${new Date().toISOString()}: Webbase changed...`);
 						STWSite.#instance = undefined as unknown as STWSite;
 						STWSite.index.clear();
 					}, 200); // Wait 200ms for changes to settle

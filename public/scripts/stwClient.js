@@ -14,8 +14,8 @@ self.addEventListener("load", stwStartWebsocket);
 let stwWS;
 function stwStartWebsocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/`; 
-    
+    const wsUrl = `${protocol}//${window.location.host}/`;
+
     stwWS = new WebSocket(wsUrl);
 
     stwWS.onopen = _event => {
@@ -104,87 +104,87 @@ function stwStartWebsocket() {
     };
 }
 function stwToggleCollapse(event) {
-	event.preventDefault();
-	const el = event.currentTarget;
-	el.querySelector("i.fa-solid").classList.toggle("fa-angle-down");
-	if (el.querySelector("i.fa-solid").classList.toggle("fa-angle-right"))
-		el.nextElementSibling.classList.add("stwHide");
-	else
-		el.nextElementSibling.classList.remove("stwHide");
+    event.preventDefault();
+    const el = event.currentTarget;
+    el.querySelector("i.fa-solid").classList.toggle("fa-angle-down");
+    if (el.querySelector("i.fa-solid").classList.toggle("fa-angle-right"))
+        el.nextElementSibling.classList.add("stwHide");
+    else
+        el.nextElementSibling.classList.remove("stwHide");
 }
 
 // Toggle studio mode with Alt+F12
 window.addEventListener("keydown", event => {
-	if (event.altKey && event.key == "F12") {
-		event.preventDefault();
-		if (document.querySelector(".stwStudio")) {
-			const stash = document.getElementById("stwSite");
-			while (stash.firstChild)
-				document.body.appendChild(stash.firstChild);
-			document.querySelector(".stwStudio").remove();
-		} else {
-			const stash = document.createElement("div");
-			while (document.body.firstChild)
-				stash.appendChild(document.body.firstChild);
-			document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="stwSplitter"></div><div id="stwSite"></div></div><footer id="stwStatusbar"></footer></div>`)
-			while (stash.firstChild)
-				document.getElementById("stwSite").appendChild(stash.firstChild);
-			stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: { recurse: false } }));
-		}
-	}
+    if (event.altKey && event.key == "F12") {
+        event.preventDefault();
+        if (document.querySelector(".stwStudio")) {
+            const stash = document.getElementById("stwSite");
+            while (stash.firstChild)
+                document.body.appendChild(stash.firstChild);
+            document.querySelector(".stwStudio").remove();
+        } else {
+            const stash = document.createElement("div");
+            while (document.body.firstChild)
+                stash.appendChild(document.body.firstChild);
+            document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="stwSplitter"></div><div id="stwSite"></div></div><footer id="stwStatusbar"></footer></div>`)
+            while (stash.firstChild)
+                document.getElementById("stwSite").appendChild(stash.firstChild);
+            stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: { recurse: false } }));
+        }
+    }
 });
 
 // Handle resizing of the sidebar in studio mode
 document.addEventListener("mousedown", function (event) {
-	const splitter = event.target.closest(".stwSplitter");
-	if (!splitter) return;
-	const container = splitter.parentElement;
-	const aside = container.querySelector("aside");
-	const startX = event.clientX;
-	const startWidth = aside.offsetWidth;
+    const splitter = event.target.closest(".stwSplitter");
+    if (!splitter) return;
+    const container = splitter.parentElement;
+    const aside = container.querySelector("aside");
+    const startX = event.clientX;
+    const startWidth = aside.offsetWidth;
 
-	function onMouseMove(e2) {
-		const dx = e2.clientX - startX;
-		let newWidth = startWidth + dx;
-		newWidth = Math.max(100, Math.min(window.innerWidth * 0.5, newWidth));
-		container.style.gridTemplateColumns = `${newWidth}px 5px 1fr`;
-	}
+    function onMouseMove(e2) {
+        const dx = e2.clientX - startX;
+        let newWidth = startWidth + dx;
+        newWidth = Math.max(100, Math.min(window.innerWidth * 0.5, newWidth));
+        container.style.gridTemplateColumns = `${newWidth}px 5px 1fr`;
+    }
 
-	function onMouseUp() {
-		document.removeEventListener("mousemove", onMouseMove);
-		document.removeEventListener("mouseup", onMouseUp);
-	}
+    function onMouseUp() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+    }
 
-	document.addEventListener("mousemove", onMouseMove);
-	document.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
 });
 
 // Open content properties when studio mode is enabled with Alt+click
 window.addEventListener("click", function (e) {
-	const article = e.target.closest("article[id]");
-	if (document.querySelector(".stwStudio") && article && e.altKey) {
-		e.preventDefault();
-		stwWS.send(JSON.stringify({ method: 'PATCH', resource: `/stws/editcontent?_id=${article.id}`, options: { placeholder: '' } }));
-	}
+    const article = e.target.closest("article[id]");
+    if (document.querySelector(".stwStudio") && article && e.altKey) {
+        e.preventDefault();
+        stwWS.send(JSON.stringify({ method: 'PATCH', resource: `/stws/editcontent?_id=${article.id}`, options: { placeholder: '' } }));
+    }
 });
 
 // Handle navigation inside the webbase
 // This allows the user to navigate inside the webbase without reloading the page
 document.addEventListener("DOMContentLoaded", () => {
-	document.body.addEventListener("click", function (event) {
-		const target = event.target.closest("a[href]");
+    document.body.addEventListener("click", function (event) {
+        const target = event.target.closest("a[href]");
 
         const href = target?.getAttribute("href").replace(window.location.origin, "");
-		if (href?.startsWith("/")) {
-			event.preventDefault();
-			history.pushState({}, "", target.getAttribute("href"));
-			stwWS.send(JSON.stringify({ method: "PATCH", resource: href, options: {} }));
-		}
-	});
+        if (href?.startsWith("/")) {
+            event.preventDefault();
+            //			history.pushState({}, "", target.getAttribute("href"));
+            stwWS.send(JSON.stringify({ method: "PATCH", resource: href, options: {} }));
+        }
+    });
 });
 
 // Optional: handle browser back/forward navigation
 window.addEventListener("popstate", function () {
-	stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
+    stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
 });
 

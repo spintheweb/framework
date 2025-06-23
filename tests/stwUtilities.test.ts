@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.224.0/assert/assert_equals.ts";
+import { assertEquals } from "@std/assert";
 import { wbpl } from "../stwComponents/stwUtilities.ts";
 
 const placeholders: Map<string, string> = new Map([

@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+# --- Configuration ---
+IMAGE_NAME="your_dockerhub_username/spintheweb:latest"
+CONTAINER_NAME="stw-container"
+PUBLIC_DIR="/var/www/spintheweb/public"
+
+# --- Upgrade Process ---
+echo "Pulling latest image: $IMAGE_NAME"
+docker pull $IMAGE_NAME
+
+# --- Smart Update for Client Scripts ---
+echo "Updating client-side scripts..."
+TEMP_CONTAINER_ID=$(docker create $IMAGE_NAME)
+docker cp $TEMP_CONTAINER_ID:/app/public/scripts/stwClient.js ${PUBLIC_DIR}/scripts/
+docker cp $TEMP_CONTAINER_ID:/app/public/css/stwStyle.css ${PUBLIC_DIR}/css/
+docker rm -v $TEMP_CONTAINER_ID
+echo "Client-side scripts updated."
+
+echo "Stopping and removing old container..."
+docker stop $CONTAINER_NAME || true
+docker rm $CONTAINER_NAME || true
+
+# --- Execute the run script ---
+# Assumes run.sh is in the same directory (/opt/spintheweb/)
+echo "Handing off to run script..."
+./run.sh
