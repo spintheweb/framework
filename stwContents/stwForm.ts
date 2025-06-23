@@ -9,6 +9,7 @@
 **/
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { STWLayout } from "../stwContents/wbll.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWForm extends STWContent {
@@ -16,16 +17,24 @@ export class STWForm extends STWContent {
 		super(content);
 	}
 
-	public override render(_req: Request, session: STWSession, _records: ISTWRecords): string {
+	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
+		const layout = this.getLayout(session);
+
+		if (!records.fields?.length || !records.rows?.length) 
+			return layout.settings.get("nodata") || "";
+
+		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
+		if (!layout.hasTokens)
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "l\\tf\\n".repeat(fields.length)));
+
 		let body = "";
 
-		// Merge record and session placeholders
 		const placeholders = new Map(session.placeholders);
-		if (_records.rows?.length)
-			for (const [name, value] of Object.entries(_records.rows[0]))
+		if (records.rows?.length)
+			for (const [name, value] of Object.entries(records.rows[0]))
 				placeholders.set(`@@${name}`, String(value));
 
-		body += this.layout.get(session.lang)?.render(this.type, _req, session, _records.fields as any, placeholders);
+		body += this.layout.get(session.lang)?.render(this.type, request, session, fields, placeholders);
 
 		// If the form is inside a dialog, method="dialog"
 		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : "post"}">

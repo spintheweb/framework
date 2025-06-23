@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { wbpl } from "../stwComponents/stwUtilities.ts";
+import { wbpl } from "../stwComponents/wbpl.ts";
 
 const placeholders: Map<string, string> = new Map([
 	["@user", "alice"],
@@ -29,25 +29,27 @@ const placeholders: Map<string, string> = new Map([
 	- Ellipses ... after a placeholder delimited by single (') or double quotes (") are replaced with the values of the placeholder, e.g., given @numbers="1,2,3,4,5,6,7,8,9,0" and the phrase "[number in ('@numbers'...)] and" becomes "number in ('1','2','3','4','5','6','7','8','9','0') and".
 */
 const examples = [
-	{ phrase: "select * from users {where [session = '@string2'] and [status = '@status']}", parsedPhrase: "select * from users where session = 'Hello \" World' and status = 'active'" },
-	{ phrase: "select * from users {where [session = \"@string2\"] and [status = '@status']}", parsedPhrase: "select * from users where session = \"Hello \"\" World\" and status = 'active'" },
-	{ phrase: "I will {[@go]; go! [@site]}", parsedPhrase: "I will ; go! Webbase" },
-	{ phrase: "[ @@session ], foo", parsedPhrase: ", foo" },
-	{ phrase: "well? [ hello @@session ], foo", parsedPhrase: "well? , foo" },
-	{ phrase: "Hello [[\\@@user]], welcome to @site!", parsedPhrase: "Hello [@alice], welcome to Webbase!" },
-	{ phrase: "Hello @user, welcome to @site!", parsedPhrase: "Hello alice, welcome to Webbase!" },
-	{ phrase: "Hello \\@@user, welcome to @site!", parsedPhrase: "Hello @alice, welcome to Webbase!" },
-	{ phrase: "Hello [ @@session ]", parsedPhrase: "Hello " },
-	{ phrase: "{Hello [ @@session ]}, foo", parsedPhrase: ", foo" },
-	{ phrase: "{[@user] Hello [ @@session ]}, foo", parsedPhrase: "alice Hello , foo" },
-	{ phrase: "Hello { [@foo] and [ @@session ]     \n     }", parsedPhrase: "Hello " },
-	{ phrase: "[number in ('@numbers'...)] and", parsedPhrase: "number in ('1','2','3','4','5','6','7','8','9','0') and" },
-	{ phrase: "[number in (\"@numbers\"...)] and", parsedPhrase: "number in (\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"0\") and" },
-	{ phrase: "Hello [ @@session ]", parsedPhrase: "Hello " },
-	{ phrase: "'@string'", parsedPhrase: "'Hello '' World'" },
-	{ phrase: "select * from users where [session = '@session'] and role = '@role'", parsedPhrase: "select * from users where  role = 'admin'" },
-	{ phrase: "I will [@go]; go!", parsedPhrase: "I will ; go!" },
-	{ phrase: "I will {[@go]; go!}", parsedPhrase: "I will " },
+	{ phrase: `select * from users {where [session = '@string2'] and [status = '@status']}`, parsedPhrase: `select * from users where session = 'Hello " World' and status = 'active'` },
+	{ phrase: `select * from users {where [session = "@string2"] and [status = '@status']}`, parsedPhrase: `select * from users where session = "Hello "" World" and status = 'active'` },
+	{ phrase: `I will {[@go]; go! [@site]}`, parsedPhrase: `I will ; go! Webbase` },
+	{ phrase: `[ @@session ], foo`, parsedPhrase: `, foo` },
+	{ phrase: `well? [ hello @@session ], foo`, parsedPhrase: `well? , foo` },
+	{ phrase: `Hello [[\\@@user]], welcome to @site!`, parsedPhrase: `Hello [@alice], welcome to Webbase!` },
+	{ phrase: `Hello @user, welcome to @site!`, parsedPhrase: `Hello alice, welcome to Webbase!` },
+	{ phrase: `Hello \\@@user, welcome to @site!`, parsedPhrase: `Hello @alice, welcome to Webbase!` },
+	{ phrase: `Hello [ @@session ]`, parsedPhrase: `Hello ` },
+	{ phrase: `{Hello [ @@session ]}, foo`, parsedPhrase: `, foo` },
+	{ phrase: `{[@user] Hello [ @@session ]}, foo`, parsedPhrase: `alice Hello , foo` },
+	{ phrase: `Hello { [@foo] and [ @@session ]     \n     }`, parsedPhrase: `Hello ` },
+	{ phrase: `[number in ('@numbers'...)] and`, parsedPhrase: `number in ('1','2','3','4','5','6','7','8','9','0') and` },
+	{ phrase: `[number in ("@numbers"...)] and`, parsedPhrase: `number in ("1","2","3","4","5","6","7","8","9","0") and` },
+	{ phrase: `Hello [ @@session ]`, parsedPhrase: `Hello ` },
+	{ phrase: `'@string'`, parsedPhrase: `'Hello '' World'` },
+	{ phrase: `select * from users where [session = '@session'] and role = '@role'`, parsedPhrase: `select * from users where  role = 'admin'` },
+	{ phrase: `I will [@go]; go!`, parsedPhrase: `I will ; go!` },
+	{ phrase: `I will {[@go]; go!}`, parsedPhrase: `I will ` },
+	{ phrase: `($tree:=function($node){{"_id":_id,"slug":$node.slug.en?$node.slug.en:"","type":$node.subtype?$node.subtype:$node.type,"name":$node.name.en,"children":$node.children?$map($node.children,$tree):[]}};$tree($))`, parsedPhrase: `($tree:=function($node){{"_id":_id,"slug":$node.slug.en?$node.slug.en:"","type":$node.subtype?$node.subtype:$node.type,"name":$node.name.en,"children":$node.children?$map($node.children,$tree):[]}};$tree($))` },
+	{ phrase: `[]`, parsedPhrase: `[]` },
 ];
 
 Deno.test("examples", async () => {
@@ -65,6 +67,6 @@ Deno.test("examples", async () => {
 			log += `Phrase:   "${ex.phrase}"\nExpected: "${ex.parsedPhrase}"\nActual:   "${actual}"\n\n`;
 		}
 	}
-	await Deno.writeTextFile("./tests/stwUtilities.test.log", log + (fails ? "" : "All tests passed!\n"));
+	await Deno.writeTextFile("./tests/wbpl.test.log", log + (fails ? "" : "All tests passed!\n"));
 	assertEquals(fails, 0, `${fails} test(s) failed!`);
 });

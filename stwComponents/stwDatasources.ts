@@ -10,7 +10,7 @@
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
-import { wbpl } from "./stwUtilities.ts";
+import { wbpl } from "./wbpl.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata";
 

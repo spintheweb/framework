@@ -121,6 +121,6 @@ export abstract class STWContent extends STWElement {
 	}
 
 	public async render(_req: Request, _session: STWSession, _record: ISTWRecords): Promise<string> {
-		return Promise.resolve(`Render ${this.constructor.name}`);
+		return await Promise.resolve(`Render ${this.constructor.name}`);
 	}
 }

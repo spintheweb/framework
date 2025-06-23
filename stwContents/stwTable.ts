@@ -7,6 +7,7 @@
 **/
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { STWLayout } from "../stwContents/wbll.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWTable extends STWContent {
@@ -14,30 +15,32 @@ export class STWTable extends STWContent {
 		super(content);
 	}
 
-	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
-		const layout = this.getLayout(_session);
-		if (!layout || !_records.rows?.length) return "";
+	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
+		const layout = this.getLayout(session);
+
+		if (!records.fields?.length || !records.rows?.length) 
+			return layout.settings.get("nodata") || "";
+
+		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
+		if (!layout.hasTokens)
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "lf".repeat(fields.length)));
 
 		let body = "";
 		let row = 0;
-		const placeholders = new Map(_session.placeholders);
-		const fields = _records.fields?.map(f => f.name) || Object.keys(_records.rows[0] || {});
 
-		for (const [name, value] of Object.entries(_records.rows[0])) {
+		const placeholders = new Map(session.placeholders);
+		for (const [name, value] of Object.entries(records.rows[0]))
 			placeholders.set(`@@${name}`, String(value));
-		}
 
-		const header = await layout.render("TableH", _req, _session, fields, placeholders);
+		const header = await layout.render("TableH", request, session, fields, placeholders);
 		body = `<table><thead><tr>${header}</tr></thead><tbody>`;
 
 		while (true) {
-			body += `<tr>${await layout.render(this.type, _req, _session, fields, placeholders)}</tr>`;
-			if (++row >= _records.rows.length || row >= parseInt(layout.settings.get("rows") || "25")) {
+			body += `<tr>${await layout.render(this.type, request, session, fields, placeholders)}</tr>`;
+			if (++row >= records.rows.length || row >= parseInt(layout.settings.get("rows") || "25"))
 				break;
-			}
-			for (const [name, value] of Object.entries(_records.rows[row])) {
+			for (const [name, value] of Object.entries(records.rows[row]))
 				placeholders.set(`@@${name}`, String(value));
-			}
 		}
 		body += "</tbody></table>";
 

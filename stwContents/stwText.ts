@@ -8,7 +8,7 @@
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
-import { wbpl } from "../stwComponents/stwUtilities.ts";
+import { wbpl } from "../stwComponents/wbpl.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {

@@ -9,7 +9,7 @@
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
 import { STWSession } from "../stwComponents/stwSession.ts";
-import { wbpl } from "../stwComponents/stwUtilities.ts";
+import { wbpl } from "../stwComponents/wbpl.ts";
 
 const SYNTAX: RegExp = new RegExp([
 	/(\\[aAs])(?:\('([^]*?)'\))/,
@@ -46,7 +46,7 @@ class STWToken {
  *  @param render
  */
 export class STWLayout {
-	private wbll: string;
+	private _wbll: string;
 	private tokens: STWToken[] = [];
 	private tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
@@ -58,11 +58,11 @@ export class STWLayout {
 	]);
 
 	public constructor(wbll: string) {
-		this.wbll = wbll;
+		this._wbll = wbll;
 		this.tokenHandlers = this.initializeHandlers();
 
 		// The constructor is a Lexer, it checks for syntax errors and tokenizes the layout
-		for (const expression of this.wbll.matchAll(SYNTAX)) {
+		for (const expression of this._wbll.matchAll(SYNTAX)) {
 			if (expression.groups?.error !== undefined)
 				throw new SyntaxError(expression.input.slice(0, expression.index) + ' ⋙' + expression.input.slice(expression.index));;
 
@@ -82,7 +82,7 @@ export class STWLayout {
 						const leadingSpace = attributesString.substring(lastIndex, attr.index);
 						if (leadingSpace.trim() !== '') {
 							const errorIndex = attributesStringStartIndex + lastIndex + leadingSpace.indexOf(leadingSpace.trim());
-							throw new SyntaxError(this.wbll.slice(0, errorIndex) + ' ⋙' + this.wbll.slice(errorIndex));
+							throw new SyntaxError(this._wbll.slice(0, errorIndex) + ' ⋙' + this._wbll.slice(errorIndex));
 						}
 
 						let value = attr[3] || "true";
@@ -96,40 +96,40 @@ export class STWLayout {
 					const trailingChars = attributesString.substring(lastIndex);
 					if (trailingChars.trim() !== '') {
 						const errorIndex = attributesStringStartIndex + lastIndex + trailingChars.indexOf(trailingChars.trim());
-						throw new SyntaxError(this.wbll.slice(0, errorIndex) + ' ⋙' + this.wbll.slice(errorIndex));
+						throw new SyntaxError(this._wbll.slice(0, errorIndex) + ' ⋙' + this._wbll.slice(errorIndex));
 					}
 
 					if (token.symbol == "\\s")
-                        this.settings = new Map(token.attrs);
-                    else if (token.symbol == "\\a" && this.tokens.at(-1)) {
-                        const prevToken = this.tokens.at(-1) as STWToken;
-                        for (const [key, value] of token.attrs) {
-                            prevToken.attrs.set(key, value);
-                        }
-                    } else
-                        this.tokens.push(token);
-                    continue;
+						this.settings = new Map(token.attrs);
+					else if (token.symbol == "\\a" && this.tokens.at(-1)) {
+						const prevToken = this.tokens.at(-1) as STWToken;
+						for (const [key, value] of token.attrs) {
+							prevToken.attrs.set(key, value);
+						}
+					} else
+						this.tokens.push(token);
+					continue;
 
-                } else if (token.symbol[0] === '\\' && 'rnt'.includes(token.symbol[1])) { // \r, \n, \t
-                    this.tokens.push(token);
-                    continue;
-                } else if (pattern[1] || "hcrw".indexOf(token.symbol) !== -1) {
-                    token.args = "chrw".indexOf(token.symbol) != -1 ? [""] : []; // No format argument
-                    for (const arg of ((pattern[1] || '') + ';').matchAll(/(?:(=?(["']?)[^]*?\2));/gmu))
-                        token.args.push(arg[1]);
-                    const type = ["hidden", "checkbox", "radiobox", "password", ""].at("hcrw".indexOf(token.symbol));
-                    if (type) {
-                        token.attrs.set("type", `'${type}'`);
-                    }
-                    if ("eEchrw".indexOf(token.symbol) != -1)
-                        token.attrs.set("name", `'${token.args[1] || "@@"}'`);
-                    else if ("dDmMsSu".indexOf(token.symbol) != -1)
-                        token.attrs.set("name", `'${token.args[0] || "@@"}'`);
-                    token.attrs.set("value", `'${token.args[2] || "@@"}'`);
-                }
+				} else if (token.symbol[0] === '\\' && 'rnt'.includes(token.symbol[1])) { // \r, \n, \t
+					this.tokens.push(token);
+					continue;
+				} else if (pattern[1] || "hcrw".indexOf(token.symbol) !== -1) {
+					token.args = "chrw".indexOf(token.symbol) != -1 ? [""] : []; // No format argument
+					for (const arg of ((pattern[1] || '') + ';').matchAll(/(?:(=?(["']?)[^]*?\2));/gmu))
+						token.args.push(arg[1]);
+					const type = ["hidden", "checkbox", "radiobox", "password", ""].at("hcrw".indexOf(token.symbol));
+					if (type) {
+						token.attrs.set("type", `'${type}'`);
+					}
+					if ("eEchrw".indexOf(token.symbol) != -1)
+						token.attrs.set("name", `'${token.args[1] || "@@"}'`);
+					else if ("dDmMsSu".indexOf(token.symbol) != -1)
+						token.attrs.set("name", `'${token.args[0] || "@@"}'`);
+					token.attrs.set("value", `'${token.args[2] || "@@"}'`);
+				}
 
-                if (pattern[2]?.match("^[<>p]")) {
-                    for (const symbol of pattern[2].matchAll(/(<|>|p(?:\('([^]*?)'\)?)?)/gmu)) {
+				if (pattern[2]?.match("^[<>p]")) {
+					for (const symbol of pattern[2].matchAll(/(<|>|p(?:\('([^]*?)'\)?)?)/gmu)) {
 						if (symbol[2]) {
 							const pair = [...symbol[2].matchAll(/([a-zA-Z0-9-_]*)(?:;([^]*))?/gmu)][0];
 
@@ -151,6 +151,18 @@ export class STWLayout {
 				this.tokens.push(token);
 			}
 		}
+	}
+
+	public get hasTokens(): boolean {
+		return this.tokens.length > 0;
+	}
+	public get wbll(): string {
+		return this._wbll;
+	}
+	public set wbll(value: string) {
+		this._wbll = value;
+		this.tokens = [];
+		this._render = undefined;
 	}
 
 	public render(subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
@@ -182,35 +194,35 @@ export class STWLayout {
 		 * @param baseUrl The base URL for the link.
 		 * @param params The list of parameter tokens (p).
 		 * @returns A string of JavaScript code.
-         */
-        const querystring = (baseUrl: string, params: STWToken[]): string => {
-            let code = `let base = typeof window === 'undefined' ? (req.url || 'http://localhost') : location.href; let url = new URL(\`${baseUrl}\` || '/', base), p_name, p_val;`;
-            for (const param of params) {
-                const nameArg = `"${param.args[0] || ''}" || fieldName`;
-                const valueArg = param.args[1] ? `wbpl("${param.args[1]}", ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
-                code += `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) url.searchParams.set(p_name, p_val);`;
-                if (!param.args[0])
+			*/
+		const querystring = (baseUrl: string, params: STWToken[]): string => {
+			let code = `let base = typeof window === 'undefined' ? (req.url || 'http://localhost') : location.href; let url = new URL(\`${baseUrl}\` || '/', base), p_name, p_val;`;
+			for (const param of params) {
+				const nameArg = `"${param.args[0] || ''}" || fieldName`;
+				const valueArg = param.args[1] ? `wbpl("${param.args[1]}", ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
+				code += `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) url.searchParams.set(p_name, p_val);`;
+				if (!param.args[0])
 					code += `fldCursor();\n`;
-            }
-            code += `href = url.href;`;
-            return code;
-        };
+			}
+			code += `href = url.href;`;
+			return code;
+		};
 
-        handlers.set("a", (token) => {
-            token.attrs.delete("value");
-            token.attrs.delete("href");
+		handlers.set("a", (token) => {
+			token.attrs.delete("value");
+			token.attrs.delete("href");
 
-            const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
-            const textHandler = this.tokenHandlers.get(innerToken.symbol);
-            const textCode = textHandler ? textHandler(innerToken, false) : "";
-            
-            const baseUrl = token.args[0] || "";
-            const params = token.params;
+			const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
+			const textHandler = this.tokenHandlers.get(innerToken.symbol);
+			const textCode = textHandler ? textHandler(innerToken, false) : "";
 
-            // We generate a block scope to create a private scope for building the href.
-            // This code is context-aware: it generates a relative href on the client
-            // and an absolute href on the server for unit testing.
-            return `{
+			const baseUrl = token.args[0] || "";
+			const params = token.params;
+
+			// We generate a block scope to create a private scope for building the href.
+			// This code is context-aware: it generates a relative href on the client
+			// and an absolute href on the server for unit testing.
+			return `{
                 let href = "";
                 const baseUrl = wbpl(\`${baseUrl.replace(/`/g, '\\`')}\`, ph);
                 const hasProtocol = /^[a-z]+:\\/\\//i.test(baseUrl);
@@ -218,14 +230,14 @@ export class STWLayout {
                 const queryParams = new URLSearchParams();
                 let p_name, p_val;
                 ${params.map(param => {
-                    const nameArg = `"${param.args[0] || ''}" || fieldName`;
-                    const valueArg = param.args[1] ? `wbpl(\`${param.args[1].replace(/`/g, '\\`')}\`, ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
-                    let code = `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) queryParams.set(p_name, p_val);`;
-                    if (!param.args[0]) {
-                        code += `fldCursor();`;
-                    }
-                    return code;
-                }).join('\n')}
+				const nameArg = `"${param.args[0] || ''}" || fieldName`;
+				const valueArg = param.args[1] ? `wbpl(\`${param.args[1].replace(/`/g, '\\`')}\`, ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
+				let code = `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) queryParams.set(p_name, p_val);`;
+				if (!param.args[0]) {
+					code += `fldCursor();`;
+				}
+				return code;
+			}).join('\n')}
                 const queryString = queryParams.toString();
 
                 if (hasProtocol) {
@@ -246,33 +258,33 @@ export class STWLayout {
                 const textContent = (() => { let html=""; ${textCode} return html; })();
                 html+=\`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
             }`;
-        });
+		});
 
-        handlers.set("b", (token) => `html+=\`<button${attributes(token)}>${token.args[1]}</button>\`;`);
+		handlers.set("b", (token) => `html+=\`<button${attributes(token)}>${token.args[1]}</button>\`;`);
 
-        const checkboxRadioHandler = (token: STWToken) => {
-            const nameArg = token.args[1];
-            const valueArg = token.args[2];
-            const labelArg = token.args[0];
+		const checkboxRadioHandler = (token: STWToken) => {
+			const nameArg = token.args[1];
+			const valueArg = token.args[2];
+			const labelArg = token.args[0];
 
-            // Override attributes set by the lexer with dynamic code that resolves at render time.
-            token.attrs.set("name", `wbpl(\`${nameArg || '@@'}\`, ph)`);
-            token.attrs.set("value", `wbpl(\`${valueArg || ''}\`, ph)`);
+			// Override attributes set by the lexer with dynamic code that resolves at render time.
+			token.attrs.set("name", `wbpl(\`${nameArg || '@@'}\`, ph)`);
+			token.attrs.set("value", `wbpl(\`${valueArg || ''}\`, ph)`);
 
-            // Generate code that adds the 'checked' attribute if the input's value matches the current field's value.
-            const checkedLogic = `(String(fieldValue) === wbpl(\`${valueArg || ''}\`, ph)) ? ' checked' : ''`;
-            
-            // Generate code for an associated label, if one is provided.
-            const label = labelArg ? `<label>\${wbpl(\`${labelArg.replace(/`/g, '\\`')}\`, ph)}</label>` : '';
+			// Generate code that adds the 'checked' attribute if the input's value matches the current field's value.
+			const checkedLogic = `(String(fieldValue) === wbpl(\`${valueArg || ''}\`, ph)) ? ' checked' : ''`;
 
-            return `html+=\`<input\${${checkedLogic}}${attributes(token)}>${label}\`; if (!"${nameArg}") fldCursor();`;
-        };
+			// Generate code for an associated label, if one is provided.
+			const label = labelArg ? `<label>\${wbpl(\`${labelArg.replace(/`/g, '\\`')}\`, ph)}</label>` : '';
 
-        handlers.set("c", checkboxRadioHandler);
+			return `html+=\`<input\${${checkedLogic}}${attributes(token)}>${label}\`; if (!"${nameArg}") fldCursor();`;
+		};
 
-        handlers.set("d", (token) => `html+=\`<select ${attributes(token)}><option></option></select>\`;`);
+		handlers.set("c", checkboxRadioHandler);
 
-        const fieldInputHandler = (token: STWToken, _recurse: boolean = false) => {
+		handlers.set("d", (token) => `html+=\`<select ${attributes(token)}><option></option></select>\`;`);
+
+		const fieldInputHandler = (token: STWToken, _recurse: boolean = false) => {
 			const nameArg = token.symbol === 'e' ? token.args[1] : token.args[0];
 			const valueArg = token.symbol === 'e' ? token.args[2] : token.args[1];
 

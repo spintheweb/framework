@@ -7,6 +7,7 @@
 **/
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { STWLayout } from "../stwContents/wbll.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWTree extends STWContent {
@@ -14,8 +15,15 @@ export class STWTree extends STWContent {
 		super(content);
 	}
 
-	public override render(req: Request, session: STWSession, records: ISTWRecords): string {
-		const layout = this.layout.get(session.lang);
+	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
+		const layout = this.getLayout(session);
+
+		if (!records.fields?.length || !records.rows?.length) 
+			return layout.settings.get("nodata") || "";
+
+		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
+		if (!layout.hasTokens)
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "f".repeat(fields.length)));
 
 		const renderNode = (node: any, depth: number = 0): string => {
 			const placeholders = new Map(session.placeholders);
@@ -25,7 +33,7 @@ export class STWTree extends STWContent {
 			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-solid fa-angle-down" style="width:1rem"></i>` : ""}`;
 			const children = hasChildren ? `<ul>${node.children.map((child: any) => renderNode(child, depth + 1)).join("")}</ul>` : "";
 
-			return `<li><div>${toggle} ${layout?.render(this.type, req, session, records, placeholders)}</div>${children}</li>`;
+			return `<li><div>${toggle} ${layout?.render(this.type, request, session, fields, placeholders)}</div>${children}</li>`;
 		};
 
 		let body = "";
@@ -46,6 +54,7 @@ export class STWTree extends STWContent {
 					});
 				}
 			</script>`;
+
 		return body
 	}
 
