@@ -9,6 +9,8 @@
 	--on-special: hsl(0, 0%, 98%);
 
 	--padding: 0.5rem;
+	--padding-reduced: 0.25rem;
+	--padding-compact: 0.125rem;
 	--thickness: 0.25rem
 }
 

@@ -17,14 +17,16 @@ export class STWCalendar extends STWContent {
 
 	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		const daysInMonth = getDaysInMonth(1, 2025);
-		const layout = this.getLayout(session);
+		let layout = this.getLayout(session);
 
 		if (!records.fields?.length || !records.rows?.length) 
 			return layout.settings.get("nodata") || "";
 
 		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
-		if (!layout.hasTokens)
-			this.layout.set(session.lang, new STWLayout(layout.wbll + "f".repeat(fields.length)));
+		if (!layout.hasTokens) {
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "lf".repeat(fields.length)));
+			layout = this.getLayout(session);
+		}
 
 		const placeholders = new Map(session.placeholders);
 		for (const [name, value] of Object.entries(records.rows[0]))

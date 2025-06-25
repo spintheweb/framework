@@ -46,12 +46,15 @@ export class STWSite extends STWElement {
 		if (!STWSite.#instance) {
 			console.log(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
-			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml";
+			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbml";
 			this.#wbml = JSON.parse(Deno.readTextFileSync(webbase));
 			STWSite.#instance = new STWSite(this.#wbml);
 			if (!STWSite.#instance)
 				throw new Error(`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
 			STWSite.#instance.loadStudio();
+
+			if (Deno.env.get("DEBUG") === "true")
+				STWSite.watchWebbases();
 		}
 		return STWSite.#instance;
 	}
@@ -73,7 +76,7 @@ export class STWSite extends STWElement {
 					.then(webbaselet => load(webbaselet))
 					.catch(_error => { throw _error });
 			} else
-				load(JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml")));
+				load(JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml")));
 
 		} catch (error) {
 			console.error(`${(error as Error).name}: ${(error as Error).message}`);
@@ -172,8 +175,8 @@ export class STWSite extends STWElement {
 		this.#watcherStarted = true;
 
 		const webbasePath = [
-			Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbml",
-			Deno.env.get("STUDIO_WEBBASE") || "./stwStudio.wbml"
+			Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbml",
+			Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml"
 		];
 		let reloadTimeout: number | undefined;
 

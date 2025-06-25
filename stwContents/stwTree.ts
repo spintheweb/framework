@@ -9,6 +9,7 @@ import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { wbpl } from "../stwComponents/wbpl.ts";
 
 export class STWTree extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -16,14 +17,16 @@ export class STWTree extends STWContent {
 	}
 
 	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
-		const layout = this.getLayout(session);
+		let layout = this.getLayout(session);
 
 		if (!records.fields?.length || !records.rows?.length) 
 			return layout.settings.get("nodata") || "";
 
 		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
-		if (!layout.hasTokens)
-			this.layout.set(session.lang, new STWLayout(layout.wbll + "f".repeat(fields.length)));
+		if (!layout.hasTokens) {
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "lf".repeat(fields.length)));
+			layout = this.getLayout(session);
+		}
 
 		const renderNode = (node: any, depth: number = 0): string => {
 			const placeholders = new Map(session.placeholders);
@@ -33,7 +36,7 @@ export class STWTree extends STWContent {
 			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-solid fa-angle-down" style="width:1rem"></i>` : ""}`;
 			const children = hasChildren ? `<ul>${node.children.map((child: any) => renderNode(child, depth + 1)).join("")}</ul>` : "";
 
-			return `<li><div>${toggle} ${layout?.render(this.type, request, session, fields, placeholders)}</div>${children}</li>`;
+			return `<li ${wbpl(layout.groupAttributes, placeholders)}><div ${wbpl(layout.blockAttributes, placeholders)}>${toggle} ${layout?.render(this.type, request, session, fields, placeholders)}</div>${children}</li>`;
 		};
 
 		let body = "";
@@ -56,10 +59,6 @@ export class STWTree extends STWContent {
 			</script>`;
 
 		return body
-	}
-
-	private renderRecord(_req: Request, _session: STWSession, _records: ISTWRecords): string {
-		return "";
 	}
 }
 

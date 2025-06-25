@@ -31,8 +31,14 @@ await mergeAndMinify();
 
 const watcher = Deno.watchFs(folder);
 console.log(`Watching ${folder} for CSS changes...`);
+let debounceTimer: number | undefined;
+
 for await (const event of watcher) {
-	if (event.paths.some(p => p.endsWith(".css") && !p.endsWith("stwStyle.css"))) {
-		await mergeAndMinify();
-	}
+    if (event.paths.some(p => p.endsWith(".css") && !p.endsWith("stwStyle.css"))) {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            mergeAndMinify();
+            debounceTimer = undefined;
+        }, 200); // 200ms debounce window
+    }
 }

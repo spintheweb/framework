@@ -65,7 +65,7 @@
 					"options": [
 						{
 							"name": {
-								"en": "<i class=\"fas fa-2x fa-sitemap\" title=\"Webbase\"></i>"
+								"en": "<i class=\"fas fa-2x fa-sitemap\" title=\"Web application\"></i>"
 							},
 							"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
 						},
@@ -115,7 +115,7 @@
 					"query": "($tree:=function($node){{\"_id\":_id,\"slug\":$node.slug.en?$node.slug.en:\"\",\"type\":$node.subtype?$node.subtype:$node.type,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
 					"layout": {
-						"en": "fff"
+						"en": "\\A('onclick=\"/@@slug\"')>>\\A('onclick=\"/@@slug\"')>>n('2;Area;<i class=\"fa-solid fa-globe\"></i>;Page;<i class=\"fa-solid fa-file\"></i>;Content;<i class=\"fa-solid fa-puzzle-piece\"></i>;Form;<i class=\"fa-solid fa-list\"></i>;Tree;<i class=\"fa-solid fa-sitemap\"></i>')f"
 					}
 				},
 				{

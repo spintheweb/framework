@@ -8,17 +8,19 @@ const Placeholders = new Map<string, string>([
 
 const Records = {
 	affectedRows: 3,
-	fields: [{ name: "nome" }, { name: "altezza" }, { name: "dataDiNascita" }],
+	fields: [{ name: "nome" }, { name: "altezza" }, { name: "dataDiNascita" }, { name: "sesso" }],
 	rows: [
-		{ nome: "Mario Rossi", altezza: 1.78, dataDiNascita: "1985-04-12" },
-		{ nome: "Luca Bianchi", altezza: 1.82, dataDiNascita: "1990-09-23" },
-		{ nome: "Giulia Verdi", altezza: 1.65, dataDiNascita: "1995-01-30" }
+		{ nome: "Mario Rossi", altezza: 1.78, dataDiNascita: "1985-04-12", sesso: "M" },
+		{ nome: "Luca Bianchi", altezza: 1.82, dataDiNascita: "1990-09-23", sesso: "M" },
+		{ nome: "Giulia Verdi", altezza: 1.65, dataDiNascita: "1995-01-30", sesso: "F" }
 	]
 };
 
 const Examples = [
+	{ wbll: `j('alert("Hello {@@nome}!")')`, html: `<script>alert("Hello Mario Rossi!")</script>` },
+	{ wbll: `f>>f<n('2;M;Maschio;F;Femmina')`, html: ` Mario Rossi  M Maschio` },
 	{ wbll: `i('/logo.png')\\a('alt="logo @@altezza" title="@@nome This is an image" @@blank')`, html: `<img alt="logo 1.78" title="Mario Rossi This is an image"  src="/logo.png">` },
-	{ wbll: `\\s('caption')whel`, html: `<input type="password" name="nome" value="Mario Rossi"><input type="hidden" name="altezza" value="1.78"><input name="dataDiNascita" value="1985-04-12"><label>stwFld3</label>` },
+	{ wbll: `\\s('caption')whel`, html: `<input type="password" name="nome" value="Mario Rossi"><input type="hidden" name="altezza" value="1.78"><input name="dataDiNascita" value="1985-04-12"><label>sesso</label>` },
 	{ wbll: `l('Nome')t(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">` },
 	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi"><label>altezza</label><input name="altezza" value="1.78"><label>dataDiNascita</label><input name="dataDiNascita" value="1985-04-12">` },
 	{ wbll: `a('http://www.keyvisions.it')ppt('Click here')`, html: `<a href="http://www.keyvisions.it/?nome=Mario+Rossi&altezza=1.78">Click here</a>` },

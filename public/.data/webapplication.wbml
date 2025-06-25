@@ -48,7 +48,7 @@
 						"en": "customers"
 					},
 					"visibility": {
-						"guests": false
+						"guests": true
 					},
 					"subtype": "Table",
 					"cssClass": "stwTable",
@@ -58,7 +58,7 @@
 					"query": "SELECT * FROM customers LIMIT 3",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Customers\" ')lflflflflf"
+						"en": "\\s('caption=\"Customers\"')"
 					}
 				},
 				{

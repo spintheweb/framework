@@ -20,7 +20,7 @@ const SYNTAX: RegExp = new RegExp([
 	/(?:([jJtT]))(?:\('([^]*?)'\))/,
 	/\/\/.*$/,
 	/\/\*[^]*(\*\/)?/,
-	/([<>]+)/, // TODO: Group consecutive moves
+	/([<>])/,
 	/(?<error>[\S])/ // Anything else is an error
 ].map(r => r.source).join('|'), "gmu");
 
@@ -48,7 +48,9 @@ class STWToken {
 export class STWLayout {
 	private _wbll: string;
 	private tokens: STWToken[] = [];
-	private tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
+	public groupAttributes: string = ""; // Holds attributes from the \A token
+	public blockAttributes: string = ""; // Holds attributes from a pre-flight \a token
+	private static tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
 	private _render?: (subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
 
@@ -58,10 +60,18 @@ export class STWLayout {
 	]);
 
 	public constructor(wbll: string) {
-		this._wbll = wbll;
-		this.tokenHandlers = this.initializeHandlers();
+		if (!STWLayout.tokenHandlers)
+			STWLayout.tokenHandlers = this.initializeHandlers();
 
-		// The constructor is a Lexer, it checks for syntax errors and tokenizes the layout
+		this._wbll = wbll;
+		this._lex();
+	}
+
+	// Checks for syntax errors and tokenizes the layout
+	private _lex(): void {
+		this.tokens = [];
+		this._render = undefined;
+
 		for (const expression of this._wbll.matchAll(SYNTAX)) {
 			if (expression.groups?.error !== undefined)
 				throw new SyntaxError(expression.input.slice(0, expression.index) + ' ⋙' + expression.input.slice(expression.index));;
@@ -71,7 +81,7 @@ export class STWLayout {
 			if (pattern[0]) {
 				const token = new STWToken(pattern[0]);
 
-				if (token.symbol[0] === '\\' && 'as'.includes(token.symbol[1])) { // \a, \s
+				if (token.symbol[0] === '\\' && 'aAs'.includes(token.symbol[1])) { // \a, \A, \s
 					const attributesString = pattern[1] || '';
 					const attrRegex = /(@?@?@?[a-zA-Z0-9-_]+)(?:=(["'])([^]*?)\2)?/gmu;
 					let lastIndex = 0;
@@ -99,13 +109,19 @@ export class STWLayout {
 						throw new SyntaxError(this._wbll.slice(0, errorIndex) + ' ⋙' + this._wbll.slice(errorIndex));
 					}
 
-					if (token.symbol == "\\s")
+					if (token.symbol === "\\s")
 						this.settings = new Map(token.attrs);
-					else if (token.symbol == "\\a" && this.tokens.at(-1)) {
-						const prevToken = this.tokens.at(-1) as STWToken;
-						for (const [key, value] of token.attrs) {
-							prevToken.attrs.set(key, value);
-						}
+					else if (token.symbol === "\\A")
+						this.groupAttributes = pattern[1] || "";
+					else if (token.symbol === "\\a") {
+						const lastLogicalToken = [...this.tokens].reverse().find(t => !['<', '>'].includes(t.symbol));
+
+						if (lastLogicalToken)
+							for (const [key, value] of token.attrs)
+								lastLogicalToken.attrs.set(key, value);
+						else
+							this.blockAttributes = pattern[1] || "";
+
 					} else
 						this.tokens.push(token);
 					continue;
@@ -146,7 +162,8 @@ export class STWLayout {
 				} else if (token.symbol == "A") {
 					token.symbol = "a";
 					token.attrs.set("target", "_blank");
-				}
+				} else if ("tj".indexOf(token.symbol) != -1)
+					token.args = [pattern[1] || ""];
 
 				this.tokens.push(token);
 			}
@@ -161,8 +178,7 @@ export class STWLayout {
 	}
 	public set wbll(value: string) {
 		this._wbll = value;
-		this.tokens = [];
-		this._render = undefined;
+		this._lex();
 	}
 
 	public render(subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
@@ -196,7 +212,7 @@ export class STWLayout {
 		 * @returns A string of JavaScript code.
 			*/
 		const querystring = (baseUrl: string, params: STWToken[]): string => {
-			let code = `let base = typeof window === 'undefined' ? (req.url || 'http://localhost') : location.href; let url = new URL(\`${baseUrl}\` || '/', base), p_name, p_val;`;
+			let code = `let base = typeof window === 'undefined' ? (origin.url || 'http://localhost') : location.href; let url = new URL(\`${baseUrl}\` || '/', base), p_name, p_val;`;
 			for (const param of params) {
 				const nameArg = `"${param.args[0] || ''}" || fieldName`;
 				const valueArg = param.args[1] ? `wbpl("${param.args[1]}", ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
@@ -213,7 +229,7 @@ export class STWLayout {
 			token.attrs.delete("href");
 
 			const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
-			const textHandler = this.tokenHandlers.get(innerToken.symbol);
+			const textHandler = STWLayout.tokenHandlers.get(innerToken.symbol);
 			const textCode = textHandler ? textHandler(innerToken, false) : "";
 
 			const baseUrl = token.args[0] || "";
@@ -233,28 +249,23 @@ export class STWLayout {
 				const nameArg = `"${param.args[0] || ''}" || fieldName`;
 				const valueArg = param.args[1] ? `wbpl(\`${param.args[1].replace(/`/g, '\\`')}\`, ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
 				let code = `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) queryParams.set(p_name, p_val);`;
-				if (!param.args[0]) {
+				if (!param.args[0])
 					code += `fldCursor();`;
-				}
 				return code;
 			}).join('\n')}
                 const queryString = queryParams.toString();
-
                 if (hasProtocol) {
                     const url = new URL(baseUrl);
                     queryParams.forEach((value, key) => url.searchParams.set(key, value));
                     href = url.href;
                 } else if (typeof window === 'undefined') {
-                    // Server-side (unit test): resolve to absolute URL
                     const base = req.url || 'http://localhost';
                     const url = new URL(baseUrl, base);
                     queryParams.forEach((value, key) => url.searchParams.set(key, value));
                     href = url.href;
                 } else {
-                    // Client-side: keep URL relative for WebSocket handling
                     href = baseUrl + (queryString ? '?' + queryString : '');
                 }
-
                 const textContent = (() => { let html=""; ${textCode} return html; })();
                 html+=\`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
             }`;
@@ -265,19 +276,13 @@ export class STWLayout {
 		const checkboxRadioHandler = (token: STWToken) => {
 			const nameArg = token.args[1];
 			const valueArg = token.args[2];
-			const labelArg = token.args[0];
 
-			// Override attributes set by the lexer with dynamic code that resolves at render time.
 			token.attrs.set("name", `wbpl(\`${nameArg || '@@'}\`, ph)`);
 			token.attrs.set("value", `wbpl(\`${valueArg || ''}\`, ph)`);
 
-			// Generate code that adds the 'checked' attribute if the input's value matches the current field's value.
 			const checkedLogic = `(String(fieldValue) === wbpl(\`${valueArg || ''}\`, ph)) ? ' checked' : ''`;
 
-			// Generate code for an associated label, if one is provided.
-			const label = labelArg ? `<label>\${wbpl(\`${labelArg.replace(/`/g, '\\`')}\`, ph)}</label>` : '';
-
-			return `html+=\`<input\${${checkedLogic}}${attributes(token)}>${label}\`; if (!"${nameArg}") fldCursor();`;
+			return `html+=\`<input\${${checkedLogic}}${attributes(token)}>\`; if (!"${nameArg}") fldCursor();`;
 		};
 
 		handlers.set("c", checkboxRadioHandler);
@@ -295,17 +300,24 @@ export class STWLayout {
 		};
 		handlers.set("e", fieldInputHandler);
 
-		handlers.set("f", () => `html+=fieldValue;fldCursor();`);
+		handlers.set("f", () => `html+=" "+fieldValue+" ";fldCursor();`);
 
 		handlers.set("h", fieldInputHandler);
 
 		handlers.set("i", (token) => {
+			let mode = token.args[0];
+			const options = JSON.stringify(token.args.slice(1));
+			if (mode === "1")
+				mode = `${options}[Number(fieldValue)-1]||"";`;
+			else if (mode === "2") 
+				mode = `()=>{const idx=${options}.findIndex((v,i)=>i%2===0 && v==String(fieldValue));return idx!==-1 ? ${options}[idx+1]:"";}`;
+
+			token.attrs.set("src", `\${"${mode ?? ''}" || fieldName}`);
 			token.attrs.delete("value");
-			token.attrs.set("src", `\${"${token.args[0] || ''}" || ''}`);
-			return `html+=\`<img${attributes(token)}>\`;`;
+			return `html+=\`<img${attributes(token)}>\`;fldCursor();`;
 		});
 
-		handlers.set("j", (token) => `html+=\`<script>${token.args[0] ?? ''}</script>\`;`);
+		handlers.set("j", (token) => `html+=\`<script>\${wbpl("${token.args[0].replaceAll('"', '\\"') ?? ''}", ph)}</script>\`;`);
 		handlers.set("v", (token) => `html+=\`${eval(token.args[0]) ?? ''}\`;`);
 
 		handlers.set("k", (token) => `if ("${token.args[0] ?? ''}") ph.set("${token.args[0]}", "${token.args[1] ?? ''}");`);
@@ -322,7 +334,14 @@ export class STWLayout {
 			return `html+=\`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`; if ("${nameArg ?? ''}") fldCursor();`;
 		});
 
-		handlers.set("n", (token) => `html+=\`${token.args[0]}\`;`);
+		handlers.set("n", (token) => {
+			const mode = token.args[0], options = JSON.stringify(token.args.slice(1));
+			if (mode === "1")
+				return `html+=${options}[Number(fieldValue)-1]||"";fldCursor();`;
+			if (mode === "2") 
+				return `{const idx=${options}.findIndex((v,i)=>i%2===0 && v==String(fieldValue));html+=idx!==-1 ? ${options}[idx+1]:"";}fldCursor();`;
+			return "fldCursor();";
+		});
 
 		handlers.set("o", (token) => {
 			token.attrs.set("id", crypto.randomUUID());
@@ -348,6 +367,9 @@ export class STWLayout {
 		handlers.set("\\n", brHandler);
 		handlers.set("\\t", brHandler);
 
+		handlers.set(">", () => `fldCursor();`);
+		handlers.set("<", () => `fldCursor(-1);`);
+
 		return handlers;
 	}
 
@@ -355,7 +377,7 @@ export class STWLayout {
 		let fn = `let html="",fld=0,df=0,fieldName=(fields[0]?.name ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "",fldCursor=(df=1)=>{fld+=df; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length; fieldName=fields[fld]?.name ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";return "";};`;
 
 		this.tokens.forEach(token => {
-			const handler = this.tokenHandlers.get(token.symbol);
+			const handler = STWLayout.tokenHandlers.get(token.symbol);
 			if (handler)
 				fn += handler(token, false);
 		});

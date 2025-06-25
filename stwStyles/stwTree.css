@@ -8,6 +8,11 @@
     white-space: nowrap;
 }
 
+.stwTree li > div {
+    padding: var(--padding-reduced);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .stwTree li > div:hover {
   background-color: var(--special);
   color: var(--on-special);
