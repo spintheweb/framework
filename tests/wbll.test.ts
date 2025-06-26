@@ -8,7 +8,8 @@ const Placeholders = new Map<string, string>([
 
 const Records = {
 	affectedRows: 3,
-	fields: [{ name: "nome" }, { name: "altezza" }, { name: "dataDiNascita" }, { name: "sesso" }],
+//	fields: [{ name: "nome" }, { name: "altezza" }, { name: "dataDiNascita" }, { name: "sesso" }],
+	fields: ["nome", "altezza", "dataDiNascita", "sesso"],
 	rows: [
 		{ nome: "Mario Rossi", altezza: 1.78, dataDiNascita: "1985-04-12", sesso: "M" },
 		{ nome: "Luca Bianchi", altezza: 1.82, dataDiNascita: "1990-09-23", sesso: "M" },

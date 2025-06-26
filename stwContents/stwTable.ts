@@ -19,7 +19,7 @@ export class STWTable extends STWContent {
 	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		let layout = this.getLayout(session);
 
-		if (!records.fields?.length || !records.rows?.length) 
+		if (!records.fields?.length || !records.rows?.length)
 			return layout.settings.get("nodata") || "";
 
 		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
@@ -28,22 +28,27 @@ export class STWTable extends STWContent {
 			layout = this.getLayout(session);
 		}
 
-		let body = "";
-		let row = 0;
-
 		const placeholders = new Map(session.placeholders);
 		for (const [name, value] of Object.entries(records.rows[0]))
 			placeholders.set(`@@${name}`, String(value));
 
-		const header = await layout.render("TableH", request, session, fields, placeholders);
-		body = `<table><thead><tr><th>${header}</th></tr></thead><tbody>`;
+		let body = "<table><thead><tr>";
+		let tr = layout.render(request, session, fields, placeholders);
+		tr.matchAll(/(<label.*?>(.*?)<\/label>).*?/g).forEach(match => body += `<th>${match[2].trim()}</th>`);
+		body += "</tr></thead><tbody>";
 
+		let row = 0;
 		while (true) {
-			body += `<tr${wbpl(layout.groupAttributes, placeholders)}><td>${await layout.render(this.type, request, session, fields, placeholders)}</td></tr>`;
+			body += `<tr ${wbpl(layout.groupAttributes, placeholders)}>`;
+			tr.matchAll(/<label(.*?)>(.*?)<\/label>(.*?)(?=<label|$)/g).forEach(match => body += `<td${match[1].trim()}>${match[3].trim()}</td>`);
+			body += "</tr>";
+
 			if (++row >= records.rows.length || row >= parseInt(layout.settings.get("rows") || "25"))
 				break;
+
 			for (const [name, value] of Object.entries(records.rows[row]))
 				placeholders.set(`@@${name}`, String(value));
+			tr = layout.render(request, session, fields, placeholders);
 		}
 
 		body += "</tbody></table>";

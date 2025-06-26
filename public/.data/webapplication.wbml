@@ -71,17 +71,17 @@
 						"en": "dbschema"
 					},
 					"visibility": {
-						"guests": false
+						"guests": true
 					},
-					"subtype": "Tree",
-					"cssClass": "stwTree",
+					"subtype": "Table",
+					"cssClass": "stwTable",
 					"section": "main",
 					"sequence": "10",
 					"dsn": "mysqlsample",
 					"query": "SELECT 'TABLES' as TYPE, 'TABLES' as NAME, null as rows, '' as DATA_TYPE, '' as COLUMN_TYPE, '' as COLUMN_KEY, 'TABLE' as PATH\nUNION\nSELECT 'TABLE', T.TABLE_NAME, T.TABLE_ROWS, '', '', '', concat_ws('/', 'TABLE', T.TABLE_NAME)\n    FROM information_schema.tables T \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'TABLE', T.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.tables T inner join information_schema.columns C on T.TABLE_SCHEMA = C.TABLE_SCHEMA and T.TABLE_NAME = C.TABLE_NAME \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'VIEWS', 'VIEWS', null, '', '', '', 'VIEW'\nUNION\nSELECT 'VIEW', V.TABLE_NAME, null, '', '', '', concat_ws('/', 'VIEW', V.TABLE_NAME)\n    FROM information_schema.views V\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'VIEW', V.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.views V inner join information_schema.columns C on V.TABLE_SCHEMA = C.TABLE_SCHEMA and V.TABLE_NAME = C.TABLE_NAME\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'ROUTINES', 'ROUTINES', null, '', '', '', 'ROUTINE'\nUNION\nSELECT distinct concat(R.ROUTINE_TYPE, 'S'), concat(R.ROUTINE_TYPE, 'S'), null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT R.ROUTINE_TYPE, R.ROUTINE_NAME, null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'PARAMETER', ifnull(P.PARAMETER_NAME, 'RETURN'), null, P.DATA_TYPE, P.DTD_IDENTIFIER, ifnull(P.PARAMETER_MODE, ''), concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME, ifnull(P.PARAMETER_NAME, 'RETURN'))\n    FROM information_schema.ROUTINES R left join information_schema.PARAMETERS P ON R.ROUTINE_SCHEMA = P.SPECIFIC_SCHEMA and R.ROUTINE_NAME = P.SPECIFIC_NAME\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"DB Schema\" key=\"path\"')\nt('<span><i class=\"fas fa-fw fa-table\"></i></span>')>a('sales')p<ff>ff"
+						"en": "\\s('caption=\"DB Schema\" key=\"path\"')"
 					}
 				},
 				{
@@ -285,6 +285,29 @@
 							"ref": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371"
 						}
 					]
+				},
+				{
+					"_id": "b1e2c3d4-5678-11ee-9abc-def012345678",
+					"type": "Content",
+					"name": {
+						"en": "Offices"
+					},
+					"slug": {
+						"en": "offices"
+					},
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "List",
+					"cssClass": "stwList",
+					"section": "rightSidebar",
+					"sequence": "1",
+					"dsn": "mysqlsample",
+					"query": "select * from soffices",
+					"params": "",
+					"layout": {
+						"en": "\\s('caption=\"Offices\"')>l('City:')fl('Tel.:')f"
+					}
 				}
 			],
 			"visibility": {},

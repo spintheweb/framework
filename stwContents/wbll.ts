@@ -52,7 +52,7 @@ export class STWLayout {
 	public blockAttributes: string = ""; // Holds attributes from a pre-flight \a token
 	private static tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
-	private _render?: (subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
+	private _render?: (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
 
 	settings: Map<string, string> = new Map([
 		["rows", "25"],
@@ -173,6 +173,7 @@ export class STWLayout {
 	public get hasTokens(): boolean {
 		return this.tokens.length > 0;
 	}
+
 	public get wbll(): string {
 		return this._wbll;
 	}
@@ -181,13 +182,12 @@ export class STWLayout {
 		this._lex();
 	}
 
-	public render(subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
+	public render(req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
 		if (!this._render) {
 			const fn: string = this.compileRenderFunction();
-			// console.debug(fn);
-			this._render = new Function("subtype", "req", "session", "fields", "ph", "wbpl", fn) as (subtype: string, req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbplFn: (text: string, ph: Map<string, string>) => string) => string;
+			this._render = new Function("req", "session", "fields", "ph", "wbpl", fn) as (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbplFn: (text: string, ph: Map<string, string>) => string) => string;
 		}
-		return this._render(subtype, req, session, fields, ph, wbpl);
+		return this._render(req, session, fields, ph, wbpl);
 	}
 
 	// Token handlers are functions that take a token and return a string of JavaScript code
@@ -374,7 +374,7 @@ export class STWLayout {
 	}
 
 	private compileRenderFunction(): string {
-		let fn = `let html="",fld=0,df=0,fieldName=(fields[0]?.name ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "",fldCursor=(df=1)=>{fld+=df; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length; fieldName=fields[fld]?.name ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";return "";};`;
+		let fn = `let html="",fld=0,df=0,fieldName=(fields[0] ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "",fldCursor=(df=1)=>{fld+=df; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length; fieldName=fields[fld] ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";return "";};`;
 
 		this.tokens.forEach(token => {
 			const handler = STWLayout.tokenHandlers.get(token.symbol);

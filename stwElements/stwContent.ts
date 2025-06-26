@@ -95,21 +95,45 @@ export abstract class STWContent extends STWElement {
 
 		const layout = this.layout?.get(session.lang);
 
+		let bodyHtml = "", records;
+		try {
+			records = await STWDatasources.query(session, this);
+
+			bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
+				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
+				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
+				<div>
+				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
+				${await this.render(req, session, records)}
+				${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
+				</div>
+				${layout?.settings.has("frame") ? "</fieldset>" : ""}
+			</article>`;
+
+		} catch (error) {
+			const safeStringify = (obj: any) => {
+				const keys = [
+					"subtype", "cssClass", "section", "sequence",
+					"dsn", "query", "params", "layout"
+				];
+				const filtered: Record<string, unknown> = {};
+				for (const key of keys)
+					filtered[key] = obj[key];
+				return JSON.stringify(filtered, null, 2);
+			};
+			bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="stwError">
+				<h1>Error</h1>
+				<header>${(error as Error).message}</header>
+				<pre>${safeStringify(this)}</pre>
+			</article>`;
+		}
+
 		const data = {
 			method: "PUT",
 			id: this._id,
 			section: (ref || this).section,
 			sequence: (ref || this).sequence,
-			body: `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
-				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
-				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
-				<div>
-				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
-				${await this.render(req, session, await STWDatasources.query(session, this))}
-				${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
-				</div>
-				${layout?.settings.has("frame") ? "</fieldset>" : ""}
-			</article>`,
+			body: bodyHtml,
 		};
 		if (layout?.settings.get("visible") === "false")
 			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content

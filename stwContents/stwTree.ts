@@ -36,7 +36,7 @@ export class STWTree extends STWContent {
 			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-solid fa-angle-down" style="width:1rem"></i>` : ""}`;
 			const children = hasChildren ? `<ul>${node.children.map((child: any) => renderNode(child, depth + 1)).join("")}</ul>` : "";
 
-			return `<li ${wbpl(layout.groupAttributes, placeholders)}><div ${wbpl(layout.blockAttributes, placeholders)}>${toggle} ${layout?.render(this.type, request, session, fields, placeholders)}</div>${children}</li>`;
+			return `<li ${wbpl(layout.groupAttributes, placeholders)}><div ${wbpl(layout.blockAttributes, placeholders)}>${toggle} ${layout?.render(request, session, fields, placeholders)}</div>${children}</li>`;
 		};
 
 		let body = "";

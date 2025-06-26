@@ -36,7 +36,7 @@ export class STWForm extends STWContent {
 			for (const [name, value] of Object.entries(records.rows[0]))
 				placeholders.set(`@@${name}`, String(value));
 
-		body += this.layout.get(session.lang)?.render(this.type, request, session, fields, placeholders);
+		body += this.layout.get(session.lang)?.render(request, session, fields, placeholders);
 
 		// If the form is inside a dialog, method="dialog"
 		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : "post"}">

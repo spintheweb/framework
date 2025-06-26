@@ -37,7 +37,7 @@ export class STWList extends STWContent {
 
 		body = `<ul>`;
 		while (true) {
-			body += `<li${wbpl(layout.groupAttributes, placeholders)}>${await layout.render(this.type, request, session, fields, placeholders)}</li>`;
+			body += `<li${wbpl(layout.groupAttributes, placeholders)}>${await layout.render(request, session, fields, placeholders)}</li>`;
 			if (++row >= records.rows.length || row >= parseInt(layout.settings.get("rows") || "25"))
 				break;
 			for (const [name, value] of Object.entries(records.rows[row]))

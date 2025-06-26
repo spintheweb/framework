@@ -63,7 +63,8 @@ export class STWDatasources {
 						affectedRows: 1,
 						fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name })) : [],
 						rows: Array.isArray(json) ? json : [json]
-					}));}
+					}));
+				}
 				if (datasource?.type === "api")
 					return await fetchAPIData(session, content, datasource);
 				if (datasource instanceof STWSite)
@@ -72,11 +73,7 @@ export class STWDatasources {
 					return await datasource.execute(wbpl(content.query, session.placeholders));
 			}
 		} catch (error) {
-			if (error instanceof Error) {
-				console.error(error.message);
-			} else {
-				console.error(String(error));
-			}
+			throw error;
 		}
 		return new Promise<ExecuteResult>(resolve => resolve({ affectedRows: 0, fields: [], rows: [] }));
 	}
