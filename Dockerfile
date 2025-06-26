@@ -1,5 +1,5 @@
 ### STAGE 1: Build ###
-FROM denoland/deno:1.44.4 as builder
+FROM denoland/deno:distroless as builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ COPY .cert ./.cert
 COPY .env .
 
 ### STAGE 2: Runtime ###
-FROM denoland/deno:1.44.4-distroless
+FROM denoland/deno:distroless
 
 WORKDIR /app
 
