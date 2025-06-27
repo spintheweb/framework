@@ -2,27 +2,34 @@
 set -e
 
 # --- Configuration ---
-IMAGE_NAME="your_dockerhub_username/spintheweb:latest"
+IMAGE_NAME="keyvisions/spintheweb:latest"
 CONTAINER_NAME="stw-container"
-PUBLIC_DIR="/var/www/spintheweb/public"
+BASE_DIR="/opt/spintheweb"
+PUBLIC_DIR="${BASE_DIR}/public"
 
 # --- Upgrade Process ---
 echo "Pulling latest image: $IMAGE_NAME"
 docker pull $IMAGE_NAME
 
-# --- Smart Update for Client Scripts ---
-echo "Updating client-side scripts..."
+# --- Smart Update for Core Assets ---
+echo "Extracting core client assets from the new image..."
+# Create a temporary, non-running container from the new image
 TEMP_CONTAINER_ID=$(docker create $IMAGE_NAME)
+
+# Copy only the essential framework files from the container to the host,
+# leaving all other user-generated content in PUBLIC_DIR untouched.
 docker cp $TEMP_CONTAINER_ID:/app/public/scripts/stwClient.js ${PUBLIC_DIR}/scripts/
-docker cp $TEMP_CONTAINER_ID:/app/public/css/stwStyle.css ${PUBLIC_DIR}/css/
+docker cp $TEMP_CONTAINER_ID:/app/public/styles/stwStyle.css ${PUBLIC_DIR}/styles/
+# Add any other core assets you need to update here.
+
+# Clean up the temporary container
 docker rm -v $TEMP_CONTAINER_ID
-echo "Client-side scripts updated."
+echo "Core assets updated."
 
 echo "Stopping and removing old container..."
 docker stop $CONTAINER_NAME || true
 docker rm $CONTAINER_NAME || true
 
-# --- Execute the run script ---
-# Assumes run.sh is in the same directory (/opt/spintheweb/)
-echo "Handing off to run script..."
+# --- Hand off to run.sh to start the new container correctly ---
+echo "Starting new container via run.sh..."
 ./run.sh

@@ -1,5 +1,5 @@
 ### STAGE 1: Build ###
-FROM denoland/deno:distroless as builder
+FROM denoland/deno:alpine as builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ COPY .cert ./.cert
 COPY .env .
 
 ### STAGE 2: Runtime ###
-FROM denoland/deno:distroless
+FROM denoland/deno:alpine as runtime
 
 WORKDIR /app
 

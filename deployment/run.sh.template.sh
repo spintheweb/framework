@@ -2,20 +2,33 @@
 set -e
 
 # --- Configuration ---
-# These variables should match the ones in upgrade.sh
-IMAGE_NAME="your_dockerhub_username/spintheweb:latest"
+IMAGE_NAME="keyvisions/spintheweb:latest"
 CONTAINER_NAME="stw-container"
-PUBLIC_DIR="/var/www/spintheweb/public"
-ENV_FILE="/var/www/spintheweb/.env"
 
-# --- Run Command ---
+# --- Host Directories for Persistent Data ---
+# These directories live on your server and will be mounted into the container.
+BASE_DIR="/opt/spintheweb"
+PUBLIC_DIR="${BASE_DIR}/public"
+WEBBASE_DIR="${BASE_DIR}/webbase"
+CERT_DIR="${BASE_DIR}/.cert"
+ENV_FILE="${BASE_DIR}/.env"
+
+# --- Create directories if they don't exist ---
+mkdir -p $PUBLIC_DIR
+mkdir -p $WEBBASE_DIR
+mkdir -p $CERT_DIR
+
+# --- Run the Container ---
 echo "Starting container: $CONTAINER_NAME"
-docker run -d --rm \
+docker run -d \
+  --name $CONTAINER_NAME \
+  --restart always \
   -p 443:443 \
   -p 8000:8000 \
-  --name $CONTAINER_NAME \
-  --env-file $ENV_FILE \
   -v "${PUBLIC_DIR}:/app/public" \
+  -v "${WEBBASE_DIR}:/app/webbase" \
+  -v "${CERT_DIR}:/app/.cert:ro" \
+  -v "${ENV_FILE}:/app/.env:ro" \
   $IMAGE_NAME
 
 echo "Container started successfully."
