@@ -26,18 +26,17 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/spintheweb:latest
 
-  deploy:
-    name: Deploy to Production Server
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Connect and run upgrade script
-        if: ${{ secrets.DEPLOY_HOST != 'none' }}
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            # Execute the upgrade script on the server
-            /opt/spintheweb/upgrade.sh
+#  deploy:
+#    name: Deploy to Production Server
+#    needs: build-and-push
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Connect and run upgrade script
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.DEPLOY_HOST }}
+#          username: ${{ secrets.DEPLOY_USERNAME }}
+#          key: ${{ secrets.DEPLOY_KEY }}
+#          script: |
+#            # Execute the upgrade script on the server
+#            /opt/spintheweb/upgrade.sh
