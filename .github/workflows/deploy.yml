@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Connect and run upgrade script
+        if: secrets.DEPLOY_HOST != 'none'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -40,5 +41,3 @@ jobs:
           script: |
             # Execute the upgrade script on the server
             /opt/spintheweb/upgrade.sh
-
-            
