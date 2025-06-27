@@ -40,3 +40,5 @@ jobs:
           script: |
             # Execute the upgrade script on the server
             /opt/spintheweb/upgrade.sh
+
+            
