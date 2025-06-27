@@ -27,7 +27,7 @@ export class STWAccordion extends STWContent {
 			const element = session.site.find(session, option.ref || "");
 			if (element instanceof STWContent && element.isVisible(session)) {
 				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-				body += `<dt data-ref="${element._id}"><i class="fa-solid fa-fw fa-angle-down"></i>${name}</dt><dd><article id="${crypto.randomUUID()}" href="${option.ref}${(new URL(_req.url)).search}"></article></dd>`;
+				body += `<dt data-ref="${element._id}"><i class="fa-light fa-fw fa-angle-down"></i>${name}</dt><dd><article id="${crypto.randomUUID()}" href="${option.ref}${(new URL(_req.url)).search}"></article></dd>`;
 			}
 		});
 

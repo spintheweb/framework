@@ -14,6 +14,9 @@ import { wbpl } from "./wbpl.ts";
 import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata";
 
+// Global cache for query results
+const queryCache = new Map<string, { data: ISTWRecords, timestamp: number }>();
+
 export type ISTWRecords = ExecuteResult;
 
 interface ISTWDatasource {
@@ -29,6 +32,25 @@ export class STWDatasources {
 	static datasources: Map<string, STWSite | MySQLClient | ISTWDatasource> = new Map();
 
 	static async query(session: STWSession, content: STWContent): Promise<ISTWRecords> {
+		if (!content.dsn || !content.query) {
+			return { fields: [], rows: [] };
+		}
+
+		// Generate a unique key for this query based on content ID and resolved parameters
+		const cacheKey = `${content._id}:${wbpl(content.params, session.placeholders)}`;
+
+		// 1. Check cache if caching is enabled for this content
+		if (content.cache && queryCache.has(cacheKey)) {
+			const cached = queryCache.get(cacheKey)!;
+			const isCacheValid = content.cache === -1 || (Date.now() - cached.timestamp < content.cache * 1000);
+
+			if (isCacheValid) {
+				return cached.data; // Return cached data
+			}
+		}
+
+		// 2. If not in cache or cache is stale, perform the query using the original logic
+		let records: ISTWRecords;
 		try {
 			if (!STWDatasources.datasources.size) {
 				STWDatasources.datasources.set("stw", session.site); // Webbase
@@ -55,27 +77,33 @@ export class STWDatasources {
 				}
 			}
 
-			if (content.dsn && content.query) {
-				const datasource = STWDatasources.datasources.get(content.dsn);
-				if (content.dsn === "json") {
-					const json = JSON.parse(content.query);
-					return new Promise<ISTWRecords>(resolve => resolve({
-						affectedRows: 1,
-						fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name })) : [],
-						rows: Array.isArray(json) ? json : [json]
-					}));
-				}
-				if (datasource?.type === "api")
-					return await fetchAPIData(session, content, datasource);
-				if (datasource instanceof STWSite)
-					return await fetchWebbaseData(session, content);
-				if (datasource instanceof MySQLClient)
-					return await datasource.execute(wbpl(content.query, session.placeholders));
+			const datasource = STWDatasources.datasources.get(content.dsn);
+			if (content.dsn === "json") {
+				const json = JSON.parse(content.query);
+				records = {
+					affectedRows: 1,
+					fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name, type: 'string' })) : [],
+					rows: Array.isArray(json) ? json : [json]
+				};
+			} else if (datasource?.type === "api") {
+				records = await fetchAPIData(session, content, datasource);
+			} else if (datasource instanceof STWSite) {
+				records = await fetchWebbaseData(session, content);
+			} else if (datasource instanceof MySQLClient) {
+				records = await datasource.execute(wbpl(content.query, session.placeholders));
+			} else {
+				records = { affectedRows: 0, fields: [], rows: [] };
 			}
 		} catch (error) {
 			throw error;
 		}
-		return new Promise<ExecuteResult>(resolve => resolve({ affectedRows: 0, fields: [], rows: [] }));
+
+		// 3. Store the new results in the cache if caching is enabled
+		if (content.cache) {
+			queryCache.set(cacheKey, { data: records, timestamp: Date.now() });
+		}
+
+		return records;
 	}
 }
 

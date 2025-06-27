@@ -65,3 +65,12 @@ a,
 .stwCollapsible {
 	cursor: pointer;
 }
+
+.stwError {
+	border: thin solid red;
+}
+
+.stwError>pre{
+	white-space: pre-wrap;
+	word-break: break-word;
+}

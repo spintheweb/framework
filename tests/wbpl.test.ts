@@ -16,18 +16,6 @@ const placeholders: Map<string, string> = new Map([
 	["@string2", "Hello \" World"],
 ]);
 
-/*
-	- Placeholders are sequences of characters that follow this rule: (?>(@{1,3}[a-zA-Z0-9_$.]*[a-zA-Z0-9_])), e.g., @$user, @@email.to, @@@role, @_status_, etc.
-	- Placeholders are replaced with their values from a `placeholders` map.
-	- If a placeholder is not found in the `placeholders` map it is considered empty, i.e., "".
-	- \@ is used to escape the @ character, so it is not treated as part of a placeholder.
-	- Square brackets [] delimit text that is to be removed if all placeholders inside them are empty; also, if the brackets end up empty the first sequence of non-whitespace characters (\S+) that follows the closing square brackets is removed, if there is no such sequence to remove, the sequence of non-whitespace characters before the opening bracket is removed. Delimiting square brackets are always removed!
-	- Curly brackets {} delimit text that is to be removed if all placeholders inside them are empty. Delimiting curly brackets are always removed! Note: curly brackets DO NOT REMOVE the first sequence of non-whitespace characters (\S+) that follows nor precede them as square brackets do!
-	- Square brackets nested inside curly brackets behave as described above.
-	- Nested square brackets logic is applied only to innermost sets of square brackets, e.g., given the phrase "Hello [ [@user] ]", the result is "Hello [ alice ]" (the outer brackets are not removed).
-	- Placeholders delimited by single (') or double quotes (") must double the quotes inside the placeholder value, e.g., given @name="O'Conner" and the phrase "My name is '@name'" becomes "My name is 'O''Conner'".
-	- Ellipses ... after a placeholder delimited by single (') or double quotes (") are replaced with the values of the placeholder, e.g., given @numbers="1,2,3,4,5,6,7,8,9,0" and the phrase "[number in ('@numbers'...)] and" becomes "number in ('1','2','3','4','5','6','7','8','9','0') and".
-*/
 const examples = [
 	{ phrase: `select * from users {where [session = '@string2'] and [status = '@status']}`, parsedPhrase: `select * from users where session = 'Hello " World' and status = 'active'` },
 	{ phrase: `select * from users {where [session = "@string2"] and [status = '@status']}`, parsedPhrase: `select * from users where session = "Hello "" World" and status = 'active'` },

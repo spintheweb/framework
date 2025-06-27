@@ -50,6 +50,7 @@ export class STWLayout {
 	private tokens: STWToken[] = [];
 	public groupAttributes: string = ""; // Holds attributes from the \A token
 	public blockAttributes: string = ""; // Holds attributes from a pre-flight \a token
+	private _isInteractive: boolean = false; // Indicates if the layout is interactive, used to determine if the interactive elements should be rendered
 	private static tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
 	private _render?: (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
@@ -168,6 +169,12 @@ export class STWLayout {
 				this.tokens.push(token);
 			}
 		}
+
+		this._isInteractive = this.tokens.some(token => token.symbol === "b" || token.symbol === "B");
+	}
+
+	public get isInteractive(): boolean {
+		return this._isInteractive;
 	}
 
 	public get hasTokens(): boolean {
@@ -182,9 +189,13 @@ export class STWLayout {
 		this._lex();
 	}
 
-	public render(req: Request, session: STWSession, fields: string[], ph: Map<string, string>): string {
+	public render(req: Request, session: STWSession, fields: string[], ph: Map<string, string>, isInteractive: boolean = false): string {
+		for (const [key, value] of ph.entries())
+			if (value === 'null' || value === 'undefined')
+				ph.set(key, '');
+
 		if (!this._render) {
-			const fn: string = this.compileRenderFunction();
+			const fn: string = this.compileRenderFunction(isInteractive);
 			this._render = new Function("req", "session", "fields", "ph", "wbpl", fn) as (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbplFn: (text: string, ph: Map<string, string>) => string) => string;
 		}
 		return this._render(req, session, fields, ph, wbpl);
@@ -305,14 +316,19 @@ export class STWLayout {
 		handlers.set("h", fieldInputHandler);
 
 		handlers.set("i", (token) => {
-			let mode = token.args[0];
+			const mode = token.args[0];
 			const options = JSON.stringify(token.args.slice(1));
-			if (mode === "1")
-				mode = `${options}[Number(fieldValue)-1]||"";`;
-			else if (mode === "2") 
-				mode = `()=>{const idx=${options}.findIndex((v,i)=>i%2===0 && v==String(fieldValue));return idx!==-1 ? ${options}[idx+1]:"";}`;
 
-			token.attrs.set("src", `\${"${mode ?? ''}" || fieldName}`);
+			let srcExpression: string;
+			if (mode === "1") {
+				srcExpression = `(${options}[Number(fieldValue)-1]||"")`;
+			} else if (mode === "2") {
+				srcExpression = `(()=>{const opts=${options};let idx=opts.findIndex((v,i)=>i%2===0&&v==String(fieldValue));return (idx!==-1&&opts[idx+1])?opts[idx+1]:opts.at(-1);})()`;
+			} else {
+				srcExpression = `wbpl(\`${mode || ''}\`, ph)`;
+			}
+
+			token.attrs.set("src", `${srcExpression} || fieldName`);
 			token.attrs.delete("value");
 			return `html+=\`<img${attributes(token)}>\`;fldCursor();`;
 		});
@@ -338,8 +354,8 @@ export class STWLayout {
 			const mode = token.args[0], options = JSON.stringify(token.args.slice(1));
 			if (mode === "1")
 				return `html+=${options}[Number(fieldValue)-1]||"";fldCursor();`;
-			if (mode === "2") 
-				return `{const idx=${options}.findIndex((v,i)=>i%2===0 && v==String(fieldValue));html+=idx!==-1 ? ${options}[idx+1]:"";}fldCursor();`;
+			if (mode === "2")
+				return `{const opts=${options};let idx=opts.findIndex((v,i)=>i%2===0&&v==String(fieldValue));html+=(idx!==-1&&opts[idx+1])?opts[idx+1]:opts.at(-1);}fldCursor();`;
 			return "fldCursor();";
 		});
 
@@ -373,14 +389,59 @@ export class STWLayout {
 		return handlers;
 	}
 
-	private compileRenderFunction(): string {
+	private compileRenderFunction(isInteractive: boolean): string {
 		let fn = `let html="",fld=0,df=0,fieldName=(fields[0] ?? "stwFld0"),fieldValue=ph.get("@@" + fieldName) ?? "",fldCursor=(df=1)=>{fld+=df; if(fld<0) fld=0; else if (fld>=fields.length) fld=fields.length; fieldName=fields[fld] ?? "stwFld"+fld; fieldValue=ph.get("@@"+fieldName) ?? "";return "";};`;
 
-		this.tokens.forEach(token => {
-			const handler = STWLayout.tokenHandlers.get(token.symbol);
+		for (const token of this.tokens) {
+			let handler: ((token: STWToken, inline: boolean) => string) | undefined;
+			let tokenToRender = token;
+
+			if (isInteractive)
+				handler = STWLayout.tokenHandlers.get(token.symbol);
+			else
+				switch (token.symbol) {
+					case 'e':
+					case 'w':
+					case 'm':
+					case 'u':
+						handler = STWLayout.tokenHandlers.get('f');
+						break;
+					case 'b':
+					case 'h':
+						handler = undefined; // Render nothing
+						break;
+					case 'd':
+						handler = STWLayout.tokenHandlers.get('n');
+						tokenToRender = new STWToken('n', ['2', ...token.args], token.params, token.attrs, token.text);
+						break;
+					case 's': {
+						const options = JSON.stringify(token.args);
+						fn += `{
+                            const values = String(fieldValue).split(',').map(s => s.trim());
+                            const opts = ${options};
+                            const mappedValues = values.map(val => {
+                                const idx = opts.findIndex((v, i) => i % 2 === 0 && v === val);
+                                return (idx !== -1 && opts[idx + 1]) ? opts[idx + 1] : '';
+                            }).filter(v => v);
+                            html += mappedValues.join(', ');
+                            fldCursor();
+                        }`;
+						handler = undefined; // Custom code generated
+						break;
+					}
+					case 'c':
+					case 'r':
+						tokenToRender = new STWToken(token.symbol, token.args, token.params, new Map(token.attrs), token.text);
+						tokenToRender.attrs.set('disabled', 'true');
+						handler = STWLayout.tokenHandlers.get(tokenToRender.symbol);
+						break;
+					default:
+						handler = STWLayout.tokenHandlers.get(token.symbol);
+				}
+
 			if (handler)
-				fn += handler(token, false);
-		});
+				fn += handler(tokenToRender, false);
+		}
 
 		fn += "return html;";
 		return fn;

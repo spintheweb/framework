@@ -1,17 +1,27 @@
-.stwStudio {
+#stwStudio {
 	position: absolute;
-	display: grid;
-	grid-template-rows: 2rem auto 2rem;
 	top: 0;
 	left: 0;
 	bottom: 0;
 	right: 0;
+	display: grid;
+	grid-template-rows: 2rem 1fr 2rem; /* Header, content, footer */
+	overflow: hidden;
+	background-color: var(--bg);
+}
+
+#stwStudio > div {
+	display: grid;
+	/* Sidebar, splitter, main site view */
+	grid-template-columns: 300px 5px 1fr; 
 	overflow: hidden;
 }
 
-.stwStudio>div {
-	display: grid;
-	grid-template-columns: auto var(--padding) 3fr;
+#stwSite {
+	overflow: auto; /* Confines the site and adds scrollbars when needed */
+	height: 100%;
+	width: 100%;
+	position: relative; /* Establishes a positioning context for child elements */
 }
 
 #stwMenubar,
@@ -26,7 +36,15 @@
 
 #stwSidebar {
 	border-right: thin solid var(--border);
-	overflow: auto;
+	overflow: hidden; /* Let child elements manage their own scrolling */
+	display: flex;
+	flex-direction: column;
+}
+
+/* Make direct children of the sidebar grow to fill available space */
+#stwSidebar > * {
+	flex-grow: 1;
+	overflow-y: auto; /* Add a scrollbar to the child if its content overflows */
 }
 
 #stwStatusbar {
@@ -35,10 +53,10 @@
 
 .stwSplitter {
 	cursor: col-resize;
-	width: var(--thickness);
+	background-color: var(--border);
+	transition: background-color 0.2s ease;
 }
 
 .stwSplitter:hover {
 	background-color: var(--special);
-	color: var(--on-special);
 }

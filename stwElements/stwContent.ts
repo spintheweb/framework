@@ -29,34 +29,41 @@ export interface ISTWContentWithOptions extends ISTWContent {
 }
 
 export interface ISTWContent extends ISTWElement {
-	subtype: string;
-	cssClass: string;
-	section: string;
-	sequence: number;
-	dsn: string;
-	query: string;
-	params: string;
-	layout: object;
+    subtype: string;
+    cssClass: string;
+    section: string;
+    sequence: number;
+    dsn: string;
+    query: string;
+    params: string;
+    layout: object;
+    stateful?: boolean;
+    cache?: number; // Cache duration in seconds. -1 for forever, 0 or undefined for no cache.
 }
 export abstract class STWContent extends STWElement {
-	cssClass: string;
-	section: string;
-	sequence: number;
-	dsn: string;
-	query: string;
-	params: string;
-	protected layout!: Map<string, STWLayout>;
+    override readonly type: string;
+    cssClass: string;
+    section: string;
+    sequence: number;
+    dsn: string;
+    query: string;
+    params: string;
+    protected layout!: Map<string, STWLayout>;
+    readonly stateful: boolean;
+    readonly cache: number;
 
 	public constructor(content: ISTWContent, _settings?: { [key: string]: string }) {
 		super(content);
 
-		this.type = content.subtype;
-		this.cssClass = content.cssClass;
-		this.section = content.section;
-		this.sequence = content.sequence || 0.0;
-		this.dsn = content.dsn;
-		this.query = content.query;
-		this.params = content.params;
+        this.type = content.subtype;
+        this.cssClass = content.cssClass;
+        this.section = content.section;
+        this.sequence = content.sequence || 0.0;
+        this.dsn = content.dsn;
+        this.query = content.query;
+        this.params = content.params;
+        this.stateful = content.stateful || false;
+        this.cache = content.cache || 0;
 
 		if (!["Text", "Script", "Shortcut"].includes(this.type) && content.layout) {
 			this.layout = new Map();
@@ -82,6 +89,29 @@ export abstract class STWContent extends STWElement {
 			return value;
 		}
 		return this[name].get(session.lang) || "";
+	}
+
+	/**
+	 * Retrieves the state of this content for the given session.
+	 * The state is stored in the session object.
+	 * @param session The current user session.
+	 * @returns The state object, or undefined if not stateful or no state is set.
+	 */
+	public getState(session: STWSession): any {
+		return this.stateful ? session.states?.get(this._id) : undefined;
+	}
+
+	/**
+	 * Saves the state of this content for the given session.
+	 * The state is stored in the session object.
+	 * @param session The current user session.
+	 * @param state The state object to save.
+	 */
+	public setState(session: STWSession, state: any): void {
+		if (this.stateful) {
+			if (!session.states) session.states = new Map<string, any>();
+			session.states.set(this._id, state);
+		}
 	}
 
 	public override async serve(req: Request, session: STWSession, ref: STWContent | undefined): Promise<Response> {
@@ -122,7 +152,7 @@ export abstract class STWContent extends STWElement {
 				return JSON.stringify(filtered, null, 2);
 			};
 			bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="stwError">
-				<h1>Error</h1>
+				<h1><i class="fa-light fa-fw fa-bug"></i> Error</h1>
 				<header>${(error as Error).message}</header>
 				<pre>${safeStringify(this)}</pre>
 			</article>`;
@@ -140,7 +170,7 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="stwToggleCollapse(event)"><i class="fa-solid fa-fw fa-angle-down"></i>` : "<h1>";
+			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="stwToggleCollapse(event)"><i class="fa-light fa-fw fa-angle-down"></i>` : "<h1>";
 		}
 	}
 

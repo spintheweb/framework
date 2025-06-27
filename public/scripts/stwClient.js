@@ -106,8 +106,8 @@ function stwStartWebsocket() {
 function stwToggleCollapse(event) {
     event.preventDefault();
     const el = event.currentTarget;
-    el.querySelector("i.fa-solid").classList.toggle("fa-angle-down");
-    if (el.querySelector("i.fa-solid").classList.toggle("fa-angle-right"))
+    el.querySelector("i.fa-light").classList.toggle("fa-angle-down");
+    if (el.querySelector("i.fa-light").classList.toggle("fa-angle-right"))
         el.nextElementSibling.classList.add("stwHide");
     else
         el.nextElementSibling.classList.remove("stwHide");
@@ -117,16 +117,16 @@ function stwToggleCollapse(event) {
 window.addEventListener("keydown", event => {
     if (event.altKey && event.key == "F12") {
         event.preventDefault();
-        if (document.querySelector(".stwStudio")) {
+        if (document.getElementById("stwStudio")) {
             const stash = document.getElementById("stwSite");
             while (stash.firstChild)
                 document.body.appendChild(stash.firstChild);
-            document.querySelector(".stwStudio").remove();
+            document.getElementById("stwStudio").remove();
         } else {
             const stash = document.createElement("div");
             while (document.body.firstChild)
                 stash.appendChild(document.body.firstChild);
-            document.body.insertAdjacentHTML("afterbegin", `<div class="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="stwSplitter"></div><div id="stwSite"></div></div><footer id="stwStatusbar"></footer></div>`)
+            document.body.insertAdjacentHTML("afterbegin", `<div id="stwStudio"><header id="stwMenubar"></header><div><aside id="stwSidebar"></aside><div class="stwSplitter"></div><div id="stwSite"></div></div><footer id="stwStatusbar"></footer></div>`)
             while (stash.firstChild)
                 document.getElementById("stwSite").appendChild(stash.firstChild);
             stwWS.send(JSON.stringify({ method: "PATCH", resource: "/stws/interface", options: { recurse: false } }));
@@ -162,7 +162,7 @@ document.addEventListener("mousedown", function (event) {
 // Open content properties when studio mode is enabled with Alt+click
 window.addEventListener("click", function (e) {
     const article = e.target.closest("article[id]");
-    if (document.querySelector(".stwStudio") && article && e.altKey) {
+    if (document.getElementById("stwStudio") && article && e.altKey) {
         e.preventDefault();
         stwWS.send(JSON.stringify({ method: 'PATCH', resource: `/stws/editcontent?_id=${article.id}`, options: { placeholder: '' } }));
     }
