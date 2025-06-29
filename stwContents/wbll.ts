@@ -160,6 +160,10 @@ export class STWLayout {
 					(this.tokens.at(-1) as STWToken).text = token;
 					continue;
 
+				} else if ("t" === token.symbol && this.tokens.at(-1)?.symbol === "b") {
+					(this.tokens.at(-1) as STWToken).text = token;
+					continue;
+
 				} else if (token.symbol == "A") {
 					token.symbol = "a";
 					token.attrs.set("target", "_blank");
@@ -170,7 +174,8 @@ export class STWLayout {
 			}
 		}
 
-		this._isInteractive = this.tokens.some(token => token.symbol === "b" || token.symbol === "B");
+		// TODO: The key is mandatory if the button perform CRUD operations. b('url;action...')
+		this._isInteractive = this.tokens.some(token => token.symbol === "b");
 	}
 
 	public get isInteractive(): boolean {
@@ -206,11 +211,11 @@ export class STWLayout {
 	private initializeHandlers(): Map<string, (token: STWToken, inline: boolean) => string> {
 		const handlers = new Map<string, (token: STWToken) => string>();
 
-		const attributes = (token: STWToken): string =>
+		const attributes = (token: STWToken, inline: boolean = false): string =>
 			[...token.attrs.entries()].map(([k, v]) => {
 				if (k.startsWith("@"))
 					return ` \${(ph.get("${k}") || "")}`;
-				if (v.startsWith("${") && v.endsWith("}"))
+				if (v.startsWith("${") && v.endsWith("}") || inline)
 					return ` ${k}="${v}"`;
 				return ` ${k}="\${${v}}"`;
 			}).join("");
@@ -282,7 +287,13 @@ export class STWLayout {
             }`;
 		});
 
-		handlers.set("b", (token) => `html+=\`<button${attributes(token)}>${token.args[1]}</button>\`;`);
+		handlers.set("b", (token) => {
+			const value = (token.args[1] + token.args[2]) || "";
+			token.attrs.set("name", "stwAction");
+			token.attrs.set("type", value === "" ? "button" : value === "stwreset" ? "reset" : "submit");
+			if (value) token.attrs.set("value", value); else token.attrs.delete("value");
+			return `html+=\`<button${attributes(token, true)}>${token.text?.args[0] || ""}</button>\`;`
+		});
 
 		const checkboxRadioHandler = (token: STWToken) => {
 			const nameArg = token.args[1];

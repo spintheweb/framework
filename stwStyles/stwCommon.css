@@ -5,8 +5,10 @@
 	--bg-faint: hsl(0, 0%, 92%);
 	--border: hsl(0, 0%, 75%);
 	--text: hsl(220, 15%, 20%);
-	--special: hsl(200, 80%, 45%);
+	--special: rgb(23, 145, 207);
+	--special-hover: rgba(23, 145, 207, 0.5);
 	--on-special: hsl(0, 0%, 98%);
+	--error: hsl(0, 80%, 50%);
 
 	--padding: 0.5rem;
 	--padding-reduced: 0.25rem;
@@ -20,7 +22,8 @@
 		--bg-faint: hsl(220, 15%, 22%);
 		--border: hsl(0, 0%, 25%);
 		--text: hsl(0, 0%, 98%);
-		--special: hsl(200, 80%, 60%);
+		--special: rgb(71, 180, 235);
+		--special-hover: rgba(71, 180, 235, 0.5);
 		--on-special: hsl(0, 0%, 98%);
 	}
 }
@@ -48,6 +51,11 @@ article {
 	position: relative;
 }
 
+input {
+	padding: var(--padding-compact);
+	margin: 0;
+}
+
 a,
 .stwSpecial {
 	color: var(--special);
@@ -67,7 +75,10 @@ a,
 }
 
 .stwError {
-	border: thin solid red;
+	font-size: small;
+	padding: var(--padding-reduced);
+	margin: var(--padding-reduced);
+	background-color: var(--error);
 }
 
 .stwError>pre{

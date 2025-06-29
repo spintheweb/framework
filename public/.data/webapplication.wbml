@@ -25,7 +25,7 @@
 			"query": "{\"email\":\"\"}",
 			"params": "",
 			"layout": {
-				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';Send Reset Link;;stw;requestPasswordReset')"
+				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;requestPasswordReset')t('Send Reset Link')"
 			}
 		},
 		{
@@ -71,7 +71,7 @@
 						"en": "dbschema"
 					},
 					"visibility": {
-						"guests": true
+						"guests": false
 					},
 					"subtype": "Tree",
 					"cssClass": "stwTree",
@@ -81,7 +81,7 @@
 					"query": "SELECT 'TABLES' as TYPE, 'TABLES' as NAME, null as rows, '' as DATA_TYPE, '' as COLUMN_TYPE, '' as COLUMN_KEY, 'TABLE' as PATH\nUNION\nSELECT 'TABLE', T.TABLE_NAME, T.TABLE_ROWS, '', '', '', concat_ws('/', 'TABLE', T.TABLE_NAME)\n    FROM information_schema.tables T \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'TABLE', T.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.tables T inner join information_schema.columns C on T.TABLE_SCHEMA = C.TABLE_SCHEMA and T.TABLE_NAME = C.TABLE_NAME \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'VIEWS', 'VIEWS', null, '', '', '', 'VIEW'\nUNION\nSELECT 'VIEW', V.TABLE_NAME, null, '', '', '', concat_ws('/', 'VIEW', V.TABLE_NAME)\n    FROM information_schema.views V\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'VIEW', V.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.views V inner join information_schema.columns C on V.TABLE_SCHEMA = C.TABLE_SCHEMA and V.TABLE_NAME = C.TABLE_NAME\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'ROUTINES', 'ROUTINES', null, '', '', '', 'ROUTINE'\nUNION\nSELECT distinct concat(R.ROUTINE_TYPE, 'S'), concat(R.ROUTINE_TYPE, 'S'), null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT R.ROUTINE_TYPE, R.ROUTINE_NAME, null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'PARAMETER', ifnull(P.PARAMETER_NAME, 'RETURN'), null, P.DATA_TYPE, P.DTD_IDENTIFIER, ifnull(P.PARAMETER_MODE, ''), concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME, ifnull(P.PARAMETER_NAME, 'RETURN'))\n    FROM information_schema.ROUTINES R left join information_schema.PARAMETERS P ON R.ROUTINE_SCHEMA = P.SPECIFIC_SCHEMA and R.ROUTINE_NAME = P.SPECIFIC_NAME\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"DB Schema\" key=\"xPATH\"')"
+						"en": "\\s('caption=\"DB Schema\" key=\"PATH\"')"
 					}
 				},
 				{
@@ -127,7 +127,7 @@
 					"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';Logon;;stw;logon')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
+						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
 					}
 				},
 				{
@@ -298,15 +298,15 @@
 					"visibility": {
 						"guests": true
 					},
-					"subtype": "List",
-					"cssClass": "stwList",
+					"subtype": "Table",
+					"cssClass": "stwTable",
 					"section": "rightSidebar",
 					"sequence": "1",
 					"dsn": "mysqlsample",
-					"query": "select * from soffices",
+					"query": "select * from offices",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Offices\"')>l('City:')fl('Tel.:')f"
+						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('Delete')"
 					}
 				}
 			],

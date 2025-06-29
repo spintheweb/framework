@@ -3,6 +3,11 @@
     width: 100%;
 }
 
+.stwTable thead td {
+    background-color: var(--special-hover);
+    color: var(--on-special);
+}
+
 .stwTable th,
 .stwTable td {
     padding: var(--padding);
@@ -10,8 +15,8 @@
 }
 
 .stwTable th {
-    background: var(--bg);
-    color: var(--text);
+    background-color: var(--special);
+    color: var(--on-special);
 }
 
 .stwTable tr:nth-child(even) {
@@ -19,6 +24,6 @@
 }
 
 .stwTable tr:hover {
-    background: var(--special);
+    background: var(--special-hover);
     color: var(--on-special);
 }

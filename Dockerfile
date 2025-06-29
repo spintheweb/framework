@@ -1,5 +1,5 @@
 ### STAGE 1: Build ###
-FROM denoland/deno:alpine as builder
+FROM denoland/deno:alpine AS builder
 
 WORKDIR /app
 
@@ -9,30 +9,31 @@ COPY stwSpinner.ts .
 # Cache dependencies. This step is re-run only if deno.json or stwSpinner.ts change.
 RUN deno cache stwSpinner.ts
 
-# Copy the rest of the application files, EXCLUDING the public directory
-COPY stwComponents ./stwComponents
-COPY stwContents ./stwContents
-COPY stwElements ./stwElements
-COPY webbaselets ./webbaselets
-COPY .cert ./.cert
-COPY .env .
+# Copy the rest of the application files
+COPY . .
 
 ### STAGE 2: Runtime ###
-FROM denoland/deno:alpine as runtime
+FROM denoland/deno:alpine AS runtime
 
 WORKDIR /app
 
-# Copy only the necessary application files from the builder stage
-COPY --from=builder /app .
-# Copy the Deno cache from the builder stage
-COPY --from=builder /deno-dir/ /deno-dir/
-
-# Expose the ports your application listens on
-EXPOSE 443
-EXPOSE 8000
+# Set an environment variable to identify the container environment
+ENV SPINNER_ENV=docker
 
 # This user is created in the base image and is non-root
 USER deno
 
+# Copy application files from the builder stage, setting ownership to the 'deno' user.
+COPY --chown=deno:deno --from=builder /app .
+
+# Copy the Deno dependency cache, also setting ownership. This is the critical fix.
+COPY --chown=deno:deno --from=builder /deno-dir /deno-dir/
+
+# Expose the ports your application listens on
+EXPOSE 443
+EXPOSE 80
+
 # Define the command to run your application.
-CMD ["run", "--allow-net", "--allow-read", "--allow-env", "stwSpinner.ts"]
+# Grant read access to the entire application directory './'
+# This is safe inside the container and allows dynamic module loading.
+CMD ["run", "--allow-net", "--allow-read=./", "--allow-env", "stwSpinner.ts"]

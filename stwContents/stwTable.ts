@@ -29,29 +29,43 @@ export class STWTable extends STWContent {
 		}
 
 		const placeholders = new Map(session.placeholders);
-		for (const [name, value] of Object.entries(records.rows[0]))
-			placeholders.set(`@@${name}`, String(value));
 
 		let body = "<table><thead><tr>";
-		let tr = layout.render(request, session, fields, placeholders);
+		let tr = layout.render(request, session, fields, placeholders, layout.isInteractive && !layout.settings.get("disabled"));
 		tr.matchAll(/(<label.*?>(.*?)<\/label>).*?/g).forEach(match => body += `<th>${match[2].trim()}</th>`);
+
+		// If the layout includes an insert button, allow records insertion
+		if (layout.isInteractive && !layout.settings.get("disabled")) {
+			body += `<th style="width:1rem"></th><tr>`;
+			tr = layout.render(request, session, fields, placeholders, true);
+			tr.matchAll(/<label(.*?)>(.*?)<\/label>(.*?)(?=<label|$)/g).forEach(match => body += `<td${match[1].trim()}>${match[3].trim()}</td>`);
+			body += `<td><i class="fa-light fa-fw fa-plus"></i></td>`;
+		}
 		body += "</tr></thead><tbody>";
 
 		let row = 0;
 		while (true) {
+			for (const [name, value] of Object.entries(records.rows[row]))
+				placeholders.set(`@@${name}`, String(value));
+			tr = layout.render(request, session, fields, placeholders, layout.isInteractive && !layout.settings.get("disabled"));
+
 			body += `<tr ${wbpl(layout.groupAttributes, placeholders)}>`;
 			tr.matchAll(/<label(.*?)>(.*?)<\/label>(.*?)(?=<label|$)/g).forEach(match => body += `<td${match[1].trim()}>${match[3].trim()}</td>`);
+
+			// If the layout includes a delete button, allow records deletion
+			if (layout.isInteractive && !layout.settings.get("disabled"))
+				body += `<td><i class="fa-light fa-fw fa-trash-can"></i></td>`;
+
 			body += "</tr>";
 
 			if (++row >= records.rows.length || row >= parseInt(layout.settings.get("rows") || "25"))
 				break;
-
-			for (const [name, value] of Object.entries(records.rows[row]))
-				placeholders.set(`@@${name}`, String(value));
-			tr = layout.render(request, session, fields, placeholders);
 		}
 
 		body += "</tbody></table>";
+
+		// Remove all <button> elements from the body
+		body = body.replace(/<button.*?<\/button>/g, "");
 
 		return body;
 	}

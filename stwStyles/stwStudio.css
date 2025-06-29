@@ -58,5 +58,5 @@
 }
 
 .stwSplitter:hover {
-	background-color: var(--special);
+	background-color: var(--special-hover);
 }

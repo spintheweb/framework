@@ -14,7 +14,7 @@
 }
 
 .stwTree li > div:hover {
-  background-color: var(--special);
+  background-color: var(--special-hover);
   color: var(--on-special);
   transition: background-color 0.3s ease;
 }
