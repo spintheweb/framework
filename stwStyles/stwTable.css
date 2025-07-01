@@ -10,11 +10,12 @@
 
 .stwTable th,
 .stwTable td {
-    padding: var(--padding);
     border: thin solid var(--bg-faint);
+    padding: var(--padding-reduced);
 }
 
 .stwTable th {
+    padding: var(--padding);
     background-color: var(--special);
     color: var(--on-special);
 }
@@ -26,4 +27,8 @@
 .stwTable tr:hover {
     background: var(--special-hover);
     color: var(--on-special);
+}
+
+.stwTable input[type="text"], input:not([type]) {
+    width: -webkit-fill-available;
 }

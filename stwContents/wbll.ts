@@ -24,12 +24,14 @@ const SYNTAX: RegExp = new RegExp([
 	/(?<error>[\S])/ // Anything else is an error
 ].map(r => r.source).join('|'), "gmu");
 
+export enum ACTIONS { stwall = 63, stwnone = 0, stwinsert = 1, stwupdate = 2, stwdelete = 4, stwsearch = 8, stwfilter = 16, stwsubmit = 32 };
+
 class STWToken {
 	symbol: string; // Symbol indicates what HTML tag the token maps to, it'is a mnemonic, e.g., `a` for anchor/link, `b` for button, `c` for checkbox, `r` for radiobox...
 	args: string[] = []; // If you think of symbols as mapping functions, these are it's arguments
 	params: STWToken[] = []; // Only certain symbols (`a`, `b` and `o`) have params, they rappresent querystring parameters
 	attrs: Map<string, string> = new Map(); // Attributes are HTML attributes, e.g., `name`, `value`, `type`, `href`, etc. They are used to build the HTML tag
-	text?: STWToken; // Only `a` and `t` symbols have text, which is the content of the HTML tag, e.g., the text inside an anchor or a button
+	text?: STWToken; // Only `a`, `b` and `t` symbols have text, which is the content of the HTML tag, e.g., the text inside an anchor or a button
 
 	public constructor(symbol: string, args?: string[], params?: STWToken[], attrs?: Map<string, string>, text?: STWToken) {
 		this.symbol = symbol;
@@ -50,7 +52,7 @@ export class STWLayout {
 	private tokens: STWToken[] = [];
 	public groupAttributes: string = ""; // Holds attributes from the \A token
 	public blockAttributes: string = ""; // Holds attributes from a pre-flight \a token
-	private _isInteractive: boolean = false; // Indicates if the layout is interactive, used to determine if the interactive elements should be rendered
+	private _acts = ACTIONS.stwnone; // Indicates how the layout interacts
 	private static tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
 	private _render?: (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
@@ -66,6 +68,10 @@ export class STWLayout {
 
 		this._wbll = wbll;
 		this._lex();
+	}
+
+	public handleAction(action: string): string[] | undefined {
+		return this.tokens.find(token => token.symbol === "b" && token.args[1] + token.args[2] === action)?.args;
 	}
 
 	// Checks for syntax errors and tokenizes the layout
@@ -160,7 +166,7 @@ export class STWLayout {
 					(this.tokens.at(-1) as STWToken).text = token;
 					continue;
 
-				} else if ("t" === token.symbol && this.tokens.at(-1)?.symbol === "b") {
+				} else if ("t" === token.symbol && this.tokens.at(-1)?.symbol === "b" && !this.tokens.at(-1)?.text) {
 					(this.tokens.at(-1) as STWToken).text = token;
 					continue;
 
@@ -175,11 +181,22 @@ export class STWLayout {
 		}
 
 		// TODO: The key is mandatory if the button perform CRUD operations. b('url;action...')
-		this._isInteractive = this.tokens.some(token => token.symbol === "b");
+		this._acts = ACTIONS.stwnone; // Reset CRUD mode
+		this.tokens.forEach(token => {
+			if (token.symbol === "b" && token.args[1] === "stw")
+				switch (token.args[2]) {
+					case "search": this._acts |= ACTIONS.stwsearch; break;
+					case "filter": this._acts |= ACTIONS.stwfilter; break;
+					case "insert": this._acts |= ACTIONS.stwinsert; break;
+					case "update": this._acts |= ACTIONS.stwupdate; break;
+					case "delete": this._acts |= ACTIONS.stwdelete; break;
+					case "submit": this._acts |= ACTIONS.stwsubmit; break;
+				}
+		});
 	}
 
-	public get isInteractive(): boolean {
-		return this._isInteractive;
+	public acts(modes: ACTIONS): boolean {
+		return (this._acts & modes) !== 0;
 	}
 
 	public get hasTokens(): boolean {

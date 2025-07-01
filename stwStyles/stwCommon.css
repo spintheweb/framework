@@ -13,7 +13,9 @@
 	--padding: 0.5rem;
 	--padding-reduced: 0.25rem;
 	--padding-compact: 0.125rem;
-	--thickness: 0.25rem
+	--thickness: 0.25rem;
+
+	--fa-style: "fa-light";
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,14 +39,20 @@ body {
 
 h1 {
 	color: var(--special);
+	margin: var(--padding) 0;
 }
 
 dialog {
 	font-size: smaller;
+	min-width: 25rem;
+	border: thin solid;
 }
 
 dialog h1::after {
-	content: "&#10006;";
+	font-family: "Font Awesome 6 Pro";
+	content: "\e286";
+	float: right;
+	font-weight: 300;
 }
 
 article {

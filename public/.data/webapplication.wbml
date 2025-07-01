@@ -127,7 +127,7 @@
 					"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
+						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
 					}
 				},
 				{
@@ -306,7 +306,7 @@
 					"query": "select * from offices",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('Delete')"
+						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('-')b(';stw;insert')t('+')"
 					}
 				}
 			],

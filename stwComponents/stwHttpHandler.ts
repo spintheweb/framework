@@ -9,6 +9,9 @@ import { serveFile } from "@std/http/file-server";
 import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWSession } from "./stwSession.ts";
+import { STWContent } from "../stwElements/stwContent.ts";
+import { STWLayout } from "../stwContents/wbll.ts";
+import { STWElement } from "../stwElements/stwElement.ts";
 
 export async function handleHttp(request: Request, session: STWSession, sessionId: string): Promise<Response> {
     const pathname = new URL(request.url).pathname;
@@ -43,7 +46,11 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
         for (const [key, value] of (await request.formData()).entries())
             data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
 
-        if (STWSite.index.get(data.stwOrigin)?.isVisible(session, false)) {
+
+        const origin = STWSite.index.get(data.stwOrigin);
+        if (origin instanceof STWContent && origin?.isVisible(session, false)) {
+            const result = origin.getLayout(session).handleAction(data.stwAction);
+
             session.socket?.send(JSON.stringify({ method: "PUT", section: "dialog", body: `<label>Form data ${data.stwAction}</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
         }
     }
