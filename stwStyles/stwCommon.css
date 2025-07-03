@@ -59,6 +59,11 @@ article {
 	position: relative;
 }
 
+article:focus {
+	outline: none;
+	border: none;
+}
+
 input {
 	padding: var(--padding-compact);
 	margin: 0;
@@ -89,7 +94,7 @@ a,
 	background-color: var(--error);
 }
 
-.stwError>pre{
+.stwError>pre {
 	white-space: pre-wrap;
 	word-break: break-word;
 }

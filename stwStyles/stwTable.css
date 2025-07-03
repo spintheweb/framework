@@ -29,6 +29,6 @@
     color: var(--on-special);
 }
 
-.stwTable input[type="text"], input:not([type]) {
+.stwTable input[type="text"], .stwTable:not([type]) {
     width: -webkit-fill-available;
 }

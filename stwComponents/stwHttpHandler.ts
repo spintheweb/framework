@@ -10,8 +10,6 @@ import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWSession } from "./stwSession.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
-import { STWElement } from "../stwElements/stwElement.ts";
 
 export async function handleHttp(request: Request, session: STWSession, sessionId: string): Promise<Response> {
     const pathname = new URL(request.url).pathname;
@@ -42,16 +40,24 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
     } else if (request.method == "POST") {
         const maxupload = parseInt(Deno.env.get("MAX_UPLOADSIZE") || "200") * 1024;
 
+        const formData = await request.formData();
+
         const data: Record<string, any> = {};
-        for (const [key, value] of (await request.formData()).entries())
-            data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
+        for (const [key, value] of formData.entries()) {
+            if (data[key] instanceof Array)
+                data[key].push(value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value);
+            else if (typeof data[key] !== "undefined")
+                data[key] = new Array(value);
+            else
+                data[key] = value instanceof File ? { name: value.name, type: value.type, size: value.size, content: value.size < maxupload ? await value.text() : null } : value;
+        }
 
+        const origin = STWSite.index.get(data.stwOrigin), action = data.stwAction || "submit";
 
-        const origin = STWSite.index.get(data.stwOrigin);
         if (origin instanceof STWContent && origin?.isVisible(session, false)) {
-            const result = origin.getLayout(session).handleAction(data.stwAction);
+            const result = origin.getLayout(session).handleAction(action);
 
-            session.socket?.send(JSON.stringify({ method: "PUT", section: "dialog", body: `<label>Form data ${data.stwAction}</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
+            session.socket?.send(JSON.stringify({ method: "PUT", section: "dialog", body: `<label>Form data ${action}</label><pre>${JSON.stringify(data, null, 4)}</pre>` }));
         }
     }
     return response;

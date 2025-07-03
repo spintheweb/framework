@@ -85,7 +85,9 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
             });
         }
     };
-    socket.onerror = error => console.error(error);
+    socket.onerror = error => {
+        console.error(error);
+    };
     socket.onclose = () => {
         console.log(`${new Date().toISOString()}: WebSocket closed for session: [${session.sessionId}]...`);
 

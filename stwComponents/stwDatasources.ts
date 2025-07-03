@@ -20,13 +20,13 @@ const queryCache = new Map<string, { data: ISTWRecords, timestamp: number }>();
 export type ISTWRecords = ExecuteResult;
 
 interface ISTWDatasource {
-	type: "stw" | "json" | "api" | "mysql" | "postgres" | "mongodb", // Datasource type
-	host: string, // Server hostname
-	port: number, // Server port
-	user: string, // Username
-	password: string, // Password
-	database: string, // Database name
-	contentType: string // Content type (e.g., application/json)
+    type: "stw" | "json" | "api" | "mysql" | "postgres" | "mongodb", // Datasource type
+    host: string, // Server hostname
+    port: number, // Server port
+    user: string, // Username
+    password: string, // Password
+    database: string, // Database name
+    contentType: string // Content type (e.g., application/json)
 }
 export class STWDatasources {
     static datasources: Map<string, STWSite | MySQLClient | ISTWDatasource> = new Map();
@@ -39,22 +39,27 @@ export class STWDatasources {
 
                 // TODO: Connection pools
                 for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
-                    switch (settings.type) {
-                        case "api":
-                            this.datasources.set(settings.name, settings);
-                            break;
-                        case "mysql":
-                            this.datasources.set(settings.name, await new MySQLClient().connect({
-                                hostname: settings.host,
-                                username: settings.user,
-                                password: settings.password,
-                                db: settings.database,
-                            }));
-                            break;
-                        case "postgress":
-                            break;
-                        case "mongodb":
-                            break;
+                    try {
+                        switch (settings.type) {
+                            case "api":
+                                this.datasources.set(settings.name, settings);
+                                break;
+                            case "mysql":
+                                this.datasources.set(settings.name, await new MySQLClient().connect({
+                                    hostname: settings.host,
+                                    username: settings.user,
+                                    password: settings.password,
+                                    db: settings.database,
+                                }));
+                                break;
+                            case "postgress":
+                                break;
+                            case "mongodb":
+                                break;
+                        }
+                    } catch (error) {
+                        console.error(`Error processing datasource configuration: ${error.message}`);
+                        continue;
                     }
                 }
             })();
@@ -63,9 +68,8 @@ export class STWDatasources {
     }
 
     static async query(session: STWSession, content: STWContent): Promise<ISTWRecords> {
-        if (!content.dsn || !content.query) {
+        if (!content.dsn)
             return { fields: [], rows: [] };
-        }
 
         // Generate a unique key for this query based on content ID and resolved parameters
         const cacheKey = `${content._id}:${wbpl(content.params, session.placeholders)}`;
@@ -97,13 +101,13 @@ export class STWDatasources {
                 records = await fetchAPIData(session, content, datasource);
             } else if (datasource instanceof STWSite) {
                 records = await fetchWebbaseData(session, content);
-            } else if (datasource instanceof MySQLClient) {
+            } else if (datasource instanceof MySQLClient && datasource.pool && datasource.pool.size) {
                 records = await datasource.execute(wbpl(content.query, session.placeholders));
             } else {
                 records = { affectedRows: 0, fields: [], rows: [] };
             }
         } catch (error) {
-            throw error;
+            throw error; // Propagate the error
         }
 
         // 3. Store the new results in the cache if caching is enabled
@@ -123,17 +127,21 @@ export class STWDatasources {
  * @returns The result set
  */
 async function fetchWebbaseData(session: STWSession, content: STWContent): Promise<ISTWRecords> {
-	const query = content.query ? wbpl(content.query, session.placeholders) : `$[?(@._id=="${session.placeholders.get("@_id")}")]`;
-	const expr = jsonata(query);
-	let result = expr.evaluate(STWSite.wbml);
-	if (result instanceof Promise)
-		result = await result;
+    let result: any;
+    if (content.query) {
+        const expr = jsonata(wbpl(content.query, session.placeholders));
+        result = expr.evaluate(STWSite.wbml);
+    } else
+        result = STWSite.instance.find(session, session.placeholders.get("@_id") || "/");
 
-	return new Promise<ISTWRecords>(resolve => resolve({
-		affectedRows: 1,
-		fields: result && typeof result === "object" && !Array.isArray(result) ? Object.getOwnPropertyNames(result).map(name => ({ name })) : [],
-		rows: Array.isArray(result) ? result : [result]
-	}));
+    if (result instanceof Promise)
+        result = await result;
+
+    return new Promise<ISTWRecords>(resolve => resolve({
+        affectedRows: 1,
+        fields: result && typeof result === "object" && !Array.isArray(result) ? Object.getOwnPropertyNames(result).map(name => ({ name })) : [],
+        rows: Array.isArray(result) ? result : [result]
+    }));
 }
 
 /**
@@ -145,20 +153,20 @@ async function fetchWebbaseData(session: STWSession, content: STWContent): Promi
  * @returns The result set
  */
 async function fetchAPIData(session: STWSession, content: STWContent, datasource: any): Promise<ISTWRecords> {
-	const query = wbpl(content.query, session.placeholders)
-	const expr = jsonata(query);
+    const query = wbpl(content.query, session.placeholders)
+    const expr = jsonata(query);
 
-	const response = await fetch(`${datasource.host}?${wbpl(content.params, session.placeholders)}`,
-		{ headers: { "Content-Type": datasource.contentType || "application/json" } });
-	let json = await response.json();
+    const response = await fetch(`${datasource.host}?${wbpl(content.params, session.placeholders)}`,
+        { headers: { "Content-Type": datasource.contentType || "application/json" } });
+    let json = await response.json();
 
-	json = expr.evaluate(json);
-	if (json instanceof Promise)
-		json = await json;
+    json = expr.evaluate(json);
+    if (json instanceof Promise)
+        json = await json;
 
-	return new Promise<ISTWRecords>(resolve => resolve({
-		affectedRows: 1,
-		fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name })) : [],
-		rows: Array.isArray(json) ? json : [json]
-	}));
+    return new Promise<ISTWRecords>(resolve => resolve({
+        affectedRows: 1,
+        fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name })) : [],
+        rows: Array.isArray(json) ? json : [json]
+    }));
 }

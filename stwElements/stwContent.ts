@@ -29,41 +29,41 @@ export interface ISTWContentWithOptions extends ISTWContent {
 }
 
 export interface ISTWContent extends ISTWElement {
-    subtype: string;
-    cssClass: string;
-    section: string;
-    sequence: number;
-    dsn: string;
-    query: string;
-    params: string;
-    layout: object;
-    stateful?: boolean;
-    cache?: number; // Cache duration in seconds. -1 for forever, 0 or undefined for no cache.
+	subtype: string;
+	cssClass: string;
+	section: string;
+	sequence: number;
+	dsn: string;
+	query: string;
+	params: string;
+	layout: object;
+	stateful?: boolean;
+	cache?: number; // Cache duration in seconds. -1 for forever, 0 or undefined for no cache.
 }
 export abstract class STWContent extends STWElement {
-    override readonly type: string;
-    cssClass: string;
-    section: string;
-    sequence: number;
-    dsn: string;
-    query: string;
-    params: string;
-    protected layout!: Map<string, STWLayout>;
-    readonly stateful: boolean;
-    readonly cache: number;
+	override readonly type: string;
+	cssClass: string;
+	section: string;
+	sequence: number;
+	dsn: string;
+	query: string;
+	params: string;
+	protected layout!: Map<string, STWLayout>;
+	readonly stateful: boolean;
+	readonly cache: number;
 
 	public constructor(content: ISTWContent, _settings?: { [key: string]: string }) {
 		super(content);
 
-        this.type = content.subtype;
-        this.cssClass = content.cssClass;
-        this.section = content.section;
-        this.sequence = content.sequence || 0.0;
-        this.dsn = content.dsn;
-        this.query = content.query;
-        this.params = content.params;
-        this.stateful = content.stateful || false;
-        this.cache = content.cache || 0;
+		this.type = content.subtype;
+		this.cssClass = content.cssClass;
+		this.section = content.section;
+		this.sequence = content.sequence || 0.0;
+		this.dsn = content.dsn;
+		this.query = content.query;
+		this.params = content.params;
+		this.stateful = content.stateful || false;
+		this.cache = content.cache || 0;
 
 		if (!["Text", "Script", "Shortcut"].includes(this.type) && content.layout) {
 			this.layout = new Map();
@@ -129,16 +129,21 @@ export abstract class STWContent extends STWElement {
 		try {
 			records = await STWDatasources.query(session, this);
 
-			bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
-				${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
-				${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
-				<div>
-				${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
-				${await this.render(req, session, records)}
-				${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
-				</div>
-				${layout?.settings.has("frame") ? "</fieldset>" : ""}
-			</article>`;
+			bodyHtml = await this.render(req, session, records);
+
+			if (!bodyHtml) {
+				bodyHtml = layout?.settings.has("nodata") ? `<article id="${this._id}" data-sequence="${this.sequence}" class="stwNoData">${layout?.settings.get("header")}</article>` : "";
+			} else
+				bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
+					${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
+					${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
+					<div>
+					${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
+					${bodyHtml}
+					${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
+					</div>
+					${layout?.settings.has("frame") ? "</fieldset>" : ""}
+				</article>`;
 
 		} catch (error) {
 			const safeStringify = (obj: any) => {

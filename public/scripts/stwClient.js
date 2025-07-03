@@ -178,7 +178,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (href?.startsWith("/")) {
             event.preventDefault();
             //			history.pushState({}, "", target.getAttribute("href"));
-            stwWS.send(JSON.stringify({ method: "PATCH", resource: href, options: {} }));
+            if (stwWS && stwWS.readyState === WebSocket.OPEN) {
+                stwWS.send(JSON.stringify({ method: "PATCH", resource: href, options: {} }));
+            } else {
+                console.warn("WebSocket is not open, cannot send PATCH request, reload page.");
+                window.location.reload();
+            }
         }
     });
 });

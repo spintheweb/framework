@@ -63,10 +63,18 @@ export class STWTable extends STWContent {
 				break;
 		}
 
-		body += "</tbody></table>";
+		body += "</tbody><tfoot></tfoot></table>";
 
 		// Remove all <button> elements from the body
 		body = body.replace(/<button.*?<\/button>/g, "");
+
+		if (layout.acts(ACTIONS.stwinsert || ACTIONS.stwupdate || ACTIONS.stwdelete) && !layout.settings.get("disabled")) {
+			body = `<form method="post">
+				<input type="hidden" name="stwOrigin" value="${this._id}">
+				${body}
+				<button value="stwcrud" name="stwAction" type="submit">Save</button>
+			</form>`;
+		}
 
 		return body;
 	}

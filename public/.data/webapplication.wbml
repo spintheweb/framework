@@ -14,9 +14,7 @@
 			"slug": {
 				"en": "forgotpassword"
 			},
-			"visibility": {
-				"users": "guests"
-			},
+			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwForm",
 			"section": "dialog",
@@ -140,7 +138,7 @@
 						"en": "info"
 					},
 					"visibility": {
-						"guests": false
+						"guests": true
 					},
 					"subtype": "Menus",
 					"cssClass": null,
@@ -262,7 +260,7 @@
 						"en": "tabs"
 					},
 					"visibility": {
-						"guests": false
+						"guests": true
 					},
 					"subtype": "Tabs",
 					"cssClass": null,
@@ -344,7 +342,7 @@
 					"query": "select * from products limit 3",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Products\" rows=\"10\" ')lflflflf"
+						"en": "\\s('rows=\"10\" ')"
 					}
 				},
 				{
@@ -390,7 +388,9 @@
 					}
 				}
 			],
-			"visibility": {},
+			"visibility": {
+				"guests": true
+			},
 			"keywords": {
 				"en": ""
 			},
@@ -430,20 +430,26 @@
 								"en": "page"
 							},
 							"children": [],
-							"visibility": {},
+							"visibility": {
+								"guests": true
+							},
 							"keywords": {},
 							"description": {},
 							"contentType": "text/html",
 							"template": "index.html"
 						}
 					],
-					"visibility": {},
+					"visibility": {
+						"guests": true
+					},
 					"keywords": {},
 					"description": {},
 					"mainpage": "131e0e80-2ed6-11ee-b84a-515b8aa1e448"
 				}
 			],
-			"visibility": {},
+			"visibility": {
+				"guests": true
+			},
 			"keywords": {
 				"en": ""
 			},
@@ -462,7 +468,9 @@
 				"en": "page"
 			},
 			"children": [],
-			"visibility": {},
+			"visibility": {
+				"guests": true
+			},
 			"keywords": {},
 			"description": {},
 			"contentType": "text/html",
@@ -478,7 +486,7 @@
 				"en": "breadcrumbs"
 			},
 			"visibility": {
-				"guests": false
+				"guests": true
 			},
 			"subtype": "Breadcrumbs",
 			"cssClass": "stwBreadcrumbs",
@@ -495,7 +503,7 @@
 				"en": "menu"
 			},
 			"visibility": {
-				"guests": false
+				"guests": true
 			},
 			"subtype": "Menu",
 			"cssClass": "stwMenu",
@@ -528,7 +536,9 @@
 			"slug": {
 				"en": "languages"
 			},
-			"visibility": {},
+			"visibility": {
+				"guests": true
+			},
 			"subtype": "Languages",
 			"cssClass": "stwLanguages",
 			"section": "header",
@@ -538,7 +548,8 @@
 		}
 	],
 	"visibility": {
-		"administrators": true
+		"administrators": true,
+		"guests": true
 	},
 	"keywords": {
 		"en": "stw"
