@@ -20,6 +20,16 @@ export class STWAccordion extends STWContent {
 			});
 	}
 
+	public override toLocalizedJSON(session: STWSession): object {
+		return {
+			...super.toLocalizedJSON(session),
+			options: this.options.map(option => ({
+				...option,
+				name: Object.fromEntries(option.name)
+			}))
+		};
+	}
+
 	public override render(_req: Request, session: STWSession): string {
 		let body = "";
 

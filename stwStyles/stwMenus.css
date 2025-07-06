@@ -10,6 +10,7 @@
 	padding: var(--padding) 0;
 	cursor: pointer;
 	background-color: var(--bg-faint);
+	color: var(--text);
 }
 
 .stwMenus nav>menu {
@@ -26,12 +27,17 @@
 	min-width: 0 !important;
 }
 
-.stwMenus menu menu>li:has(menu)::after {
-	position: absolute;
-	top: 0;
-	right: var(--padding);
-	content: "▸";
-	font-size: 1.5rem;
+.stwMenus menu li:has(menu) > div {
+  position: relative;
+  padding-right: 2rem;
+}
+
+.stwMenus menu li:has(menu) .fa-angle-right {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .stwMenus menu li>menu {
@@ -40,19 +46,24 @@
 	background-color: var(--bg-faint);
 	padding: var(--padding) 0;
 	z-index: 1;
+	border: thin solid;
 }
 
 .stwMenus menu li li>menu {
 	top: 0;
-	left: var(--min-menu-width);
+	left: 100%;
 }
 
 .stwMenus menu li>div {
 	padding: 0 0.5rem;
-	line-height: 1.5rem;
+	line-height: 2rem;
 }
 
 .stwMenus menu li:hover>menu {
 	display: inherit;
 }
 
+.stwMenus menu li:not(:has(article)):hover {
+  background-color: var(--special-hover);
+  color: var(--on-special);
+}

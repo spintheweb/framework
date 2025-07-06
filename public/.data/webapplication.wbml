@@ -155,7 +155,6 @@
 							"name": {
 								"en": "Animals"
 							},
-							"ref": "/home",
 							"options": [
 								{
 									"name": {
@@ -173,7 +172,6 @@
 									"name": {
 										"en": "Bears"
 									},
-									"ref": "/home",
 									"options": [
 										{
 											"name": {
@@ -233,8 +231,7 @@
 							"name": {
 								"en": "Spin the Web Project"
 							},
-							"ref": "https://www.spintheweb.org",
-							"target": "_blank"
+							"ref": "https://www.spintheweb.org"
 						},
 						{
 							"name": {
@@ -242,8 +239,7 @@
 							}
 						},
 						{
-							"ref": "https://www.keyvisions.it",
-							"target": "_blank"
+							"ref": "https://www.keyvisions.it"
 						},
 						{
 							"ref": "4afeeae0-2a4e-11ee-9a5d-8ff6b23b06b9"
@@ -346,6 +342,29 @@
 					}
 				},
 				{
+					"_id": "b7e6e6b0-1a2b-4c3d-9e8f-123456789abc",
+					"type": "Content",
+					"name": {
+						"en": "Calendar"
+					},
+					"slug": {
+						"en": "calendar"
+					},
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "Calendar",
+					"cssClass": "",
+					"section": "main",
+					"sequence": "2",
+					"dsn": "",
+					"query": "",
+					"params": "",
+					"layout": {
+						"en": "\\s('caption=\"Calendar\"')"
+					}
+				},
+				{
 					"_id": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371",
 					"type": "Content",
 					"name": {
@@ -354,8 +373,10 @@
 					"slug": {
 						"en": "objects"
 					},
-					"visibility": {},
-					"subtype": "Table",
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "List",
 					"cssClass": "",
 					"section": "",
 					"sequence": "5",
@@ -363,7 +384,7 @@
 					"query": "$.({\"name\":name,\"color\":data.color})",
 					"params": "id=3&id=5&id=10",
 					"layout": {
-						"en": "\\s('caption=\"Objects\" rows=\"3\" ')lflf"
+						"en": "\\s('header=\"This data comes from the API: https://api.restful-api.dev/objects\"')"
 					}
 				},
 				{

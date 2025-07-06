@@ -26,10 +26,10 @@
 			"section": "dialog",
 			"sequence": "1",
 			"dsn": "stw",
-			"query": "",
+			"query": "[\"_id\", \"name\", \"slug\", \"type\"]",
 			"params": "",
 			"layout": {
-				"en": "\\s('caption=\"@@name\" key=\"_id\"')hl('Name')el('Slug')el('Section')el('Sequence')el('CSS Class')el('Type')d(';Text;2;Text;Text')\\rb(';Save;;stw;update;stwElement')"
+				"en": "\\s('caption=\"@@name (@@slug)\" key=\"_id\"')"
 			}
 		},
 		{

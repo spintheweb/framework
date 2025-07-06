@@ -12,9 +12,6 @@
 .stwHTabs > div {
 	border-bottom: thin solid var(--border);
 }
-.stwHTabs > div.stwSelectedBorder {
-	border-color: var(--special);
-}
 
 .stwVTabs > div {
 	border-right: thin solid var(--border);
@@ -25,7 +22,7 @@
 	padding: var(--thickness) var(--padding);
 	cursor: pointer;
 	margin-left: var(--padding);
-	border-top: thin solid;
+	border-top: thin solid var(--text);
 }
 
 .stwVTabs dt {

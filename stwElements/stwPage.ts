@@ -21,6 +21,13 @@ export class STWPage extends STWElement {
 		this.template = page.template || "/index.html";
 	}
 
+	public override toLocalizedJSON(session: STWSession): object {
+		return {
+			...super.toLocalizedJSON(session),
+			template: this.template
+		};
+	}
+
 	/**
 	 * Given a page, determine all the visible contents: these are not only its children, but also 
 	 * contents that are direct children of the parents areas up to the site. 

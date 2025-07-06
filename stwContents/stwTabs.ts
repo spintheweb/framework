@@ -47,16 +47,15 @@ export class STWTabs extends STWContent {
 					const tabs = self.document.getElementById(id);
 					tabs.querySelector("dl").addEventListener("click", event => {
 						const target = event.target.closest("dt");
-						if (target && !target.classList.contains("stwSelected")) {
-							event.currentTarget.querySelector("dt.stwSelected")?.classList.remove("stwSelected");
-							target.classList.add("stwSelected");
-							target.parentElement.classList.remove("stwSelectedBorder");
-							event.currentTarget.querySelector("dd article").id = "refreshSTWTab";
-							stwWS.send(JSON.stringify({ method: "PATCH", resource: target.getAttribute("data-ref"), options: { placeholder: "refreshSTWTab" } }));
-						} else if (target && target.classList.contains("stwSelected")) {
-							target.classList.remove("stwSelected");
-							target.parentElement.classList.add("stwSelectedBorder");
-							event.currentTarget.querySelector("dd article").style.display = "none";
+						if (target) {
+							event.currentTarget.querySelector("dd").innerHTML = '<article id="refreshSTWTab"></article>';
+							if (target.classList.contains("stwSelected"))
+								target.classList.remove("stwSelected");
+							else {
+								event.currentTarget.querySelector("dt.stwSelected")?.classList.remove("stwSelected");
+								target.classList.add("stwSelected");
+								stwWS.send(JSON.stringify({ method: "PATCH", resource: target.getAttribute("data-ref"), options: { placeholder: "refreshSTWTab" } }));
+							}
 						}
 					});
 				}

@@ -78,6 +78,21 @@ export abstract class STWElement {
 		return this[name].get(session.lang) || this[name].keys().next().value || "undefined";
 	}
 
+	public toLocalizedJSON(session: STWSession): object {
+		return {
+			_id: this._id,
+			type: this.type,
+			subtype: (this as any).subtype || this.type,
+			name: this.localize(session, "name"),
+			slug: this.localize(session, "slug"),
+			keywords: this.localize(session, "keywords"),
+			description: this.localize(session, "description"),
+			visibility: Object.fromEntries(this.visibility),
+			modified: this.modified,
+			children: this.children.map(child => child._id)
+		};
+	}
+
 	/**
 	 * Determines the Role Based Visibility of the element climbing up the webbase hierarchy if necessary.
 	 * By default an element is not visible except for the site's mainpage. Given the session roles, 

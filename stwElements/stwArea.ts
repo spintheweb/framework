@@ -24,6 +24,14 @@ export class STWArea extends STWElement {
 		this.version = area.version || `v1.0.0 ${new Date().toISOString()}`
 	}
 
+	public override toLocalizedJSON(session: STWSession): object {
+		return {
+			...super.toLocalizedJSON(session),
+			mainpage: this.mainpage,
+			version: this.version
+		};
+	}
+
 	public override serve(req: Request, session: STWSession): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 

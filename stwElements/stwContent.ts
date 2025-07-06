@@ -9,19 +9,18 @@ import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts"
 import { STWSession } from "../stwComponents/stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
+import { wbpl } from "../stwComponents/wbpl.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenus} and {@linkcode STWTabs}
  * 
  * @prop name: STWLocalized
  * @prop ref?: string
- * @prop target?: string
  * @prop options?: ISTWOption[]
  */
 export interface ISTWOption {
 	name: STWLocalized;
 	ref?: string;
-	target?: string;
 	options?: ISTWOption[];
 }
 export interface ISTWContentWithOptions extends ISTWContent {
@@ -78,6 +77,20 @@ export abstract class STWContent extends STWElement {
 			this.layout = new Map<string, STWLayout>(Object.entries(content.layout || {}));
 	}
 
+	public override toLocalizedJSON(session: STWSession): object {
+		return {
+			...super.toLocalizedJSON(session),
+			type: this.type,
+			cssClass: this.cssClass,
+			section: this.section,
+			sequence: this.sequence,
+			dsn: this.dsn,
+			query: this.query,
+			params: this.params,
+			layout: this.layout.get(session.lang)?.wbll || ""
+		};
+	}
+
 	public getLayout(session: STWSession): STWLayout {
 		return this.layout.get(session.lang) || new STWLayout("");
 	}
@@ -129,18 +142,23 @@ export abstract class STWContent extends STWElement {
 		try {
 			records = await STWDatasources.query(session, this);
 
+			const placeholders = new Map(session.placeholders);
+			if (records.rows?.length)
+				for (const [name, value] of Object.entries(records.rows[0]))
+					placeholders.set(`@@${name}`, String(value));
+
 			bodyHtml = await this.render(req, session, records);
 
 			if (!bodyHtml) {
-				bodyHtml = layout?.settings.has("nodata") ? `<article id="${this._id}" data-sequence="${this.sequence}" class="stwNoData">${layout?.settings.get("header")}</article>` : "";
+				bodyHtml = layout?.settings.has("nodata") ? `<article id="${this._id}" data-sequence="${this.sequence}" class="stwNoData">${wbpl(layout?.settings.get("nodata") || "", placeholders)}</article>` : "";
 			} else
 				bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
-					${layout?.settings.has("frame") ? `<fieldset><legend>${layout?.settings.get("frame")}</legend>` : ""}
-					${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${layout?.settings.get("caption")}</h1>` : ""}
+					${layout?.settings.has("frame") ? `<fieldset><legend>${wbpl(layout?.settings.get("frame") || "", placeholders)}</legend>` : ""}
+					${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${wbpl(layout?.settings.get("caption") || "", placeholders)}</h1>` : ""}
 					<div>
-					${layout?.settings.has("header") ? `<header>${layout?.settings.get("header")}</header>` : ""}
+					${layout?.settings.has("header") ? `<header>${wbpl(layout?.settings.get("header") || "", placeholders)}</header>` : ""}
 					${bodyHtml}
-					${layout?.settings.has("footer") ? `<footer>${layout?.settings.get("footer")}</footer>` : ""}
+					${layout?.settings.has("footer") ? `<footer>${wbpl(layout?.settings.get("footer") || "", placeholders)}</footer>` : ""}
 					</div>
 					${layout?.settings.has("frame") ? "</fieldset>" : ""}
 				</article>`;

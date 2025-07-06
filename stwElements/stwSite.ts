@@ -37,6 +37,16 @@ export class STWSite extends STWElement {
 		STWSite.index.set(site._id, this);
 	}
 
+	public override toLocalizedJSON(session: STWSession): object {
+		return {
+			...super.toLocalizedJSON(session),
+			langs: this.langs,
+			datasources: Object.fromEntries(this.datasources),
+			mainpage: this.mainpage,
+			version: this.version
+		};
+	}
+
 	/**
 	 * Loads webbase in memory if not loaded and return the singleton.
 	 * 

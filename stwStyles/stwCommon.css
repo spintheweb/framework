@@ -8,12 +8,14 @@
 	--special: rgb(23, 145, 207);
 	--special-hover: rgba(23, 145, 207, 0.5);
 	--on-special: hsl(0, 0%, 98%);
-	--error: hsl(0, 80%, 50%);
+	--error: brown;
 
 	--padding: 0.5rem;
 	--padding-reduced: 0.25rem;
 	--padding-compact: 0.125rem;
 	--thickness: 0.25rem;
+
+	--min-menu-width: 12rem;
 
 	--fa-style: "fa-light";
 }
