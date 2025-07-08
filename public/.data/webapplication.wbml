@@ -302,6 +302,29 @@
 					"layout": {
 						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('-')b(';stw;insert')t('+')"
 					}
+				},
+				{
+					"_id": "b7e6e6b0-1a2b-4c3d-9e8f-123456789abd",
+					"type": "Content",
+					"name": {
+						"en": "Calendar"
+					},
+					"slug": {
+						"en": "calendar"
+					},
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "Calendar",
+					"cssClass": "",
+					"section": "main",
+					"sequence": "33",
+					"dsn": "",
+					"query": "",
+					"params": "",
+					"layout": {
+						"en": "\\s('caption=\"Calendar\" period=\"monthly\" key=\"date\"')"
+					}
 				}
 			],
 			"visibility": {},

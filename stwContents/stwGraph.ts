@@ -14,7 +14,7 @@ export class STWGraph extends STWContent {
 		super(content);
 	}
 
-	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `TODO: Render ${this.constructor.name} <pre>${_records}</pre>`;
 	}
 }

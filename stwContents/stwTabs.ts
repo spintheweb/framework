@@ -21,7 +21,7 @@ export class STWTabs extends STWContent {
 			});
 	}
 
-	public override render(_req: Request, session: STWSession): string {
+	public override async render(_req: Request, session: STWSession): Promise<string> {
 		const layout = this.layout.get(session.lang) as STWLayout;
 
 		let body = "<div>", id = "";

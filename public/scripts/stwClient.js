@@ -163,6 +163,7 @@ document.addEventListener("mousedown", function (event) {
 window.addEventListener("click", function (e) {
     const article = e.target.closest("article[id]");
     if (document.getElementById("stwStudio") && article && e.altKey) {
+        e.stopPropagation();
         e.preventDefault();
         stwWS.send(JSON.stringify({ method: 'PATCH', resource: `/stws/editcontent?_id=${article.id}`, options: { placeholder: '' } }));
     }

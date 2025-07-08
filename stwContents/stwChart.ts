@@ -19,7 +19,7 @@ export class STWChart extends STWContent {
 		super(content);
 	}
 
-	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<canvas id="Chart${this._id}"></canvas>
 			<script name="STWChart" onload="fnSTWChart('Chart${this._id}')">
 				function fnSTWChart(id) {

@@ -12,7 +12,7 @@ export class STWBreadcrumbs extends STWContent {
 	public constructor(content: ISTWContent) {
 		super(content);
 	}
-	public override render(_req: Request, session: STWSession): string {
+	public override async render(_req: Request, session: STWSession): Promise<string> {
 		let body = "";
 		for (let element = session.site.find(session, new URL(_req.url).pathname); element; element = element.parent)
 			if (element.isVisible(session) & 1 && element.pathname(session))

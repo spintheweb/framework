@@ -102,7 +102,25 @@ export class STWDatasources {
 			} else if (datasource instanceof STWSite) {
 				records = await fetchWebbaseData(session, content);
 			} else if (datasource instanceof MySQLClient) {
-				records = await datasource.execute(wbpl(content.query, session.placeholders));
+				try {
+					records = await datasource.execute(wbpl(content.query, session.placeholders));
+				} catch (error) {
+					// Try to reconnect once if connection is lost
+					if (error.message && error.message.match(/(connection|closed|lost|reset|gone)/i)) {
+						// Remove the broken datasource and reset initialization promise
+						STWDatasources.datasources.delete(content.dsn);
+						STWDatasources.#initializationPromise = null;
+						await this.initialize(session);
+						const newDatasource = STWDatasources.datasources.get(content.dsn);
+						if (newDatasource instanceof MySQLClient) {
+							records = await newDatasource.execute(wbpl(content.query, session.placeholders));
+						} else {
+							throw new Error("Failed to re-establish MySQL connection.");
+						}
+					} else {
+						throw error;
+					}
+				}
 			} else {
 				records = { affectedRows: 0, fields: [], rows: [] };
 			}

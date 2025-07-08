@@ -25,7 +25,7 @@ export class STWForm extends STWContent {
 
 		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
 		if (!layout.hasTokens) {
-			this.layout.set(session.lang, new STWLayout(layout.wbll + "lf".repeat(fields.length)));
+			this.layout.set(session.lang, new STWLayout(layout.wbll + "l\\tf\\r".repeat(fields.length)));
 			layout = this.getLayout(session);
 		}
 

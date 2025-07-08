@@ -14,7 +14,7 @@ export class STWImagemap extends STWContent {
 	}
 	
 	// TODO: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area
-	public override render(_req: Request, _session: STWSession): string {
+	public override async render(_req: Request, _session: STWSession): Promise<string> {
 		return `TODO: Render ${this.constructor.name} for ${_session.user}`;
 	}
 }

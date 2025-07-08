@@ -1,3 +1,78 @@
 .stwCalendar {
-    /* Content-specific styles using global color variables */
+    width: 100%;
+    max-width: 100%;
+}
+
+.stwCalendarTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.stwCalendarTable th,
+.stwCalendarTable td {
+    border: 1px solid var(--border);
+    vertical-align: top;
+    height: 6em;
+    min-height: 5em;
+    padding: 0.25em;
+    background: var(--bg);
+    box-sizing: border-box;
+}
+
+.stwCalendarTable th {
+    background: var(--bg-special);
+    color: var(--on-special);
+    text-align: center;
+    font-weight: bold;
+    height: 2.5em;
+}
+
+.stwCalendarDayNum {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 0.25em;
+    display: block;
+}
+
+.stwCalendarRecord {
+    margin-top: 0.25em;
+    font-size: 0.95em;
+    background: var(--bg-faint);
+    padding: 0.1em 0.3em;
+}
+
+.stwCalendarToday {
+    background: var(--special-hover) !important;
+    color: var(--on-special) !important;
+    border: 2px solid var(--special) !important;
+}
+
+.stwCalendarMonthHeader {
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    background: var(--bg-faint);
+    color: var(--text);
+    padding: var(--padding-reduced);
+}
+
+.stwCalendarGroup {
+    margin-bottom: var(--padding);
+    padding: var(--padding-reduced);
+    border-left: 3px solid var(--special);
+    background: var(--bg);
+}
+
+.stwCalendarGroup:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+.stwCalendar .stwCalendarGroup > * {
+    margin-bottom: var(--padding-compact);
+}
+
+.stwCalendar .stwCalendarGroup > *:last-child {
+    margin-bottom: 0;
 }

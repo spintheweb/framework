@@ -30,7 +30,7 @@ export class STWAccordion extends STWContent {
 		};
 	}
 
-	public override render(_req: Request, session: STWSession): string {
+	public override async render(_req: Request, session: STWSession): Promise<string> {
 		let body = "";
 
 		this.options.forEach(option => {

@@ -19,7 +19,7 @@ export class STWGeomap extends STWContent {
 		super(content);
 	}
 
-	public override render(_req: Request, _session: STWSession, _records: ISTWRecords): string {
+	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<div id="Map${this._id}"></div>
 			<script name="STWGeomap" onload="fnSTWGeomap('Map${this._id}')">
 				function fnSTWGeomap(id) {

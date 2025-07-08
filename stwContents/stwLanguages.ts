@@ -20,7 +20,7 @@ export class STWLanguages extends STWContent {
 		return super.serve(_req, session, undefined);
 	}
 
-	public override render(_req: Request, session: STWSession): string {
+	public override async render(_req: Request, session: STWSession): Promise<string> {
 		return `<nav>${session.site.langs.reduce((langs, lang) => `${langs}<a href="/stw/language/${lang}">${lang.toUpperCase()}</a> `, "")}</nav>`;
 	}
 }

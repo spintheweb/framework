@@ -36,7 +36,7 @@ export class STWMenus extends STWContent {
 		};
 	}
 
-	public override render(_req: Request, session: STWSession): string {
+	public override async render(_req: Request, session: STWSession): Promise<string> {
 		let body: string = "";
 		this.options.forEach(option => subrender(option));
 		if (this.layout.get(session.lang)?.settings.has("short"))
