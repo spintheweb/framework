@@ -7,7 +7,6 @@
 **/
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContentWithOptions, ISTWOption } from "../stwElements/stwContent.ts";
-import { STWElement } from "../stwElements/stwElement.ts";
 
 export class STWMenus extends STWContent {
 	options: ISTWOption[] = [];
@@ -44,23 +43,35 @@ export class STWMenus extends STWContent {
 		return `<nav><menu>${body}</menu></nav>`;
 
 		function subrender(option: ISTWOption, iteration: boolean = false): void {
-			const element = session.site.find(session, option.ref || "");
-
+			let element = session.site.find(session, option.ref || "");
 			let href = option.ref;
-			if (element)
-				href = element?.pathname(session);
-			const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : href);
 
-			if (name === "-")
+			// If element is Site or Area, use its mainpage if available and visible
+			if (element && "mainpage" in element && element.mainpage) {
+				const mainPage = session.site.find(session, element.mainpage as string);
+				if (mainPage && mainPage.isVisible(session)) {
+					element = mainPage;
+					href = mainPage.pathname(session);
+				} else {
+					href = ""; // No visible main page
+				}
+			} else if (element) {
+				href = element.pathname(session);
+			}
+
+			const name = option?.name.get(session.lang) || element?.localize(session, "name") || href;
+
+			if (name === "-") {
 				body += iteration ? "<hr>" : "";
-			else if (!element || element.isVisible(session)) {
-				if (element instanceof STWContent)
-					body += `<li><article id="${crypto.randomUUID()}" href="${element._id}${(new URL(_req.url)).search}"></article></div>`;
-				else if (option.options?.length) {
+			} else if (!element || element.isVisible(session)) {
+				if (element instanceof STWContent) {
+					body += `<li><article id="${crypto.randomUUID()}" href="${element._id}${(new URL(_req.url)).search}"></article>`;
+				} else if (option.options?.length) {
 					body += `<li><div>${!option.options?.length && href ? `<a href="${href}">${name}</a>` : name}<i class="fa-light fa-angle-right"></i></div>`;
 					body += "<menu>", option.options.forEach(option => subrender(option, true)), body += "</menu>";
-				} else
+				} else {
 					body += `<li><div>${!option.options?.length && href ? `<a href="${href}">${name}</a>` : name}</div>`;
+				}
 				body += "</li>";
 			}
 		}
