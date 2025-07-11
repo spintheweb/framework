@@ -24,7 +24,9 @@ const SYNTAX: RegExp = new RegExp([
 	/(?<error>[\S])/ // Anything else is an error
 ].map(r => r.source).join('|'), "gmu");
 
-export enum ACTIONS { stwall = 63, stwnone = 0, stwinsert = 1, stwupdate = 2, stwdelete = 4, stwsearch = 8, stwfilter = 16, stwsubmit = 32 };
+export enum ACTIONS {
+	stwnone = 0, stwinsert = 1, stwupdate = 2, stwdelete = 4, stwsearch = 8, stwfilter = 16, stwsubmit = 32, stwlogon = 64, stwlogoff = 128, stwpwdreset = 256, stwany = ~0
+};
 
 class STWToken {
 	symbol: string; // Symbol indicates what HTML tag the token maps to, it'is a mnemonic, e.g., `a` for anchor/link, `b` for button, `c` for checkbox, `r` for radiobox...
@@ -52,14 +54,15 @@ export class STWLayout {
 	private tokens: STWToken[] = [];
 	public groupAttributes: string = ""; // Holds attributes from the \A token
 	public blockAttributes: string = ""; // Holds attributes from a pre-flight \a token
-	private _acts = ACTIONS.stwnone; // Indicates how the layout interacts
+	private _acts: ACTIONS = ACTIONS.stwnone; // Indicates how the layout interacts
 	private static tokenHandlers: Map<string, (token: STWToken, inline: boolean) => string>;
 
 	private _render?: (req: Request, session: STWSession, fields: string[], ph: Map<string, string>, wbpl: (text: string, ph: Map<string, string>) => string) => string;
 
 	settings: Map<string, string> = new Map([
 		["rows", "25"],
-		["period", "month"]
+		["period", "month"],
+		["disabled", "false"],
 	]);
 
 	public constructor(wbll: string) {
@@ -117,7 +120,8 @@ export class STWLayout {
 					}
 
 					if (token.symbol === "\\s")
-						this.settings = new Map(token.attrs);
+						for (const [key, value] of token.attrs)
+							this.settings.set(key, value);
 					else if (token.symbol === "\\A")
 						this.groupAttributes = pattern[1] || "";
 					else if (token.symbol === "\\a") {
@@ -191,6 +195,9 @@ export class STWLayout {
 					case "update": this._acts |= ACTIONS.stwupdate; break;
 					case "delete": this._acts |= ACTIONS.stwdelete; break;
 					case "submit": this._acts |= ACTIONS.stwsubmit; break;
+					case "logon": this._acts |= ACTIONS.stwlogon; break;
+					case "logoff": this._acts |= ACTIONS.stwlogoff; break;
+					case "pwdreset": this._acts |= ACTIONS.stwpwdreset; break;
 				}
 		});
 	}
@@ -261,47 +268,63 @@ export class STWLayout {
 			token.attrs.delete("value");
 			token.attrs.delete("href");
 
+			// Standalone "a": use current field value as href and advance cursor
+			if (!token.args[0]) {
+				return `{
+					let href = encodeURIComponent(fieldValue);
+					fldCursor(); // Advance cursor after using fieldValue for href
+					const textContent = (() => {
+						let html = "";
+						${token.text ? (STWLayout.tokenHandlers.get(token.text.symbol)?.(token.text, false) ?? "") : "html+=fieldValue;"}
+						return html;
+					})();
+					html += \`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
+				}`;
+			}
+
+			// "a(...)" with params: use baseUrl and query string logic
 			const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
 			const textHandler = STWLayout.tokenHandlers.get(innerToken.symbol);
 			const textCode = textHandler ? textHandler(innerToken, false) : "";
 
 			const baseUrl = token.args[0] || "";
-			const params = token.params;
 
-			// We generate a block scope to create a private scope for building the href.
-			// This code is context-aware: it generates a relative href on the client
-			// and an absolute href on the server for unit testing.
 			return `{
-                let href = "";
-                const baseUrl = wbpl(\`${baseUrl.replace(/`/g, '\\`')}\`, ph);
-                const hasProtocol = /^[a-z]+:\\/\\//i.test(baseUrl);
+				let href = "";
+				const baseUrl = wbpl(\`${baseUrl.replace(/`/g, '\\`')}\`, ph);
+				const hasProtocol = /^[a-z]+:\\/\\//i.test(baseUrl);
 
-                const queryParams = new URLSearchParams();
-                let p_name, p_val;
-                ${params.map(param => {
-				const nameArg = `"${param.args[0] || ''}" || fieldName`;
-				const valueArg = param.args[1] ? `wbpl(\`${param.args[1].replace(/`/g, '\\`')}\`, ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
-				let code = `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) queryParams.set(p_name, p_val);`;
-				if (!param.args[0])
-					code += `fldCursor();`;
-				return code;
+				const queryParams = new URLSearchParams();
+				let p_name, p_val;
+				let fldMove = 0;
+				${token.params.map(param => {
+				if (param.symbol === "p") {
+					const nameArg = `"${param.args[0] || ''}" || fieldName`;
+					const valueArg = param.args[1] ? `wbpl(\`${param.args[1].replace(/`/g, '\\`')}\`, ph)` : `(ph.get("@@" + (${nameArg})) || "")`;
+					return `p_name = ${nameArg}; p_val = ${valueArg}; if (p_val) queryParams.set(p_name, p_val); fldCursor();`;
+				} else if (param.symbol === "<") {
+					return `fldCursor(-1);`;
+				} else if (param.symbol === ">") {
+					return `fldCursor();`;
+				}
+				return "";
 			}).join('\n')}
-                const queryString = queryParams.toString();
-                if (hasProtocol) {
-                    const url = new URL(baseUrl);
-                    queryParams.forEach((value, key) => url.searchParams.set(key, value));
-                    href = url.href;
-                } else if (typeof window === 'undefined') {
-                    const base = req.url || 'http://localhost';
-                    const url = new URL(baseUrl, base);
-                    queryParams.forEach((value, key) => url.searchParams.set(key, value));
-                    href = url.href;
-                } else {
-                    href = baseUrl + (queryString ? '?' + queryString : '');
-                }
-                const textContent = (() => { let html=""; ${textCode} return html; })();
-                html+=\`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
-            }`;
+				const queryString = queryParams.toString();
+				if (hasProtocol) {
+					const url = new URL(baseUrl);
+					queryParams.forEach((value, key) => url.searchParams.set(key, value));
+					href = url.href;
+				} else if (typeof window === 'undefined') {
+					const base = req.url || 'http://localhost';
+					const url = new URL(baseUrl, base);
+					queryParams.forEach((value, key) => url.searchParams.set(key, value));
+					href = url.href;
+				} else {
+					href = baseUrl + (queryString ? '?' + queryString : '');
+				}
+				const textContent = (() => { let html=""; ${textCode} return html; })();
+				html+=\` <a href="\${href}"${attributes(token)}>\${textContent.trim()}</a>\`;
+			}`;
 		});
 
 		handlers.set("b", (token) => {
@@ -474,4 +497,11 @@ export class STWLayout {
 		fn += "return html;";
 		return fn;
 	}
+}
+
+export function isTruthy(val: string | undefined): boolean {
+	if (!val || val === "false") return false;
+	if (val === "true") return true;
+	const num = Number(val);
+	return !isNaN(num) && num !== 0;
 }

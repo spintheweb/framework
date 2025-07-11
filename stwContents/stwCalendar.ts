@@ -19,7 +19,7 @@ export class STWCalendar extends STWContent {
         let layout = this.getLayout(session);
         const period = layout.settings.get("period") || "monthly";
         const datetimeKey = layout.settings.get("key") || "date";
-        const today = layout.settings.get("date") ? new Date(layout.settings.get("date")) : new Date();
+        const today = new Date(layout.settings.get("date") || Date.now());
 
         const fields = records.fields?.map(f => f.name) || Object.keys(records.rows?.[0] || {});
         if (!layout.hasTokens) {
@@ -51,31 +51,35 @@ export class STWCalendar extends STWContent {
             const month = today.getMonth();
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
-            const firstWeekday = firstDay.getDay(); // 0=Sunday, 1=Monday, ...
             const daysInMonth = lastDay.getDate();
 
-            const locale = session.lang || "en";
+            const firstDayOfWeek = getFirstDayOfWeek(session);
+
+            // Build week day headers starting from firstDayOfWeek
             const weekDays = [];
             const baseDate = new Date(2020, 5, 7); // Sunday
             for (let i = 0; i < 7; i++) {
                 const day = new Date(baseDate);
-                day.setDate(baseDate.getDate() + i);
-                weekDays.push(day.toLocaleDateString(locale, { weekday: "short" }));
+                day.setDate(baseDate.getDate() + ((i + firstDayOfWeek) % 7));
+                weekDays.push(day.toLocaleDateString(session.lang, { weekday: "short" }));
             }
-            const monthName = today.toLocaleDateString(locale, { month: "long", year: "numeric" });
+            const monthName = today.toLocaleDateString(session.lang, { month: "long", year: "numeric" });
 
             body += `<div class="stwCalendarMonthHeader">${monthName}</div>`;
             body += `<table class="stwCalendarTable"><thead><tr>`;
             for (const wd of weekDays) body += `<th>${wd}</th>`;
             body += `</tr></thead><tbody><tr>`;
 
+            // Calculate the weekday index of the first day of the month (adjusted for firstDayOfWeek)
+            const firstWeekday = (firstDay.getDay() - firstDayOfWeek + 7) % 7;
+
             // Fill initial empty cells
             for (let i = 0; i < firstWeekday; i++) body += `<td></td>`;
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateObj = new Date(year, month, day);
-                const dateStr = dateObj.toISOString().slice(0, 10);
-                const isToday = dateStr === (new Date()).toISOString().slice(0, 10);
+                const dateStr = toLocalDateString(dateObj, session);
+                const isToday = dateStr === toLocalDateString(new Date(), session);
                 body += `<td${isToday ? ' class="stwCalendarToday"' : ''}><span class="stwCalendarDayNum">${day}</span>`;
                 for (const row of recordMap[dateStr] || []) {
                     const rowPlaceholders = new Map(placeholders);
@@ -96,7 +100,7 @@ export class STWCalendar extends STWContent {
             body += `</tr></tbody></table>`;
         } else if (period === "weekly") {
             // Determine first day of week based on session language/locale
-            const firstDayOfWeek = getFirstDayOfWeek(session.lang || "en");
+            const firstDayOfWeek = getFirstDayOfWeek(session);
             const weekStart = new Date(today);
             // Calculate offset from today to the first day of the week
             const offset = (today.getDay() - firstDayOfWeek + 7) % 7;
@@ -138,13 +142,17 @@ export class STWCalendar extends STWContent {
     }
 }
 
-function getFirstDayOfWeek(locale: string): number {
-    // Sunday = 0, Monday = 1, etc.
-    // Common mapping, can be extended as needed
+function getFirstDayOfWeek(session: STWSession): number {
     const sundayLocales = ["en-US", "en-CA", "en-AU", "en-PH", "zh-CN", "ja-JP"];
-    if (sundayLocales.some(l => locale.startsWith(l.split("-")[0]))) return 0;
-    // Most of Europe, ISO 8601, etc. use Monday
+    if (sundayLocales.some(l => session.langs[0].startsWith(l.split("-")[0]))) return 0;
     return 1;
+}
+
+function toLocalDateString(date: Date, session: STWSession): string {
+    const d = new Date(date.toLocaleString(session.langs[0], { timeZone: session.tz }));
+    return d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
 }
 
 STWFactory.Calendar = STWCalendar;

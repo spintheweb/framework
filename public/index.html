@@ -8,6 +8,7 @@
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
 	<script src="https://kit.fontawesome.com/a29c3d2fa4.js" crossorigin="anonymous"></script>
+	<link href="/styles/style.css" rel="stylesheet">
 	<link href="/styles/stwStyle.css" rel="stylesheet">
 	<script src="/scripts/stwClient.js"></script>
 	<!--script src="https://www.openlayers.org/api/OpenLayers.js"></script-->
@@ -16,10 +17,10 @@
 
 <body>
 	<header id="header"></header>
-	<div>
-		<aside id="leftSidebar"></aside>
-		<main id="main"></main>
-		<aside id="rightSidebar"></aside>
+	<div style="display: flex; gap:0.25rem;">
+		<aside id="leftSidebar" style="flex-shrink: 0;"></aside>
+		<main id="main" style="flex-grow: 1;"></main>
+		<aside id="rightSidebar" style="flex-shrink: 0;"></aside>
 	</div>
 	<footer id="footer"></footer>
 </body>

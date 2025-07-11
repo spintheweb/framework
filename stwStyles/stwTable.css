@@ -32,3 +32,9 @@
 .stwTable input[type="text"], .stwTable input:not([type]) {
     width: -webkit-fill-available;
 }
+
+.stwTable button {
+	padding: var(--padding);
+	min-width: 7rem;
+	margin: var(--padding) 0;
+}

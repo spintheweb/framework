@@ -5,9 +5,8 @@
 }
 
 .stwAccordion dt {
-	border-top: thin solid;
-	font-weight: bold;
-	cursor: pointer;
+	border-top: thin solid var(--border);
+	padding: var(--padding-reduced) 0 !important;
 }
 
 .stwAccordion dd {

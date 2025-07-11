@@ -12,11 +12,26 @@ Spin the Web Studio is a webbaselet designed for building and managing Spin the 
 
 ### Key Features
 
+- **Webbase Structure Management:**  
+  Visualize the entire webbase (site, areas, pages, contents) as a tree. Edit elements in memory and persist changes to `./public/.data/webapplication.wbml`.
+
+- **Search:**  
+  Quickly find any element within the webbase structure.
+
+- **User & Role Management:**  
+  Manage users and roles via `./public/.data/users.json`.
+
+- **Datasource Management:**  
+  Configure and manage datasources via `./public/.data/datasources.json`.
+
+- **Public Folder Interaction:**  
+  Browse, edit, and manage files in the `./public` folder, including HTML, CSS, and JavaScript assets.
+
+- **Debugging Tools:**  
+  Access debugging features to inspect and troubleshoot the application.
+
 - **Live Preview:**  
   Instantly see how changes affect the site, with support for multiple languages and user roles.
-
-- **Data Source Management:**  
-  Configure and connect to various data sources (webbase, SQL, API, etc.).
 
 - **Layout Designer:**  
   Edit and preview WBLL (Webbase Layout Language) templates, manage placeholders, and control responsive layouts.
@@ -33,3 +48,6 @@ Spin the Web Studio is a webbaselet designed for building and managing Spin the 
   Rapidly prototype and extend site features with code and visual tools.
 - **Site Administrators:**  
   Oversee structure, permissions, and localization from a central dashboard.
+
+> **Note:**  
+> Edits are performed in memory and must be explicitly saved to persist changes to disk. Access to management features should be restricted to authorized users.

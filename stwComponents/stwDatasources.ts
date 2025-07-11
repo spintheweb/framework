@@ -71,21 +71,17 @@ export class STWDatasources {
 		if (!content.dsn)
 			return { fields: [], rows: [] };
 
-		// Generate a unique key for this query based on content ID and resolved parameters
 		const cacheKey = `${content._id}:${wbpl(content.params, session.placeholders)}`;
 
-		// 1. Check cache if caching is enabled for this content
 		if (content.cache && queryCache.has(cacheKey)) {
 			const cached = queryCache.get(cacheKey)!;
 			const isCacheValid = content.cache === -1 || (Date.now() - cached.timestamp < content.cache * 1000);
-
 			if (isCacheValid) {
-				return cached.data; // Return cached data
+				return cached.data;
 			}
 		}
 
-		// 2. If not in cache or cache is stale, perform the query using the original logic
-		let records: ISTWRecords;
+		let records: ISTWRecords = { affectedRows: 0, fields: [], rows: [] };
 		try {
 			await this.initialize(session);
 
@@ -105,30 +101,18 @@ export class STWDatasources {
 				try {
 					records = await datasource.execute(wbpl(content.query, session.placeholders));
 				} catch (error) {
-					// Try to reconnect once if connection is lost
-					if (error.message && error.message.match(/(connection|closed|lost|reset|gone)/i)) {
-						// Remove the broken datasource and reset initialization promise
-						STWDatasources.datasources.delete(content.dsn);
-						STWDatasources.#initializationPromise = null;
-						await this.initialize(session);
-						const newDatasource = STWDatasources.datasources.get(content.dsn);
-						if (newDatasource instanceof MySQLClient) {
-							records = await newDatasource.execute(wbpl(content.query, session.placeholders));
-						} else {
-							throw new Error("Failed to re-establish MySQL connection.");
-						}
-					} else {
-						throw error;
-					}
+					// If connection fails, return empty records for this content only
+					console.warn(`MySQL query failed for dsn "${content.dsn}": ${error.message}`);
+					records = { affectedRows: 0, fields: [], rows: [] };
 				}
-			} else {
-				records = { affectedRows: 0, fields: [], rows: [] };
 			}
+			// else: unknown datasource, leave records empty
 		} catch (error) {
-			throw error; // Propagate the error
+			// If initialization or any other error, return empty records for this content only
+			console.warn(`Datasource error for dsn "${content.dsn}": ${error.message}`);
+			records = { affectedRows: 0, fields: [], rows: [] };
 		}
 
-		// 3. Store the new results in the cache if caching is enabled
 		if (content.cache) {
 			queryCache.set(cacheKey, { data: records, timestamp: Date.now() });
 		}

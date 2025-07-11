@@ -54,7 +54,7 @@ export class STWTree extends STWContent {
 						const li = event.target.closest("li"), i = li.querySelector("i");
 						event.currentTarget.querySelector("div.stwSelected")?.classList.remove("stwSelected");
 						li.firstElementChild?.classList.add("stwSelected");
-						if (i) {
+						if (li.querySelector("ul") && i) {
 							event.preventDefault();
 							li.querySelector("ul").style.display = i.classList.contains("fa-angle-down") ? "none" : "block";
 							i.classList.toggle("fa-angle-down");

@@ -12,6 +12,39 @@
 	},
 	"children": [
 		{
+			"_id": "e29cfba0-2952-12ee-8a01-eb5d698979c6",
+			"type": "Content",
+			"name": {
+				"en": "Web application"
+			},
+			"slug": {
+				"en": "webapplication"
+			},
+			"visibility": {},
+			"subtype": "Accordion",
+			"cssClass": null,
+			"section": "",
+			"sequence": "1",
+			"dsn": "",
+			"query": "",
+			"params": "",
+			"layout": {},
+			"options": [
+				{
+					"name": {
+						"en": "Web application"
+					},
+					"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
+				},
+				{
+					"name": {
+						"en": "Content"
+					},
+					"ref": "e29cfba0-2952-11ee-8a01-eb5d698979c6"
+				}
+			]
+		},
+		{
 			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
 			"type": "Content",
 			"name": {
@@ -22,14 +55,14 @@
 			},
 			"visibility": {},
 			"subtype": "Form",
-			"cssClass": null,
-			"section": "dialog",
-			"sequence": "1",
+			"cssClass": "stwFormCompact",
+			"section": "",
+			"sequence": "",
 			"dsn": "stw",
 			"query": "[\"_id\", \"name\", \"slug\", \"type\"]",
 			"params": "",
 			"layout": {
-				"en": "\\s('caption=\"@@name (@@slug)\" key=\"_id\"')"
+				"en": "\\s('key=\"_id\"')hl('Name')\\re\\rl('Slug')\\re\\rl('Type')\\rd(';;1;Form;Tree;Tabs')\\rb('stws;save')t('Save')"
 			}
 		},
 		{
@@ -67,12 +100,13 @@
 							"name": {
 								"en": "<i class=\"fa-light fa-fw fa-2x fa-sitemap\" title=\"Web application\"></i>"
 							},
-							"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
+							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
 						},
 						{
 							"name": {
 								"en": "<i class=\"fa-light fa-fw fa-2x fa-search\" title=\"Search\"></i>"
-							}
+							},
+							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
 						},
 						{
 							"name": {
@@ -112,10 +146,10 @@
 					"section": "",
 					"sequence": "3",
 					"dsn": "stw",
-					"query": "($tree:=function($node){{\"_id\":_id,\"slug\":$node.slug.en?$node.slug.en:\"\",\"type\":$node.subtype?$node.subtype:$node.type,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
+					"query": "($tree:=function($node){{\"type\":$node.subtype?$node.subtype:$node.type,\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
 					"layout": {
-						"en": "\\A('onclick=\"/@@slug\"')>>n('2;Site;<i class=\"fa-light fa-globe\"></i>;Area;<i class=\"fa-light fa-folder\"></i>;Page;<i class=\"fa-light fa-file\"></i>;Content;<i class=\"fa-light fa-puzzle-piece\"></i>;;<i class=\"fa-light fa-square\"></i>')f"
+						"en": "\\s('header='<i class=\"fas fa-folder\"></i>'')n('2;Site;<i class=\"fa-light fa-globe\"></i>;Area;<i class=\"fa-light fa-folder\"></i>;Page;<i class=\"fa-light fa-file\"></i>;Content;<i class=\"fa-light fa-puzzle-piece\"></i>;;<i class=\"fa-light fa-square\"></i>')a('/stws/editcontent')pf"
 					}
 				},
 				{

@@ -1,6 +1,3 @@
-import { getCookies } from "@std/http/cookie";
-import { STWSite } from "../stwElements/stwSite.ts";
-
 /**
  * Spin the Web session
  * 
@@ -8,14 +5,18 @@ import { STWSite } from "../stwElements/stwSite.ts";
  * 
  * MIT License. Copyright (c) 2024 Giancarlo Trevisan
 **/
+import { getCookies } from "@std/http/cookie";
+import { STWSite } from "../stwElements/stwSite.ts";
+
 export class STWSession {
 	sessionId: string;
 	remoteAddr: Deno.Addr;
 	user: string; // User name
 	name!: string; // Full name
 	roles: string[]; // Roles played by the user. Note: Security revolves around this aspect!
-	lang: string; // Preferred user language 
+	lang: string; // Preferred user language (this language is used to render contents based on the accepted and available site languages)
 	langs: string[]; // Accepted user languages (Accept-Language)
+	tz: string; // Timezone of the user
 	placeholders: Map<string, string>;
 	timestamp: number; // Session timeout in minutes
 	private timer: number = 0;
@@ -31,6 +32,7 @@ export class STWSession {
 		this.roles = ["guests","developers"]; // Default roles
 		this.lang = "en";
 		this.langs = ["en"];
+		this.tz = "UTC"; // Default timezone
 		this.placeholders = new Map<string, string>;
 		this.timestamp = Date.now();
 		this.dev = true;

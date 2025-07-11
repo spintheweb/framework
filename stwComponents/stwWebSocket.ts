@@ -17,7 +17,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
 
     session.socket = socket;
 
-    socket.onmessage = event => {
+    socket.onmessage = async event => {
         // deno-lint-ignore no-explicit-any
         const data: { method: string, resource: string, options: any } = JSON.parse(event.data);
 
@@ -34,7 +34,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
         if (data.method === "PATCH") {
             const element = STWSite.instance.find(session, data.resource);
             if (element instanceof STWPage) {
-                resourcesToProcess = element.contents(session, typeof(data.options.recurse) == "undefined" ? true : data.options.recurse) || [];
+                resourcesToProcess = element.contents(session, typeof (data.options.recurse) == "undefined" ? true : data.options.recurse) || [];
             } else if (element) {
                 resourcesToProcess = [data.resource];
             }
@@ -43,6 +43,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
             session.lang = STWSite.instance.langs.includes(data.options.lang)
                 ? data.options.lang
                 : session.langs.find(lang => STWSite.instance.langs.includes(lang.substring(0, 2)))?.substring(0, 2) || "en";
+            session.tz = data.options.tz || "UTC";
 
             resourcesToProcess = (STWSite.instance.find(session, data.resource) as STWPage)?.contents(session) || [];
         }
@@ -52,7 +53,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
         const finalData: any[] = [];
         let processCount = resourcesToProcess.length;
 
-        resourcesToProcess.forEach(async (resource: string) => {
+        for (const resource of resourcesToProcess) {
             const found = STWSite.instance.find(session, resource);
             if (!found) {
                 finalData.push({ method: "DELETE", id: resource });
@@ -70,7 +71,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
             if (!--processCount) {
                 send(finalData, data.options);
             }
-        });
+        }
 
         function send(payload: any[], options: any): void {
             payload.sort((a: any, b: any) => {

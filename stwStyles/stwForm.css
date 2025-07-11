@@ -1,10 +1,7 @@
-.stwForm label {
+.stwForm label, .stwFormCompact label {
+	font-size: small;
 	display: inline-grid;
 	font-weight: bolder;
-}
-
-.stwForm label {
-	font-size: small;
 }
 
 .stwForm input {
@@ -16,4 +13,10 @@
 	padding: var(--padding);
 	min-width: 7rem;
 	margin: var(--padding) 0;
+}
+
+.stwFormCompact input,
+.stwFormCompact button,
+.stwFormCompact select {
+	margin: var(--padding) var(--padding) var(--padding) 0;
 }

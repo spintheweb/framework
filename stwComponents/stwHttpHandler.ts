@@ -88,23 +88,23 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 
             if (origin instanceof STWContent && origin?.isVisible(session, false)) {
                 try {
-                    const result = origin.getLayout(session).handleAction(action, records);
+                    const result = origin.getLayout(session).handleAction(action); // TODO
                     session.socket?.send(JSON.stringify({
                         method: "PUT",
                         section: "dialog",
                         body: `<label>Form data ${action}</label><pre>${JSON.stringify(records, null, 4)}</pre>`
                     }));
-                } catch (err) {
+                } catch (error: any) {
                     session.socket?.send(JSON.stringify({
                         method: "PUT",
                         section: "dialog",
-                        body: `<label>Error</label><pre>${err.message}</pre>`
+                        body: `<label>Error</label><pre>${error.message}</pre>`
                     }));
                 }
             }
             // Always return a response
             return new Response(null, { status: 204 });
-        } catch (err) {
+        } catch (_error) {
             return new Response("Error processing form data", { status: 400 });
         }
     }

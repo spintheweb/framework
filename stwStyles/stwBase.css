@@ -1,0 +1,28 @@
+.stwSpecial {
+	color: var(--special);
+}
+
+.stwHide {
+	display: none;
+}
+
+.stwSelected {
+	background-color: var(--special) !important;
+	color: var(--on-special) !important;
+}
+
+.stwCollapsible {
+	cursor: pointer;
+}
+
+.stwError {
+	font-size: small;
+	padding: var(--padding-reduced);
+	margin: var(--padding-reduced);
+	background-color: var(--error);
+}
+
+.stwError>pre {
+	white-space: pre-wrap;
+	word-break: break-word;
+}

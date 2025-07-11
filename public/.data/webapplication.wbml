@@ -23,7 +23,7 @@
 			"query": "{\"email\":\"\"}",
 			"params": "",
 			"layout": {
-				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;requestPasswordReset')t('Send Reset Link')"
+				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;pwdreset')t('Send Reset Link')"
 			}
 		},
 		{

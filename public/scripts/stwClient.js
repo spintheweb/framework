@@ -25,6 +25,7 @@ function stwStartWebsocket() {
             options: {
                 lang: navigator.language,
                 langs: navigator.languages,
+                tz: Intl.DateTimeFormat().resolvedOptions().timeZone
             }
         }));
 
