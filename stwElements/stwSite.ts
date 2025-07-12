@@ -61,7 +61,9 @@ export class STWSite extends STWElement {
 			STWSite.#instance = new STWSite(this.#wbml);
 			if (!STWSite.#instance)
 				throw new Error(`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
-			STWSite.#instance.loadStudio();
+
+			STWSite.#instance.addWebbaselet(Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbml"); // uuid = 169ecfb1-2916-11ee-ad92-6bd31f953e80
+			STWSite.#instance.addWebbaselet(Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml"); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 
 			if (Deno.env.get("DEBUG") === "true")
 				STWSite.watchWebbases();
@@ -76,24 +78,24 @@ export class STWSite extends STWElement {
 	/**
 	 * Load Spin the Web Studio webbase, if it's already present, replace it.
 	 */
-	public loadStudio(): void {
-		console.log(`${new Date().toISOString()}: Loading STW Studio '${Deno.env.get("STUDIO_WEBBASE")}'...`);
+	public addWebbaselet(filepath: string): void {
+		console.log(`${new Date().toISOString()}: Adding webbaselet '${filepath}'...`);
 
 		try {
-			if (URL.parse(Deno.env.get("STUDIO_WEBBASE") || "")) {
-				fetch(new URL(Deno.env.get("STUDIO_WEBBASE") || ""))
+			if (URL.parse(filepath || "")) {
+				fetch(new URL(filepath || ""))
 					.then(response => response.json())
 					.then(webbaselet => load(webbaselet))
 					.catch(_error => { throw _error });
 			} else
-				load(JSON.parse(Deno.readTextFileSync(Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml")));
+				load(JSON.parse(Deno.readTextFileSync(filepath)));
 
 		} catch (error) {
 			console.error(`${(error as Error).name}: ${(error as Error).message}`);
 		}
 
 		function load(webbaselet: ISTWArea) {
-			const studio = STWSite.index.get(webbaselet._id); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
+			const studio = STWSite.index.get(webbaselet._id);
 			if (studio)
 				STWSite.#instance.remove(studio._id);
 
@@ -186,6 +188,7 @@ export class STWSite extends STWElement {
 
 		const webbasePath = [
 			Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbml",
+			Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbml",
 			Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml"
 		];
 		let reloadTimeout: number | undefined;

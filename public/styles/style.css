@@ -5,10 +5,19 @@
 	--bg-faint: hsl(0, 0%, 92%);
 	--border: hsl(0, 0%, 75%);
 	--text: hsl(220, 15%, 20%);
-	--special: rgb(23, 145, 207);
-	--special-hover: rgba(23, 145, 207, 0.5);
+
+	/* Pastel tints using color-mix for a "rubber pastel" flavor */
+	--special-red: color-mix(in srgb, #ff6f61 70%, white);
+	--special-green: color-mix(in srgb, #6fcf97 70%, white);
+	--special-blue: color-mix(in srgb, #4f8cff 70%, white);
+	--special-yellow: color-mix(in srgb, #ffe066 70%, white);
+	--special-purple: color-mix(in srgb, #b39ddb 70%, white);
+	--special-gray: color-mix(in srgb, #b0b0b0 60%, white);
+
+	--special: var(--special-blue);
+	--special-hover: color-mix(in srgb, var(--special) 60%, white);
 	--on-special: hsl(0, 0%, 98%);
-	--error: brown;
+	--error: #ff6f61;
 
 	--padding: 0.5rem;
 	--padding-reduced: 0.25rem;
@@ -26,9 +35,13 @@
 		--bg-faint: hsl(220, 15%, 22%);
 		--border: hsl(0, 0%, 25%);
 		--text: hsl(0, 0%, 98%);
-		--special: rgb(71, 180, 235);
-		--special-hover: rgba(71, 180, 235, 0.5);
-		--on-special: hsl(0, 0%, 98%);
+
+		--special-red: color-mix(in srgb, #ff6f61 60%, #222 40%);
+		--special-green: color-mix(in srgb, #6fcf97 60%, #222 40%);
+		--special-blue: color-mix(in srgb, #4f8cff 60%, #222 40%);
+		--special-yellow: color-mix(in srgb, #ffe066 60%, #222 40%);
+		--special-purple: color-mix(in srgb, #b39ddb 60%, #222 40%);
+		--special-gray: color-mix(in srgb, #b0b0b0 50%, #222 50%);
 	}
 }
 
@@ -59,7 +72,17 @@ dialog h1::after {
 
 article {
 	position: relative;
-	padding: var(--padding-compact);
+	/*padding: var(--padding-compact);*/
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+article>div {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	overflow: auto;
 }
 
 article:focus {

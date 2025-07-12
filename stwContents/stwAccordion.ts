@@ -44,13 +44,15 @@ export class STWAccordion extends STWContent {
 		if (body === "")
 			return "";
 
-		// The STWAccordion script selects the clicked accordion and requests from the spinner the accordion content
+		// The STWAccordion script toggles the clicked accordion element
 		return `<dl onclick="fnSTWAccordion('${this._id}')">${body}</dl>
 			<script name="STWAccordion" onload="fnSTWAccordion('${this._id}')">
 				function fnSTWAccordion(id) {
 					const accordion = self.document.getElementById(id);
 					accordion.querySelector("dl").addEventListener("click", event => {
-						const dt = event.target.closest("dt");
+						event.stopImmediatePropagation();
+						const dt = event.target;
+						if (dt.tagName !== "DT") return;
 						dt.querySelector("i").classList.toggle("fa-angle-down");
 						dt.querySelector("i").classList.toggle("fa-angle-right");
 						dt.nextElementSibling.style.display = dt.querySelector("i").classList.contains("fa-angle-down") ? 'block' : 'none';

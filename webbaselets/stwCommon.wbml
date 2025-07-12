@@ -1,0 +1,63 @@
+{
+	"_id": "e258daa0-293a-11ee-9629-21da0b1a268c",
+	"type": "Area",
+	"name": {
+		"en": "STW Commons"
+	},
+	"description": {
+		"en": "Spin the Web Commons webbaselet v1.0.0\nMIT License. Copyright (c) 2025 Giancarlo Trevisan"
+	},
+	"slug": {
+		"en": "stwc"
+	},
+	"children": [
+		{
+			"_id": "c1a3b5e0-31c1-11ef-a798-bf5561fd79c7",
+			"type": "Content",
+			"name": {
+				"en": "Password Recovery"
+			},
+			"slug": {
+				"en": "forgotpassword"
+			},
+			"visibility": {},
+			"subtype": "Form",
+			"cssClass": "stwForm",
+			"section": "dialog",
+			"sequence": "",
+			"dsn": "json",
+			"query": "{\"email\":\"\"}",
+			"params": "",
+			"layout": {
+				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;pwdreset')t('Send Reset Link')"
+			}
+		},
+		{
+			"_id": "4afeeae0-2a4e-11ee-9a5d-8ff6b23b06b9",
+			"type": "Content",
+			"name": {
+				"en": "Logon"
+			},
+			"slug": {
+				"en": "logon"
+			},
+			"visibility": {
+				"users": false
+			},
+			"subtype": "Form",
+			"cssClass": "stwForm",
+			"section": "main",
+			"sequence": "",
+			"dsn": "json",
+			"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
+			"params": "",
+			"layout": {
+				"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
+			}
+		}
+	],
+	"visibility": {
+		"everyone": false,
+		"developers": true
+	}
+}

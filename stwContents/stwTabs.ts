@@ -13,7 +13,7 @@ export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];
 
 	public constructor(content: ISTWContentWithOptions) {
-		super(content, { orientation: "horizontal" });
+		super(content, { mode: "horizontal" });
 
 		if (content.options)
 			content.options.forEach((option: ISTWOption) => {
@@ -41,11 +41,12 @@ export class STWTabs extends STWContent {
 		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"></article></dd>`;
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
-		return `<dl class="stw${layout.settings.get("orientation")[0].toUpperCase()}Tabs">${body}</dl>
+		return `<dl class="stw${layout.settings.get("mode")[0].toUpperCase()}Tabs">${body}</dl>
 			<script name="STWTabs" onload="fnSTWTabs('${this._id}')">
 				function fnSTWTabs(id) {
 					const tabs = self.document.getElementById(id);
 					tabs.querySelector("dl").addEventListener("click", event => {
+						event.stopImmediatePropagation();
 						const target = event.target.closest("dt");
 						if (target) {
 							event.currentTarget.querySelector("dd").innerHTML = '<article id="refreshSTWTab"></article>';

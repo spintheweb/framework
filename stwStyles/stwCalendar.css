@@ -3,22 +3,21 @@
     max-width: 100%;
 }
 
-.stwCalendarTable {
+.stwCalendar table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
 
-.stwCalendarTable td {
+.stwCalendar table td {
     border: 1px solid var(--border);
     vertical-align: top;
-    height: 6em;
-    min-height: 5em;
+    height: 2em;
+    min-height: 2em;
     padding: 0.25em;
     box-sizing: border-box;
 }
 
-.stwCalendarTable th {
+.stwCalendar table th {
     background: var(--special);
     color: var(--on-special);
     text-align: center;
@@ -27,17 +26,9 @@
 }
 
 .stwCalendarDayNum {
-    font-size: 1.1em;
-    font-weight: bold;
+    font-size: smaller;
     margin-bottom: 0.25em;
-    display: block;
-}
-
-.stwCalendarRecord {
-    margin-top: 0.25em;
-    font-size: 0.95em;
-    background: var(--bg-faint);
-    padding: 0.1em 0.3em;
+    text-align: center;
 }
 
 .stwCalendarToday {

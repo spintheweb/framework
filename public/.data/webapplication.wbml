@@ -6,27 +6,6 @@
 	},
 	"children": [
 		{
-			"_id": "c1a3b5e0-31c1-11ef-a798-bf5561fd79c7",
-			"type": "Content",
-			"name": {
-				"en": "Password Recovery"
-			},
-			"slug": {
-				"en": "forgotpassword"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwForm",
-			"section": "dialog",
-			"sequence": "3",
-			"dsn": "json",
-			"query": "{\"email\":\"\"}",
-			"params": "",
-			"layout": {
-				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;pwdreset')t('Send Reset Link')"
-			}
-		},
-		{
 			"_id": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
 			"type": "Page",
 			"name": {
@@ -103,29 +82,6 @@
 					"params": "",
 					"layout": {
 						"en": "t('\n<form action=\"/stw/logoff\" method=\"post\">\n<button type=\"submit\">Logoff</button>\n</form>')"
-					}
-				},
-				{
-					"_id": "4afeeae0-2a4e-11ee-9a5d-8ff6b23b06b9",
-					"type": "Content",
-					"name": {
-						"en": "Logon"
-					},
-					"slug": {
-						"en": "logon"
-					},
-					"visibility": {
-						"users": false
-					},
-					"subtype": "Form",
-					"cssClass": "stwForm",
-					"section": "main",
-					"sequence": "2.1",
-					"dsn": "json",
-					"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
-					"params": "",
-					"layout": {
-						"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
 					}
 				},
 				{
@@ -266,7 +222,7 @@
 					"query": "",
 					"params": "",
 					"layout": {
-						"en": "\\s('orientation=\"horizontal\"')"
+						"en": "\\s('mode=\"horizontal\"')"
 					},
 					"options": [
 						{
@@ -317,13 +273,13 @@
 					},
 					"subtype": "Calendar",
 					"cssClass": "",
-					"section": "main",
-					"sequence": "33",
+					"section": "leftSidebar",
+					"sequence": "1",
 					"dsn": "",
 					"query": "",
 					"params": "",
 					"layout": {
-						"en": "\\s('caption=\"Calendar\" period=\"monthly\" key=\"date\"')"
+						"en": "\\s('mode=\"month\" key=\"date\"')"
 					}
 				}
 			],
@@ -362,29 +318,6 @@
 					"params": "",
 					"layout": {
 						"en": "\\s('rows=\"10\" ')"
-					}
-				},
-				{
-					"_id": "b7e6e6b0-1a2b-4c3d-9e8f-123456789abc",
-					"type": "Content",
-					"name": {
-						"en": "Calendar"
-					},
-					"slug": {
-						"en": "calendar"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Calendar",
-					"cssClass": "",
-					"section": "main",
-					"sequence": "2",
-					"dsn": "",
-					"query": "",
-					"params": "",
-					"layout": {
-						"en": "\\s('caption=\"Calendar\"')"
 					}
 				},
 				{
@@ -599,7 +532,7 @@
 		"en": "stw"
 	},
 	"description": {
-		"en": "This site demonstrate..."
+		"en": "This site demonstrates..."
 	},
 	"mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
 	"langs": [

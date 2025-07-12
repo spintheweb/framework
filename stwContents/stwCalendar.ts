@@ -17,7 +17,7 @@ export class STWCalendar extends STWContent {
 
     public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
         let layout = this.getLayout(session);
-        const period = layout.settings.get("period") || "monthly";
+        const mode = layout.settings.get("mode") || "month";
         const datetimeKey = layout.settings.get("key") || "date";
         const today = new Date(layout.settings.get("date") || Date.now());
 
@@ -35,70 +35,18 @@ export class STWCalendar extends STWContent {
             const dt = row[datetimeKey] ? new Date(row[datetimeKey]) : null;
             if (!dt || isNaN(dt.getTime())) continue;
             let key = "";
-            if (period === "monthly" || period === "weekly") {
+            if (mode === "month" || mode === "week") {
                 key = dt.toISOString().slice(0, 10); // YYYY-MM-DD
-            } else if (period === "daily") {
+            } else if (mode === "day") {
                 key = dt.toISOString().slice(0, 13); // YYYY-MM-DDTHH
             }
             if (!recordMap[key]) recordMap[key] = [];
             recordMap[key].push(row);
         }
 
-        let body = `<div class="stw${capitalize(period)} stwCalendar">`;
+        let body = "";
 
-        if (period === "monthly") {
-            const year = today.getFullYear();
-            const month = today.getMonth();
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-
-            const firstDayOfWeek = getFirstDayOfWeek(session);
-
-            // Build week day headers starting from firstDayOfWeek
-            const weekDays = [];
-            const baseDate = new Date(2020, 5, 7); // Sunday
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(baseDate);
-                day.setDate(baseDate.getDate() + ((i + firstDayOfWeek) % 7));
-                weekDays.push(day.toLocaleDateString(session.lang, { weekday: "short" }));
-            }
-            const monthName = today.toLocaleDateString(session.lang, { month: "long", year: "numeric" });
-
-            body += `<div class="stwCalendarMonthHeader">${monthName}</div>`;
-            body += `<table class="stwCalendarTable"><thead><tr>`;
-            for (const wd of weekDays) body += `<th>${wd}</th>`;
-            body += `</tr></thead><tbody><tr>`;
-
-            // Calculate the weekday index of the first day of the month (adjusted for firstDayOfWeek)
-            const firstWeekday = (firstDay.getDay() - firstDayOfWeek + 7) % 7;
-
-            // Fill initial empty cells
-            for (let i = 0; i < firstWeekday; i++) body += `<td></td>`;
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateObj = new Date(year, month, day);
-                const dateStr = toLocalDateString(dateObj, session);
-                const isToday = dateStr === toLocalDateString(new Date(), session);
-                body += `<td${isToday ? ' class="stwCalendarToday"' : ''}><span class="stwCalendarDayNum">${day}</span>`;
-                for (const row of recordMap[dateStr] || []) {
-                    const rowPlaceholders = new Map(placeholders);
-                    for (const [name, value] of Object.entries(row))
-                        rowPlaceholders.set(`@@${name}`, String(value));
-                    body += `<div class="stwCalendarRecord">` +
-                        await layout.render(request, session, fields, rowPlaceholders) +
-                        `</div>`;
-                }
-                body += `</td>`;
-                // If end of week, close row and start new
-                if ((firstWeekday + day) % 7 === 0 && day !== daysInMonth) body += `</tr><tr>`;
-            }
-
-            // Fill trailing empty cells
-            const trailing = (firstWeekday + daysInMonth) % 7;
-            if (trailing !== 0) for (let i = trailing; i < 7; i++) body += `<td></td>`;
-            body += `</tr></tbody></table>`;
-        } else if (period === "weekly") {
+        if (mode === "week") {
             // Determine first day of week based on session language/locale
             const firstDayOfWeek = getFirstDayOfWeek(session);
             const weekStart = new Date(today);
@@ -118,7 +66,7 @@ export class STWCalendar extends STWContent {
                 }
                 body += `</div>`;
             }
-        } else if (period === "daily") {
+        } else if (mode === "day") {
             const dateStr = today.toISOString().slice(0, 10);
             for (let h = 0; h < 24; h++) {
                 const hourStr = `${dateStr}T${String(h).padStart(2, "0")}`;
@@ -131,13 +79,58 @@ export class STWCalendar extends STWContent {
                 }
                 body += `</div>`;
             }
-        }
+        } else {
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
 
-        body += `</div>`;
-        return body;
+            const firstDayOfWeek = getFirstDayOfWeek(session);
 
-        function capitalize(str: string) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            // Build week day headers starting from firstDayOfWeek
+            const weekDays = [];
+            const baseDate = new Date(2020, 5, 7); // Sunday
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(baseDate);
+                day.setDate(baseDate.getDate() + ((i + firstDayOfWeek) % 7));
+                weekDays.push(day.toLocaleDateString(session.lang, { weekday: "short" }));
+            }
+            const monthName = today.toLocaleDateString(session.lang, { month: "long", year: "numeric" });
+
+            body += `<div class="stwCalendarMonthHeader">${monthName}</div>`;
+            body += `<table><thead><tr>`;
+            for (const wd of weekDays) body += `<th>${wd}</th>`;
+            body += `</tr></thead><tbody><tr>`;
+
+            // Calculate the weekday index of the first day of the month (adjusted for firstDayOfWeek)
+            const firstWeekday = (firstDay.getDay() - firstDayOfWeek + 7) % 7;
+
+            // Fill initial empty cells
+            for (let i = 0; i < firstWeekday; i++) body += `<td></td>`;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = toLocalDateString(new Date(year, month, day), session);
+                const isToday = dateStr === toLocalDateString(new Date(), session);
+                body += `<td${isToday ? ' class="stwCalendarToday"' : ''}><div class="stwCalendarDayNum">${day}</div>`;
+                for (const row of recordMap[dateStr] || []) {
+                    const rowPlaceholders = new Map(placeholders);
+                    for (const [name, value] of Object.entries(row))
+                        rowPlaceholders.set(`@@${name}`, String(value));
+                    body += `<div>` + await layout.render(request, session, fields, rowPlaceholders) + `</div>`;
+                }
+                body += `</td>`;
+                // If end of week, close row and start new
+                if ((firstWeekday + day) % 7 === 0 && day !== daysInMonth)
+                    body += `</tr><tr>`;
+            }
+
+            // Fill trailing empty cells
+            const trailing = (firstWeekday + daysInMonth) % 7;
+            if (trailing !== 0) for (let i = trailing; i < 7; i++) body += `<td></td>`;
+            body += `</tr></tbody></table>`;
+
+            return body;
         }
     }
 }

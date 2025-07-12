@@ -61,7 +61,7 @@ export class STWLayout {
 
 	settings: Map<string, string> = new Map([
 		["rows", "25"],
-		["period", "month"],
+		["mode", "month"],
 		["disabled", "false"],
 	]);
 
