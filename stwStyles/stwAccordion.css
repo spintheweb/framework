@@ -1,3 +1,7 @@
+.stwAccordion {
+	overflow: hidden;
+}
+
 .stwAccordion dl {
 	display: flex;
 	flex-direction: column;

@@ -21,17 +21,21 @@ export class STWTabs extends STWContent {
 			});
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, session: STWSession): Promise<string> {
 		const layout = this.layout.get(session.lang) as STWLayout;
 
 		let body = "<div>", id = "";
-
 		this.options.forEach(option => {
-			const element = session.site.find(session, option.ref || "");
-			if (element instanceof STWContent && element.isVisible(session)) {
-				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-				body += `<dt data-ref="${element._id}"${id ? "" : ' class="stwSelected"'}>${name}</dt>`;
-				id = id || element._id;
+			if (option.name.get(session.lang) === "-")
+				body += `<dt style="flex-grow: 1;"></dt>`;
+			else {
+				const element = session.site.find(session, option.ref || "");
+				if (element instanceof STWContent && element.isVisible(session)) {
+					const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
+					body += `<dt data-ref="${element._id}"${id ? "" : " class=\"stwSelected\""}>${name}</dt>`;
+					id = id || element._id;
+				}
 			}
 		});
 
@@ -41,7 +45,8 @@ export class STWTabs extends STWContent {
 		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"></article></dd>`;
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
-		return `<dl class="stw${layout.settings.get("mode")[0].toUpperCase()}Tabs">${body}</dl>
+		const mode = layout.settings.get("mode") || "horizontal";
+		return `<dl class="stw${mode[0].toUpperCase()}Tabs">${body}</dl>
 			<script name="STWTabs" onload="fnSTWTabs('${this._id}')">
 				function fnSTWTabs(id) {
 					const tabs = self.document.getElementById(id);

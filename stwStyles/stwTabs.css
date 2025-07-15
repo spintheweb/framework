@@ -4,25 +4,32 @@
 }
 
 .stwVTabs {
-	display: grid;
-	grid-template-columns: auto 1fr;
+	display: flex;
+	height: 100%;
 	margin: 0;
 }
 
-.stwHTabs > div {
+.stwHTabs>div {
+	display: flex;
 	border-bottom: thin solid var(--border);
 }
 
-.stwVTabs > div {
+.stwVTabs>div {
+	display: flex;
+	flex-direction: column;
 	border-right: thin solid var(--border);
 }
 
-.stwHTabs dt {
+.stwHTabs dt[data-ref] {
 	display: inline-block;
 	padding: var(--thickness) var(--padding);
 	cursor: pointer;
 	margin-left: var(--padding);
 	border-top: thin solid var(--text);
+}
+
+.stwVTabs dd {
+	flex-grow: 1;
 }
 
 .stwVTabs dt {

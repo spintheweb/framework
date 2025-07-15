@@ -18,12 +18,12 @@ const Records = {
 };
 
 const Examples = [
-	{ wbll: `\\A('onclick=\"/@@slug\"')n('2;Mario Rossi;<i class=\"fa-light fa-globe\"></i>;Area;<i class=\"fa-light fa-folder\"></i>;Page;<i class=\"fa-light fa-file\"></i>;Content;<i class=\"fa-light fa-puzzle-piece\"></i>;;<i class=\"fa-light fa-square\"></i>')a('/stws/editcontent')p<<f`, html: `<i class="fa-light fa-globe"></i> <a href="http://localhost/stws/editcontent?altezza=1.78">Mario Rossi</a>`, isForm: false },
+	{ wbll: `appt('Who')`, html: ` <a href="http://localhost/Mario%20Rossi?altezza=1.78&dataDiNascita=1985-04-12">Who</a>`, isForm: false },
 	{ wbll: `j('alert("Hello {@@nome}!")')`, html: `<script>alert("Hello Mario Rossi!")</script>`, isForm: false },
 	{ wbll: `f>>f<n('2;M;Maschio;F;Femmina;*;N.D.')`, html: ` Mario Rossi   N.D.`, isForm: false },
 	{ wbll: `i('/logo.png')\\a('alt="logo @@altezza" title="@@nome This is an image" @@blank')`, html: `<img alt="logo 1.78" title="Mario Rossi This is an image"  src="/logo.png">`, isForm: false },
 	{ wbll: `\\s('caption')whel`, html: `<input type="password" name="nome" value="Mario Rossi"><input type="hidden" name="altezza" value="1.78"><input name="dataDiNascita" value="1985-04-12"><label>sesso</label>`, isForm: true },
-	{ wbll: `l('Nome')t(' ')e`, html: `<label>Nome</label> <input name="nome" value="Mario Rossi">`, isForm: true },
+	{ wbll: `l('Nome')t(' ')m`, html: `<label>Nome</label> <textarea name="nome">Mario Rossi</textarea>`, isForm: true },
 	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi"><label>altezza</label><input name="altezza" value="1.78"><label>dataDiNascita</label><input name="dataDiNascita" value="1985-04-12">`, isForm: true },
 	{ wbll: `a('http://www.keyvisions.it')ppt('Click here')`, html: ` <a href="http://www.keyvisions.it/?nome=Mario+Rossi&altezza=1.78">Click here</a>`, isForm: false },
 	{ wbll: `t('<b>Bold Text</b>')`, html: `<b>Bold Text</b>`, isForm: false },

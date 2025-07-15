@@ -35,6 +35,7 @@ export class STWMenus extends STWContent {
 		};
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, session: STWSession): Promise<string> {
 		let body: string = "";
 		this.options.forEach(option => subrender(option));

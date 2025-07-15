@@ -19,6 +19,7 @@ export class STWGeomap extends STWContent {
 		super(content);
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<div id="Map${this._id}"></div>
 			<script name="STWGeomap" onload="fnSTWGeomap('Map${this._id}')">

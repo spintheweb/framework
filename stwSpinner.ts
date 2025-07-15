@@ -78,7 +78,10 @@ Deno.serve(serverOptions, async (request: Request, info: Deno.ServeHandlerInfo):
 
     let session = stwSessions.get(sessionId);
 
-    if (!session || session.remoteAddr.hostname !== info.remoteAddr.hostname) {
+    if (
+        !session ||
+        (session.remoteAddr as Deno.NetAddr).hostname !== (info.remoteAddr as Deno.NetAddr).hostname
+    ) {
         if (session)
             console.log(`${new Date().toISOString()}: IP address changed for session [${sessionId}]. A new session will be created.`);
         session = new STWSession(sessionId, info.remoteAddr, STWSite.instance);

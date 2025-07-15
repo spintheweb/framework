@@ -32,17 +32,80 @@
 			"options": [
 				{
 					"name": {
-						"en": "Web application <span style=\"float:right\"><i class=\"fa-light fa-fw fa-folder-plus\"></i> <i class=\"fa-light fa-fw fa-file-plus\"></i> <i class=\"fa-thin fa-fw fa-square-plus\"></i></span>"
+						"en": "Web application <span style=\"float:right\"><i class=\"fa-light fa-fw fa-folder-plus\" title=\"New area\"></i> <i class=\"fa-light fa-fw fa-file-plus\" title=\"New page\"></i> <i class=\"fa-thin fa-fw fa-square-plus\" title=\"New content\"></i></span>"
 					},
 					"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
 				},
 				{
 					"name": {
-						"en": "Content"
+						"en": "Element"
 					},
 					"ref": "e29cfba0-2952-11ee-8a01-eb5d698979c6"
 				}
 			]
+		},
+		{
+			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+			"type": "Content",
+			"name": {
+				"en": "Edit Site"
+			},
+			"slug": {
+				"en": "editsite"
+			},
+			"visibility": {},
+			"subtype": "Form",
+			"cssClass": "stwFormCompact",
+			"section": "",
+			"sequence": "",
+			"dsn": "stw",
+			"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"Homepage\"]",
+			"params": "",
+			"layout": {
+				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
+			}
+		},
+		{
+			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+			"type": "Content",
+			"name": {
+				"en": "Edit Area"
+			},
+			"slug": {
+				"en": "editarea"
+			},
+			"visibility": {},
+			"subtype": "Form",
+			"cssClass": "stwFormCompact",
+			"section": "",
+			"sequence": "",
+			"dsn": "stw",
+			"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
+			"params": "",
+			"layout": {
+				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+			}
+		},
+		{
+			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+			"type": "Content",
+			"name": {
+				"en": "Edit Page"
+			},
+			"slug": {
+				"en": "editpage"
+			},
+			"visibility": {},
+			"subtype": "Form",
+			"cssClass": "stwFormCompact",
+			"section": "",
+			"sequence": "",
+			"dsn": "stw",
+			"query": "[\"_id\", \"name\", \"slug\", \"template\"]",
+			"params": "",
+			"layout": {
+				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
+			}
 		},
 		{
 			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
@@ -59,10 +122,31 @@
 			"section": "",
 			"sequence": "",
 			"dsn": "stw",
-			"query": "[\"_id\", \"name\", \"slug\", \"type\"]",
+			"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
 			"params": "",
 			"layout": {
-				"en": "\\s('key=\"_id\"')hl('Name')\\re\\rl('Slug')\\re\\rl('Type')\\rd(';;1;Form;Tree;Tabs')\\rb('stws;save')t('Save')"
+				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+			}
+		},
+		{
+			"_id": "e29cfba0-2952-11fe-8a01-eb5e698379c5",
+			"type": "Content",
+			"name": {
+				"en": "Settings"
+			},
+			"slug": {
+				"en": "settings"
+			},
+			"visibility": {},
+			"subtype": "Form",
+			"cssClass": "stwFormCompact",
+			"section": "",
+			"sequence": "",
+			"dsn": "",
+			"query": "",
+			"params": "",
+			"layout": {
+				"en": "l('Color')d('tint;;1;Blue;Green;Red;Yellow;Purple;Gray')\\rb('stws;save')t('Save')"
 			}
 		},
 		{
@@ -121,13 +205,19 @@
 						},
 						{
 							"name": {
+								"en": "-"
+							}
+						},
+						{
+							"name": {
 								"en": "<i class=\"fa-light fa-fw fa-2x fa-circle-user\" title=\"Account\"></i>"
 							}
 						},
 						{
 							"name": {
 								"en": "<i class=\"fa-light fa-fw fa-2x fa-gear\" title=\"Settings\"></i>"
-							}
+							},
+							"ref": "e29cfba0-2952-11fe-8a01-eb5e698379c5"
 						}
 					]
 				},
@@ -146,10 +236,10 @@
 					"section": "",
 					"sequence": "3",
 					"dsn": "stw",
-					"query": "($tree:=function($node){{\"type\":$node.subtype?$node.subtype:$node.type,\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
+					"query": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
 					"layout": {
-						"en": "n('2;Site;<i class=\"fa-light fa-globe\"></i>;Area;<i class=\"fa-light fa-folder\"></i>;Page;<i class=\"fa-light fa-file\"></i>;Content;<i class=\"fa-light fa-puzzle-piece\"></i>;;<i class=\"fa-light fa-square\"></i>')a('/stws/editcontent')pf"
+						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-folder\"></i>;Page*;<i class=\"fa-light fa-file\"></i>;Content*;<i class=\"fa-light fa-square-dashed\"></i>;;<i class=\"fa-light fa-square\"></i>')apf"
 					}
 				},
 				{

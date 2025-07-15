@@ -34,7 +34,8 @@ export class STWText extends STWContent {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}
 
-	public override render(_req: Request, session: STWSession, records: ISTWRecords): string {
+	// deno-lint-ignore require-await
+	public override async render(_req: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		const layoutValue = this.layout?.get(session.lang);
 		const layoutText = typeof layoutValue === "string" ? layoutValue : (layoutValue?.toString?.() ?? "");
 		if (records?.rows?.length) {

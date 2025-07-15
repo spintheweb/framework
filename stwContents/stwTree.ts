@@ -39,7 +39,7 @@ export class STWTree extends STWContent {
 			Object.entries(node).forEach(([key, value]) => placeholders.set(`@@${key}`, String(value))); // Merge record and session placeholders
 
 			const hasChildren = node.children?.length > 0;
-			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-light fa-angle-down"></i>` : ""}`;
+			const toggle = `<span style="display:inline-block;width:${depth}rem"></span>${hasChildren ? `<i class="fa-light fa-angle-down"></i> ` : ""}`;
 			const children = hasChildren ? `<ul>${node.children.map((child: any) => renderNode(child, depth + 1)).join("")}</ul>` : "";
 
 			return `<li ${wbpl(layout.groupAttributes, placeholders)}><div ${wbpl(layout.blockAttributes, placeholders)}>${toggle} ${layout?.render(request, session, fields, placeholders)}</div>${children}</li>`;
@@ -50,10 +50,12 @@ export class STWTree extends STWContent {
 			body = `<ul>${renderNode(treeData)}</ul>
 			<script name="STWTree" onload="fnSTWTree('${this._id}')">
 				function fnSTWTree(id) {
+					self.document.getElementById(id).querySelector("li>div").classList.add("stwSelected");
 					self.document.getElementById(id).addEventListener("click", event => {
 						const li = event.target.closest("li"), i = li.querySelector("i");
 						event.currentTarget.querySelector("div.stwSelected")?.classList.remove("stwSelected");
 						li.firstElementChild?.classList.add("stwSelected");
+						if (event.target.tagName !== "I") return;
 						if (li.querySelector("ul") && i) {
 							event.preventDefault();
 							li.querySelector("ul").style.display = i.classList.contains("fa-angle-down") ? "none" : "block";

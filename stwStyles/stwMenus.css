@@ -1,3 +1,7 @@
+.stwMenus>div {
+	overflow:unset;
+}
+
 .stwMenus a {
 	display: block;
 	background-color: inherit;

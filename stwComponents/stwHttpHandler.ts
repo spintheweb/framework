@@ -78,21 +78,31 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
             if (rows.length > 1) rows.shift();
 
             const fields = Object.keys(fieldMap).map(name => ({ name }));
+            const stwOrigin = rows[0]?.stwOrigin;
+            const stwAction = rows[0]?.stwAction;
+
+            // Remove from each row
+            for (const row of rows) {
+                delete row.stwOrigin;
+                delete row.stwAction;
+            }
+
             const records: ISTWRecords = {
                 fields,
                 rows,
-                affectedRows: rows.length
+                affectedRows: rows.length,
+                stwOrigin,
+                stwAction
             };
 
-            const origin = STWSite.index.get(rows[0]?.stwOrigin), action = rows[0]?.stwAction || "submit";
-
+            const origin = STWSite.index.get(records.stwOrigin || "");
             if (origin instanceof STWContent && origin?.isVisible(session, false)) {
                 try {
-                    const result = origin.getLayout(session).handleAction(action); // TODO
+                    const result = origin.getLayout(session).handleAction(stwAction); // TODO
                     session.socket?.send(JSON.stringify({
                         method: "PUT",
                         section: "dialog",
-                        body: `<label>Form data ${action}</label><pre>${JSON.stringify(records, null, 4)}</pre>`
+                        body: `<label>Form data ${stwAction}</label><pre>${JSON.stringify(records, null, 4)}</pre>`
                     }));
                 } catch (error: any) {
                     session.socket?.send(JSON.stringify({

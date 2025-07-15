@@ -19,6 +19,7 @@ export class STWChart extends STWContent {
 		super(content);
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<canvas id="Chart${this._id}"></canvas>
 			<script name="STWChart" onload="fnSTWChart('Chart${this._id}')">

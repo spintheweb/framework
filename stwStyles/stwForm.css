@@ -1,6 +1,9 @@
-.stwForm label, .stwFormCompact label {
+.stwForm {
+	padding: var(--padding)
+}
+
+.stwForm label {
 	font-size: small;
-	display: inline-grid;
 	font-weight: bolder;
 }
 
@@ -15,8 +18,21 @@
 	margin: var(--padding) 0;
 }
 
-.stwFormCompact input,
+.stwFormCompact {
+	padding: var(--padding-compact)
+}
+
+.stwFormCompact input:not([type=number]),
 .stwFormCompact button,
+.stwFormCompact textarea,
 .stwFormCompact select {
-	margin: var(--padding) var(--padding) var(--padding) 0;
+	font-family: inherit;
+	margin: var(--padding-compact) var(--padding-compact) var(--padding-compact) 0;
+	width: -webkit-fill-available;
+}
+
+.stwFormCompact label {
+	display: block;
+	font-size: smaller;
+	font-weight: bolder;
 }

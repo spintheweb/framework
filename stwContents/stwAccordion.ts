@@ -30,6 +30,7 @@ export class STWAccordion extends STWContent {
 		};
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, session: STWSession): Promise<string> {
 		let body = "";
 

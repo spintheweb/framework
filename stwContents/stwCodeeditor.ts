@@ -19,6 +19,7 @@ export class STWCodeeditor extends STWContent {
 		super(content);
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<div id="CodeEditor${this._id}"></div>
 			<script name="STWCodeeditor" onload="fnSTWCodeeditor('CodeEditor${this._id}')">

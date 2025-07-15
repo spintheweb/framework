@@ -17,6 +17,7 @@ export class STWForm extends STWContent {
 		super(content);
 	}
 
+	// deno-lint-ignore require-await
 	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		let layout = this.getLayout(session);
 

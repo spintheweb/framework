@@ -156,10 +156,13 @@ export class STWLayout {
 				}
 
 				if (pattern[2]?.match("^[<>p]")) {
+					if (/^[<>p]/.test(pattern[1])) {
+						pattern[2] = pattern[1];
+						token.args[0] = "";
+					}
 					for (const symbol of pattern[2].matchAll(/(<|>|p(?:\('([^]*?)'\)?)?)/gmu)) {
 						if (symbol[2]) {
 							const pair = [...symbol[2].matchAll(/([a-zA-Z0-9-_]*)(?:;([^]*))?/gmu)][0];
-
 							this.tokens.at(-1)?.params.push(new STWToken("p", [pair[1], pair[2] || "@@"]));
 						} else
 							token.params.push(new STWToken(symbol[0][0]));
@@ -174,7 +177,7 @@ export class STWLayout {
 					(this.tokens.at(-1) as STWToken).text = token;
 					continue;
 
-				} else if (token.symbol == "A") {
+				} else if (token.symbol === "A") {
 					token.symbol = "a";
 					token.attrs.set("target", "_blank");
 				} else if ("tj".indexOf(token.symbol) != -1)
@@ -268,35 +271,23 @@ export class STWLayout {
 			token.attrs.delete("value");
 			token.attrs.delete("href");
 
-			// Standalone "a": use current field value as href and advance cursor
-			if (!token.args[0]) {
-				return `{
-					let href = encodeURIComponent(fieldValue);
-					fldCursor(); // Advance cursor after using fieldValue for href
-					const textContent = (() => {
-						let html = "";
-						${token.text ? (STWLayout.tokenHandlers.get(token.text.symbol)?.(token.text, false) ?? "") : "html+=fieldValue;"}
-						return html;
-					})();
-					html += \`<a href="\${href}"${attributes(token)}>\${textContent}</a>\`;
-				}`;
-			}
-
-			// "a(...)" with params: use baseUrl and query string logic
 			const innerToken = token.text || new STWToken("t", [token.args[0] || ""]);
 			const textHandler = STWLayout.tokenHandlers.get(innerToken.symbol);
 			const textCode = textHandler ? textHandler(innerToken, false) : "";
 
-			const baseUrl = token.args[0] || "";
+			const baseUrl = token.args[0] || ""
 
 			return `{
 				let href = "";
-				const baseUrl = wbpl(\`${baseUrl.replace(/`/g, '\\`')}\`, ph);
+				let baseUrl = wbpl(\`${baseUrl.replace(/`/g, '\\`')}\`, ph);
+				if (baseUrl === "") {
+					baseUrl = ph.get("@@" + fieldName) || "";
+					fldCursor();
+				}
 				const hasProtocol = /^[a-z]+:\\/\\//i.test(baseUrl);
 
 				const queryParams = new URLSearchParams();
 				let p_name, p_val;
-				let fldMove = 0;
 				${token.params.map(param => {
 				if (param.symbol === "p") {
 					const nameArg = `"${param.args[0] || ''}" || fieldName`;
@@ -398,7 +389,9 @@ export class STWLayout {
 			const nameArg = token.args[0];
 			const valueArg = token.args[1];
 			token.attrs.set("name", `\${"${nameArg || ''}" || fieldName}`);
-			return `html+=\`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`; if ("${nameArg ?? ''}") fldCursor();`;
+			if (!nameArg && !valueArg)
+				return `html+=\`<textarea${attributes(token)}>\${fieldValue}</textarea>\`;fldCursor();`;
+			return `html+=\`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`;`;
 		});
 
 		handlers.set("n", (token) => {

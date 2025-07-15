@@ -17,9 +17,16 @@
 
 .stwError {
 	font-size: small;
-	padding: var(--padding-reduced);
+	padding: var(--padding-reduced) !important;
 	margin: var(--padding-reduced);
 	background-color: var(--error);
+	color: white;
+}
+
+.stwError h1 {
+	color: white;
+	line-height: 1.5rem;
+	border-bottom: thin solid white;
 }
 
 .stwError>pre {

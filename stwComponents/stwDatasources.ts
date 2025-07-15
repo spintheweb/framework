@@ -11,13 +11,19 @@ import { STWSession } from "./stwSession.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
 import { wbpl } from "./wbpl.ts";
-import { ExecuteResult, Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
+import { Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata@latest";
+
+export interface ISTWRecords {
+	fields: { name: string; type?: string }[];
+	rows: Record<string, any>[];
+	affectedRows?: number;
+	stwOrigin?: string;
+	stwAction?: string;
+}
 
 // Global cache for query results
 const queryCache = new Map<string, { data: ISTWRecords, timestamp: number }>();
-
-export type ISTWRecords = ExecuteResult;
 
 interface ISTWDatasource {
 	type: "stw" | "json" | "api" | "mysql" | "postgres" | "mongodb", // Datasource type
@@ -58,7 +64,7 @@ export class STWDatasources {
 								break;
 						}
 					} catch (error) {
-						console.error(`Error processing datasource configuration: ${error.message}`);
+						console.error(`Error processing datasource configuration: ${error instanceof Error ? error.message : String(error)}`);
 						continue;
 					}
 				}
@@ -85,7 +91,7 @@ export class STWDatasources {
 		try {
 			await this.initialize(session);
 
-			const datasource = STWDatasources.datasources.get(content.dsn);
+			const datasource = STWDatasources.datasources.get(content.dsn) || {};
 			if (content.dsn === "json") {
 				const json = JSON.parse(content.query);
 				records = {
@@ -93,23 +99,23 @@ export class STWDatasources {
 					fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name, type: 'string' })) : [],
 					rows: Array.isArray(json) ? json : [json]
 				};
-			} else if (datasource?.type === "api") {
+			} else if ("type" in datasource && datasource.type === "api") {
 				records = await fetchAPIData(session, content, datasource);
 			} else if (datasource instanceof STWSite) {
 				records = await fetchWebbaseData(session, content);
 			} else if (datasource instanceof MySQLClient) {
 				try {
-					records = await datasource.execute(wbpl(content.query, session.placeholders));
+					records = await datasource.execute(wbpl(content.query, session.placeholders)) as ISTWRecords;
 				} catch (error) {
 					// If connection fails, return empty records for this content only
-					console.warn(`MySQL query failed for dsn "${content.dsn}": ${error.message}`);
+					console.warn(`MySQL query failed for dsn "${content.dsn}": ${error instanceof Error ? error.message : String(error)}`);
 					records = { affectedRows: 0, fields: [], rows: [] };
 				}
 			}
 			// else: unknown datasource, leave records empty
 		} catch (error) {
 			// If initialization or any other error, return empty records for this content only
-			console.warn(`Datasource error for dsn "${content.dsn}": ${error.message}`);
+			console.warn(`Datasource error for dsn "${content.dsn}": ${error instanceof Error ? error.message : String(error)}`);
 			records = { affectedRows: 0, fields: [], rows: [] };
 		}
 
@@ -152,7 +158,7 @@ async function fetchWebbaseData(session: STWSession, content: STWContent): Promi
 
 	return new Promise<ISTWRecords>(resolve => resolve({
 		affectedRows: 1,
-		fields: (JSON.parse(content.query) || Object.getOwnPropertyNames(result) || []).map(name => ({ name })),
+		fields: (JSON.parse(content.query) || Object.getOwnPropertyNames(result) || []).map((name: string) => ({ name })),
 		rows: Array.isArray(result) ? result : [result]
 	}));
 }
