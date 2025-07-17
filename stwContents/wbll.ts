@@ -15,8 +15,8 @@ const SYNTAX: RegExp = new RegExp([
 	/(\\[aAs])(?:\('([^]*?)'\))/,
 	/(\\[rnt])(?:\('([^]*?)'\))?/,
 	/(?:([aAbo]))(?:\('([^]*?)'\))?((<|>|p(\('[^]*?'\))?)*)/,
-	/(?:([cefhilmruwxyz]))(?:\('([^]*?)'\))?/,
-	/(?:([dnsvVk]))(?:\('([^]*?)'\))/,
+	/(?:([cefhilLmruwxyz]))(?:\('([^]*?)'\))?/,
+	/(?:([dDnsSvVk]))(?:\('([^]*?)'\))/,
 	/(?:([jJtT]))(?:\('([^]*?)'\))/,
 	/\/\/.*$/,
 	/\/\*[^]*(\*\/)?/,
@@ -29,7 +29,7 @@ export enum ACTIONS {
 };
 
 class STWToken {
-	symbol: string; // Symbol indicates what HTML tag the token maps to, it'is a mnemonic, e.g., `a` for anchor/link, `b` for button, `c` for checkbox, `r` for radiobox...
+	symbol: string; // Symbol indicates what HTML tag the token maps to, it'is a mnemonic, e.g., `a` for anchor/link, `b` for button, `c` for checkbox, `r` for radio...
 	args: string[] = []; // If you think of symbols as mapping functions, these are it's arguments
 	params: STWToken[] = []; // Only certain symbols (`a`, `b` and `o`) have params, they rappresent querystring parameters
 	attrs: Map<string, string> = new Map(); // Attributes are HTML attributes, e.g., `name`, `value`, `type`, `href`, etc. They are used to build the HTML tag
@@ -144,7 +144,7 @@ export class STWLayout {
 					token.args = "chrw".indexOf(token.symbol) != -1 ? [""] : []; // No format argument
 					for (const arg of ((pattern[1] || '') + ';').matchAll(/(?:(=?(["']?)[^]*?\2));/gmu))
 						token.args.push(arg[1]);
-					const type = ["hidden", "checkbox", "radiobox", "password", ""].at("hcrw".indexOf(token.symbol));
+					const type = ["hidden", "checkbox", "radio", "password", ""].at("hcrw".indexOf(token.symbol));
 					if (type) {
 						token.attrs.set("type", `'${type}'`);
 					}
@@ -244,6 +244,8 @@ export class STWLayout {
 					return ` \${(ph.get("${k}") || "")}`;
 				if (v.startsWith("${") && v.endsWith("}") || inline)
 					return ` ${k}="${v}"`;
+				if (v === "")
+					return ` ${k}`;
 				return ` ${k}="\${${v}}"`;
 			}).join("");
 
@@ -327,20 +329,50 @@ export class STWLayout {
 		});
 
 		const checkboxRadioHandler = (token: STWToken) => {
-			const nameArg = token.args[1];
-			const valueArg = token.args[2];
+			token.attrs.set("name", `"${token.args[1] || ''}" || fieldName`);
+			token.attrs.delete("value");
 
-			token.attrs.set("name", `wbpl(\`${nameArg || '@@'}\`, ph)`);
-			token.attrs.set("value", `wbpl(\`${valueArg || ''}\`, ph)`);
+			const options = token.args.slice(3), mode = parseInt(options[0]);
+			let js: string = `value=wbpl("${token.args[2] ?? ''}", ph) || fieldValue, checked = (value === fieldValue ? " checked" : "");`
+			if (isNaN(mode)) 
+				return `html+=\`<input\${""}${attributes(token)}>\${checked}\`;`;
 
-			const checkedLogic = `(String(fieldValue) === wbpl(\`${valueArg || ''}\`, ph)) ? ' checked' : ''`;
-
-			return `html+=\`<input\${${checkedLogic}}${attributes(token)}>\`; if (!"${nameArg}") fldCursor();`;
+			js += `html+=\`<fieldset class="stwGroup">\`;`
+			if (mode === 1)
+				for (let i = 1; i < options.length; i += 1) {
+					js += `checked = (value === "${options[i]}" ? " checked" : "");`; // TODO: multiple checkboxes
+					js += `html+=\`<label><input${attributes(token)} value="${options[i]}"\${checked}>${options[i] || ""}</label>\`;`;
+				}
+			else if (mode === 2)
+				for (let i = 1; i < options.length; i += 2) {
+					js += `checked = (value === "${options[i]}" ? " checked" : "");`; // TODO: multiple checkboxes
+					js += `html+=\`<label><input${attributes(token)} value="${options[i]}"\${checked}>${options[i + 1] || ""}</label>\`;`;
+				}
+			js += `html+=\`</fieldset>\`; if (!"${token.args[1]}") fldCursor();`;
+			return js;
 		};
 
 		handlers.set("c", checkboxRadioHandler);
 
-		handlers.set("d", (token) => `html+=\`<select ${attributes(token)}><option></option></select>\`;`);
+		const selectHandler = (token: STWToken) => {
+			token.attrs.set("name", `"${token.args[0] || ''}" || fieldName`);
+			token.attrs.set("value", `wbpl("${token.args[1] ?? ''}", ph) || fieldValue`);
+			if ("sS".indexOf(token.symbol) !== -1) token.attrs.set("multiple", "");
+
+			let js: string = `html+=\`<select${attributes(token)}>${"SD".indexOf(token.symbol) < 0 ? '<option></option>' : ''}\`;`
+			const options = token.args.slice(2), mode = parseInt(options[0]);
+			if (mode === 1)
+				for (let i = 1; i < options.length; i += 1)
+					js += `html+=\`<option value="${options[i]}">${options[i]}</option>\`;`;
+			else if (mode === 2)
+				for (let i = 1; i < options.length; i += 2)
+					js += `html+=\`<option value="${options[i]}">${options[i + 1]}</option>\`;`;
+			js += `html+=\`</select>\`;if (!"${token.args[0]}") fldCursor();`;
+			return js;
+		};
+
+		handlers.set("d", selectHandler);
+		handlers.set("D", selectHandler);
 
 		const fieldInputHandler = (token: STWToken, _recurse: boolean = false) => {
 			const nameArg = token.symbol === 'e' ? token.args[1] : token.args[0];
@@ -411,6 +443,7 @@ export class STWLayout {
 
 		handlers.set("r", checkboxRadioHandler);
 		handlers.set("s", handlers.get("d")!);
+		handlers.set("S", handlers.get("D")!);
 		handlers.set("t", (token, inline = false) => inline ? token.args[0] : `html+=\`${token.args[0]}\`;`);
 
 		handlers.set("u", (token) => `html+=\`<input type="file"${attributes(token)}>\`;`);
@@ -455,6 +488,7 @@ export class STWLayout {
 						handler = undefined; // Render nothing
 						break;
 					case 'd':
+					case 'D':
 						handler = STWLayout.tokenHandlers.get('n');
 						tokenToRender = new STWToken('n', ['2', ...token.args], token.params, token.attrs, token.text);
 						break;

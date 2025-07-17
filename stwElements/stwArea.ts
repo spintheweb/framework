@@ -32,6 +32,13 @@ export class STWArea extends STWElement {
 		};
 	}
 
+	public override update(session: STWSession, data: any): void {
+		super.update(session, data);
+		
+		this.mainpage = data.mainpage || this.mainpage;
+		this.version = data.version || this.version;
+	}
+
 	public override serve(req: Request, session: STWSession): Promise<Response> {
 		const page = STWSite.index.get(this.mainpage);
 

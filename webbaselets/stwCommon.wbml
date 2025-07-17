@@ -23,7 +23,7 @@
 			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwForm",
-			"section": "dialog",
+			"section": "modal",
 			"sequence": "",
 			"dsn": "json",
 			"query": "{\"email\":\"\"}",
@@ -52,7 +52,7 @@
 			"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
 			"params": "",
 			"layout": {
-				"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('forgotpassword')t('click here')"
+				"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('/stwc/forgotpassword')t('click here')"
 			}
 		}
 	],

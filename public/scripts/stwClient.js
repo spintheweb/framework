@@ -57,10 +57,10 @@ function stwStartWebsocket() {
 					return;
 			}
 
-			if (data.section === "stwDialog" || data.section === "dialog") {
+			if (data.section === "stwModal" || data.section === "modal") {
 				// self.document.querySelector("dialog")?.remove();
 				self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-				if (data.section === "dialog")
+				if (data.section === "modal")
 					self.document.querySelector("dialog")?.showModal();
 				else
 					self.document.querySelector("dialog")?.show();

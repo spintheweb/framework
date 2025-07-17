@@ -200,4 +200,18 @@ export abstract class STWContent extends STWElement {
 	public async render(_req: Request, _session: STWSession, _record: ISTWRecords): Promise<string> {
 		return await Promise.resolve(`Render ${this.constructor.name}`);
 	}
+
+	public override update(session: STWSession, data: any): void {
+		super.update(session, data);
+
+		this.cssClass = data.cssClass || this.cssClass;
+		this.section = data.section || this.section;
+		this.sequence = data.sequence || this.sequence;
+		this.dsn = data.dsn || this.dsn;
+		this.query = data.query || this.query;
+		this.params = data.params || this.params;
+
+		if (data.layout)
+			this.layout.set(session.lang, new STWLayout(data.layout));
+	}
 }

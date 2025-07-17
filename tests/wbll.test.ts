@@ -18,6 +18,7 @@ const Records = {
 };
 
 const Examples = [
+	{ wbll: `l('Name')c(';;1;Mario Rossi;Lucia Bianchi;Giulia Verdi')l('Port')\\rc('port')>>l('Sex')\\rr(';;2;M;Maschio;F;Femmina;;N.D.')`, html: `<label>Name</label><fieldset class="stwGroup"><label><input type="checkbox" name="nome" value="Mario Rossi" checked>Mario Rossi</label><label><input type="checkbox" name="nome" value="Lucia Bianchi">Lucia Bianchi</label><label><input type="checkbox" name="nome" value="Giulia Verdi">Giulia Verdi</label></fieldset><label>Port</label><br><input type="checkbox" name="port"><label>Sex</label><br><fieldset class="stwGroup"><label><input type="radio" name="sesso" value="M">Maschio</label><label><input type="radio" name="sesso" value="F">Femmina</label><label><input type="radio" name="sesso" value="" checked>N.D.</label></fieldset>`, isForm: true },
 	{ wbll: `appt('Who')`, html: ` <a href="http://localhost/Mario%20Rossi?altezza=1.78&dataDiNascita=1985-04-12">Who</a>`, isForm: false },
 	{ wbll: `j('alert("Hello {@@nome}!")')`, html: `<script>alert("Hello Mario Rossi!")</script>`, isForm: false },
 	{ wbll: `f>>f<n('2;M;Maschio;F;Femmina;*;N.D.')`, html: ` Mario Rossi   N.D.`, isForm: false },

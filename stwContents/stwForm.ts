@@ -21,9 +21,6 @@ export class STWForm extends STWContent {
 	public override async render(request: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		let layout = this.getLayout(session);
 
-		if (!records.fields?.length || !records.rows?.length)
-			return layout.settings.get("nodata") || "";
-
 		const fields = records.fields.map(f => f.name) || Object.keys(records.rows[0] || {});
 		if (!layout.hasTokens) {
 			this.layout.set(session.lang, new STWLayout(layout.wbll + "l\\tf\\r".repeat(fields.length)));
@@ -39,8 +36,8 @@ export class STWForm extends STWContent {
 
 		body += this.layout.get(session.lang)?.render(request, session, fields, placeholders, layout.acts(ACTIONS.stwany) && !isTruthy(layout.settings.get("disabled")));
 
-		// If the form is inside a dialog, method="dialog"
-		return `<form method="${this.section.startsWith("stwDialog") ? "dialog" : "post"}">
+		// If the form is modal, method="dialog"
+		return `<form method="${this.section === "modal" ? "dialog" : "post"}">
 			<input type="hidden" name="stwOrigin" value="${this._id}">
 			${body}
 		</form>`;

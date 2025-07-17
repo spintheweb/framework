@@ -12,6 +12,124 @@
 	},
 	"children": [
 		{
+			"_id": "e29cfba0-2952-11ee-8a01-eb5d698379c5",
+			"type": "Area",
+			"name": {
+				"en": "Edit"
+			},
+			"slug": {
+				"en": "edit"
+			},
+			"visibility": {},
+			"children": [
+				{
+					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit Site"
+					},
+					"slug": {
+						"en": "site"
+					},
+					"visibility": {},
+					"subtype": "Form",
+					"cssClass": "stwFormCompact",
+					"section": "",
+					"sequence": "",
+					"dsn": "stw",
+					"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"Homepage\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
+					}
+				},
+				{
+					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit Area"
+					},
+					"slug": {
+						"en": "area"
+					},
+					"visibility": {},
+					"subtype": "Form",
+					"cssClass": "stwFormCompact",
+					"section": "",
+					"sequence": "",
+					"dsn": "stw",
+					"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+					}
+				},
+				{
+					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit Page"
+					},
+					"slug": {
+						"en": "page"
+					},
+					"visibility": {},
+					"subtype": "Form",
+					"cssClass": "stwFormCompact",
+					"section": "",
+					"sequence": "",
+					"dsn": "stw",
+					"query": "[\"_id\", \"name\", \"slug\", \"template\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
+					}
+				},
+				{
+					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit content"
+					},
+					"slug": {
+						"en": "content"
+					},
+					"visibility": {},
+					"subtype": "Form",
+					"cssClass": "stwFormCompact",
+					"section": "",
+					"sequence": "",
+					"dsn": "stw",
+					"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+					}
+				},
+				{
+					"_id": "e20cfba0-2952-11ee-8a01-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit datasource"
+					},
+					"slug": {
+						"en": "datasource"
+					},
+					"visibility": {},
+					"subtype": "Form",
+					"cssClass": "stwFormCompact",
+					"section": "",
+					"sequence": "",
+					"dsn": "stw",
+					"query": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"name\"')l('Name')el('Type')d(';;2;mysql;mySQL;api;API')l('Host')el('Port')e\\a('type=\"number\"')l('User')el('Password')wl('Database')el('Content-Type')d(';;1;application/json')\\rb(';stw;update')t('Save')"
+					}
+				}
+			]
+		},
+		{
 			"_id": "e29cfba0-2952-12ee-8a01-eb5d698979c6",
 			"type": "Content",
 			"name": {
@@ -28,7 +146,7 @@
 			"dsn": "",
 			"query": "",
 			"params": "",
-			"layout": {},
+			"layout": {"en": "\\s('header=\"&emsp;WEBBASE\"')"},
 			"options": [
 				{
 					"name": {
@@ -38,94 +156,37 @@
 				},
 				{
 					"name": {
-						"en": "Element"
+						"en": "Data sources <span style=\"float:right\"><i class=\"fa-thin fa-fw fa-plus\" title=\"New data source\"></i></span>"
+					},
+					"ref": "e20cfba0-2952-11ee-8a01-eb5d698979c6"
+				},
+				{
+					"name": {
+						"en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-fw fa-plus\" title=\"New role\"></i></span>"
 					},
 					"ref": "e29cfba0-2952-11ee-8a01-eb5d698979c6"
 				}
 			]
 		},
 		{
-			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
+			"_id": "c7a1e2b0-16b2-4e6a-9f2a-8d2e4c9b7f3a",
 			"type": "Content",
 			"name": {
-				"en": "Edit Site"
+				"en": "Search"
 			},
 			"slug": {
-				"en": "editsite"
+				"en": "search"
 			},
 			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwFormCompact",
 			"section": "",
 			"sequence": "",
-			"dsn": "stw",
-			"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"Homepage\"]",
+			"dsn": "",
+			"query": "",
 			"params": "",
 			"layout": {
-				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
-			}
-		},
-		{
-			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-			"type": "Content",
-			"name": {
-				"en": "Edit Area"
-			},
-			"slug": {
-				"en": "editarea"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwFormCompact",
-			"section": "",
-			"sequence": "",
-			"dsn": "stw",
-			"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
-			"params": "",
-			"layout": {
-				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
-			}
-		},
-		{
-			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-			"type": "Content",
-			"name": {
-				"en": "Edit Page"
-			},
-			"slug": {
-				"en": "editpage"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwFormCompact",
-			"section": "",
-			"sequence": "",
-			"dsn": "stw",
-			"query": "[\"_id\", \"name\", \"slug\", \"template\"]",
-			"params": "",
-			"layout": {
-				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
-			}
-		},
-		{
-			"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-			"type": "Content",
-			"name": {
-				"en": "Edit content"
-			},
-			"slug": {
-				"en": "editcontent"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwFormCompact",
-			"section": "",
-			"sequence": "",
-			"dsn": "stw",
-			"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
-			"params": "",
-			"layout": {
-				"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+				"en": "\\s('header=\"&emsp;SEARCH\"')e\\a('placeholder=\"Search\"')e\\a('placeholder=\"Replace\"')b(';stw;search')t('Search')\\nt('search results')"
 			}
 		},
 		{
@@ -182,7 +243,7 @@
 					"options": [
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-sitemap\" title=\"Web application\"></i>"
+								"en": "<i class=\"fa-light fa-fw fa-2x fa-sitemap\" title=\"Webbase\"></i>"
 							},
 							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
 						},
@@ -190,7 +251,7 @@
 							"name": {
 								"en": "<i class=\"fa-light fa-fw fa-2x fa-search\" title=\"Search\"></i>"
 							},
-							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
+							"ref": "c7a1e2b0-16b2-4e6a-9f2a-8d2e4c9b7f3a"
 						},
 						{
 							"name": {
@@ -200,17 +261,7 @@
 						},
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-code-branch\" title=\"Source control\"></i>"
-							}
-						},
-						{
-							"name": {
 								"en": "-"
-							}
-						},
-						{
-							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-circle-user\" title=\"Account\"></i>"
 							}
 						},
 						{
@@ -234,12 +285,12 @@
 					"subtype": "Tree",
 					"cssClass": null,
 					"section": "",
-					"sequence": "3",
+					"sequence": "",
 					"dsn": "stw",
-					"query": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
+					"query": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit/\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
 					"layout": {
-						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-folder\"></i>;Page*;<i class=\"fa-light fa-file\"></i>;Content*;<i class=\"fa-light fa-square-dashed\"></i>;;<i class=\"fa-light fa-square\"></i>')apf"
+						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-fw fa-folder\"></i>;Page*;<i class=\"fa-light fa-fw fa-file\"></i>;Content*;<i class=\"fa-light fa-fw fa-cloud\"></i>;;<i class=\"fa-light fa-fw fa-square\"></i>')apf"
 					}
 				},
 				{
@@ -255,7 +306,7 @@
 					"subtype": "Tree",
 					"cssClass": null,
 					"section": "",
-					"sequence": "3",
+					"sequence": "",
 					"dsn": "stw",
 					"query": "($tree:=function($node){{\"_id\":_id,\"slug\":$node.slug.en?$node.slug.en:\"\",\"type\":$node.subtype?$node.subtype:$node.type,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
@@ -279,7 +330,7 @@
 					"subtype": "Form",
 					"cssClass": null,
 					"section": "",
-					"sequence": "1",
+					"sequence": "",
 					"dsn": "",
 					"query": "",
 					"params": "",
@@ -309,9 +360,7 @@
 					}
 				}
 			],
-			"visibility": {},
-			"contentType": null,
-			"template": null
+			"visibility": {}
 		}
 	],
 	"visibility": {

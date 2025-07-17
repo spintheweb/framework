@@ -151,6 +151,15 @@ export class STWSite extends STWElement {
 			});
 	}
 
+	public override update(session: STWSession, data: any): void {
+		super.update(session, data);
+		
+		this.langs = data.langs || this.langs;
+		this.datasources = new Map(Object.entries(data.datasources || {}));
+		this.mainpage = data.mainpage || this.mainpage;
+		this.version = data.version || this.version;
+	}
+
 	public override export(): string {
 		let fragment: string = "";
 		this.children.forEach(child => fragment += child.export());

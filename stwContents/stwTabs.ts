@@ -42,7 +42,7 @@ export class STWTabs extends STWContent {
 		if (!id)
 			return "";
 
-		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"></article></dd>`;
+		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"><i class="fa-light fa-loader fa-spin"></i></article></dd>`;
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
 		const mode = layout.settings.get("mode") || "horizontal";
@@ -53,7 +53,7 @@ export class STWTabs extends STWContent {
 					tabs.querySelector("dl").addEventListener("click", event => {
 						event.stopImmediatePropagation();
 						const target = event.target.closest("dt");
-						if (target) {
+						if (target && target.hasAttribute("data-ref")) {
 							event.currentTarget.querySelector("dd").innerHTML = '<article id="refreshSTWTab"></article>';
 							if (target.classList.contains("stwSelected"))
 								target.classList.remove("stwSelected");

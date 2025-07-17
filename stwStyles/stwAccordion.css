@@ -20,6 +20,10 @@
 	text-overflow: ellipsis;
 }
 
+.stwAccordion dd:not(:first-of-type) {
+	display: none;
+}
+
 .stwAccordion dt span {
 	width: var(--margin);
 	display: inline-block;

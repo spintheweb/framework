@@ -144,6 +144,25 @@ export abstract class STWElement {
 		return xml + `</${this.type}>\n`;
 	}
 
+	public update(session: STWSession, data: any): void {
+		this.localize(session, "name", data.name || "");
+		this.localize(session, "slug", data.slug || "");
+		this.keywords.set(session.lang, data.keywords || "");
+		this.description.set(session.lang, data.description || "");
+		this.modified = Date.now();
+
+		if (data.visibility) {
+			this.visibility.clear();
+			for (const [role, visible] of Object.entries(data?.visibility))
+				if (typeof visible === "undefined" || visible === null)
+					this.visibility.delete(role);
+				else
+					this.visibility.set(role, true);
+		}
+
+		// TODO: children
+	};
+
 	public serve(_req: Request, _session: STWSession, _ref?: STWContent): Promise<Response> {
 		return Promise.resolve(new Response("Not implemented", { status: 501 }));
 	}

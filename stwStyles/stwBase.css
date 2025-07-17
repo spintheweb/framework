@@ -33,3 +33,12 @@
 	white-space: pre-wrap;
 	word-break: break-word;
 }
+
+fieldset.stwGroup {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+	border: none;
+	padding: 0;
+	margin: 0;
+}

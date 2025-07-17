@@ -1,66 +1,60 @@
 .stwCalendar {
-    width: 100%;
-    max-width: 100%;
+	width: 100%;
+	max-width: 100%;
 }
 
-.stwCalendar table {
-    width: 100%;
-    border-collapse: collapse;
+.stwCalendar table:first-of-type {
+	width: 100%;
+	border-collapse: collapse;
 }
 
-.stwCalendar table td {
-    border: 1px solid var(--border);
-    vertical-align: top;
-    height: 2em;
-    min-height: 2em;
-    padding: 0.25em;
-    box-sizing: border-box;
+.stwCalendar table:first-of-type td {
+	border: thin solid var(--border);
+	vertical-align: top;
+	min-height: 2rem;
+	padding: 0.25rem;
+	box-sizing: border-box;
 }
 
-.stwCalendar table th {
-    background: var(--special);
-    color: var(--on-special);
-    text-align: center;
-    font-weight: bold;
-    height: 2.5em;
+.stwCalendar table:first-of-type th {
+	background: var(--special);
+	color: var(--on-special);
+	height: 2rem;
+	min-width: 2.5rem;
 }
 
 .stwCalendarDayNum {
-    font-size: smaller;
-    margin-bottom: 0.25em;
-    text-align: center;
+	font-size: smaller;
+	margin-bottom: 0.25rem;
+	text-align: center;
 }
 
 .stwCalendarToday {
-    background: var(--special-hover) !important;
-    color: var(--on-special) !important;
-    border: 2px solid var(--special) !important;
+	background: var(--special-hover) !important;
+	color: var(--on-special) !important;
+	border: medium solid var(--special) !important;
 }
 
 .stwCalendarMonthHeader {
-    text-align: center;
-    font-size: 1.3em;
-    font-weight: bold;
-    margin-bottom: 0.5em;
-    background: var(--bg-faint);
-    color: var(--text);
-    padding: var(--padding-reduced);
+	text-align: center;
+	font-weight: bold;
+	padding: var(--padding-reduced);
 }
 
 .stwCalendarGroup {
-    margin-bottom: var(--padding);
-    padding: var(--padding-reduced);
-    border-left: 3px solid var(--special);
+	margin-bottom: var(--padding);
+	padding: var(--padding-reduced);
+	border-left: thick solid var(--special);
 }
 
 .stwCalendarGroup:not(:last-child) {
-    margin-bottom: 1.5rem;
+	margin-bottom: 1.5rem;
 }
 
-.stwCalendar .stwCalendarGroup > * {
-    margin-bottom: var(--padding-compact);
+.stwCalendar .stwCalendarGroup>* {
+	margin-bottom: var(--padding-compact);
 }
 
-.stwCalendar .stwCalendarGroup > *:last-child {
-    margin-bottom: 0;
+.stwCalendar .stwCalendarGroup>*:last-child {
+	margin-bottom: 0;
 }

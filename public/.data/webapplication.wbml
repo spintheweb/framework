@@ -2,7 +2,7 @@
 	"_id": "169ecfb0-2916-11ee-ad92-6bd31f953e80",
 	"type": "Site",
 	"name": {
-		"en": "Hello World"
+		"en": "Spin the Web Project"
 	},
 	"children": [
 		{
@@ -88,10 +88,10 @@
 					"_id": "92a2ced0-ae64-11ee-90a9-c195cb5cfc71",
 					"type": "Content",
 					"name": {
-						"en": "Info"
+						"en": "Menus"
 					},
 					"slug": {
-						"en": "info"
+						"en": "menus"
 					},
 					"visibility": {
 						"guests": true
@@ -99,7 +99,7 @@
 					"subtype": "Menus",
 					"cssClass": null,
 					"section": "header",
-					"sequence": "4",
+					"sequence": "1",
 					"dsn": "",
 					"query": "",
 					"params": "",
@@ -182,12 +182,6 @@
 						},
 						{
 							"ref": "169ecfb0-2916-11ee-ad92-6bd31f953e80"
-						},
-						{
-							"name": {
-								"en": "Spin the Web Project"
-							},
-							"ref": "https://www.spintheweb.org"
 						},
 						{
 							"name": {
@@ -368,12 +362,6 @@
 			"visibility": {
 				"guests": true
 			},
-			"keywords": {
-				"en": ""
-			},
-			"description": {
-				"en": ""
-			},
 			"contentType": "text/html",
 			"template": "index.html"
 		},
@@ -465,44 +453,13 @@
 			"visibility": {
 				"guests": true
 			},
-			"subtype": "Breadcrumbs",
-			"cssClass": "stwBreadcrumbs",
-			"section": "footer",
-			"sequence": "1"
-		},
-		{
-			"_id": "a59a6ba0-294f-11ee-8920-81914e862dd6",
-			"type": "Content",
-			"name": {
-				"en": "Menu"
-			},
-			"slug": {
-				"en": "menu"
-			},
-			"visibility": {
-				"guests": true
-			},
-			"subtype": "Menu",
-			"cssClass": "stwMenu",
-			"section": "header",
-			"sequence": "1",
 			"dsn": "",
 			"query": "",
 			"params": "",
-			"layout": {
-				"en": ""
-			},
-			"options": [
-				{
-					"_id": "169ecfb1-2916-11ee-ad92-6bd31f953e80"
-				},
-				{
-					"_id": "e96850b0-2934-11ee-9adf-ab38b1846e6d"
-				},
-				{
-					"_id": "d18e40c0-3d21-11ee-8e8f-d7e9515d7646"
-				}
-			]
+			"subtype": "Breadcrumbs",
+			"cssClass": "stwBreadcrumbs",
+			"section": "header",
+			"sequence": "2"
 		},
 		{
 			"_id": "04aefc10-293b-11ee-92de-0fc9206ffad8",
@@ -518,8 +475,8 @@
 			},
 			"subtype": "Languages",
 			"cssClass": "stwLanguages",
-			"section": "header",
-			"sequence": "2",
+			"section": "footer",
+			"sequence": "1",
 			"behavior": true,
 			"layout": {}
 		}

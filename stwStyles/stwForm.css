@@ -1,5 +1,6 @@
-.stwForm {
-	padding: var(--padding)
+.stwForm form,
+.stwFormCompact form {
+	padding: var(--padding) !important;
 }
 
 .stwForm label {
@@ -16,10 +17,6 @@
 	padding: var(--padding);
 	min-width: 7rem;
 	margin: var(--padding) 0;
-}
-
-.stwFormCompact {
-	padding: var(--padding-compact)
 }
 
 .stwFormCompact input:not([type=number]),

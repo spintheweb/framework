@@ -36,7 +36,7 @@ export class STWPage extends STWElement {
 	 * @returns String array of contents ids
 	 */
 	public contents(_session: STWSession, recurse: boolean = true): string[] {
-		const contents = this.children.filter(content => !(content as unknown as STWContent).section.startsWith("stwDialog") && content.isVisible(_session) & 1).map(content => content._id);
+		const contents = this.children.filter(content => !(content as unknown as STWContent).section.startsWith("stwModal") && content.isVisible(_session) & 1).map(content => content._id);
 		if (recurse)
 			climb(this.parent, contents, recurse);
 		return contents;
@@ -60,6 +60,12 @@ export class STWPage extends STWElement {
 		console.debug(`${new Date().toISOString()}: ${this.type} (${this.pathname(session)}) [${this._id}]`);
 
 		return serveFile(req, `./public/${this.template}`);
+	}
+
+	public override update(session: STWSession, data: any): void {
+		super.update(session, data);
+		
+		this.template = data.template || this.template;
 	}
 }
 

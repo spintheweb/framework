@@ -24,21 +24,25 @@
 	display: inline-block;
 	padding: var(--thickness) var(--padding);
 	cursor: pointer;
-	margin-left: var(--padding);
-	border-top: thin solid var(--text);
+	border-top: thin solid var(--border);
+	border-left: thin solid var(--border);
+}
+.stwHTabs dt[data-ref]:last-of-type {
+	border-right: thin solid var(--border);
 }
 
-.stwVTabs dd {
+.stwVTabs dd:first-of-type {
 	flex-grow: 1;
 }
 
-.stwVTabs dt {
+.stwVTabs dt[data-ref] {
 	padding: var(--padding);
 	cursor: pointer;
 }
 
 .stwTabs dd {
-	margin: 0
+	display: flex;
+	margin: 0;
 }
 
 .stwTabs dd>article {
