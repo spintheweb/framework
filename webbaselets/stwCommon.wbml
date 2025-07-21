@@ -23,7 +23,7 @@
 			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwForm",
-			"section": "modal",
+			"section": "stwShowModal",
 			"sequence": "",
 			"dsn": "json",
 			"query": "{\"email\":\"\"}",

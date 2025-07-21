@@ -12,9 +12,6 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWGeomap extends STWContent {
-	// TODO: scripts should be loaded in the template, e.g. index.html
-	static scripts: string = `<script src="https://www.openlayers.org/api/OpenLayers.js"></script>`;
-
 	public constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -22,6 +19,7 @@ export class STWGeomap extends STWContent {
 	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<div id="Map${this._id}"></div>
+			<script name="OpenLayers" src="https://www.openlayers.org/api/OpenLayers.js"></script>
 			<script name="STWGeomap" onload="fnSTWGeomap('Map${this._id}')">
 				function fnSTWGeomap(id) {
 					if (typeof OpenLayers !== "undefined") {
@@ -29,7 +27,7 @@ export class STWGeomap extends STWContent {
 						map.addLayer(new OpenLayers.Layer.OSM());
 						map.zoomToMaxExtent();
 					} else
-					 	self.document.getElementById(id).innerHTML = 'OpenLayers not loaded, see <a target="_blank" href="https://openlayers.org/">https://openlayers.org/</a>';
+						self.document.getElementById(id).innerHTML = 'OpenLayers not loaded, see <a target="_blank" href="https://openlayers.org/">https://openlayers.org/</a>';
 				}
 			</script>`;
 	}

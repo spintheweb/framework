@@ -11,16 +11,14 @@
 	<link href="/styles/style.css" rel="stylesheet">
 	<link href="/styles/stwStyle.css" rel="stylesheet">
 	<script src="/scripts/stwClient.js"></script>
-	<!--script src="https://www.openlayers.org/api/OpenLayers.js"></script-->
-	<!--script src="https://cdn.jsdelivr.net/npm/chart.js"></script-->
 </head>
 
 <body>
 	<header id="header"></header>
-	<div style="display: flex; gap:0.25rem;">
-		<aside id="leftSidebar" style="flex-shrink: 0;"></aside>
-		<main id="main" style="flex-grow: 1;"></main>
-		<aside id="rightSidebar" style="flex-shrink: 0;"></aside>
+	<div style="display: flex; gap:0.5rem; height: 100vh; align-items: flex-start;">
+		<aside id="leftSidebar" style="position: relative; display: flex; flex-direction: column;"></aside>
+		<main id="main" style="position: relative; display: flex; flex-direction: column; overflow-x: auto; width:100%;"></main>
+		<aside id="rightSidebar" style="position: relative; display: flex; flex-direction: column;"></aside>
 	</div>
 	<footer id="footer"></footer>
 </body>

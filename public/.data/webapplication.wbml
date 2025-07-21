@@ -100,9 +100,6 @@
 					"cssClass": null,
 					"section": "header",
 					"sequence": "1",
-					"dsn": "",
-					"query": "",
-					"params": "",
 					"layout": {
 						"en": "\\s('short')"
 					},
@@ -209,12 +206,8 @@
 						"guests": true
 					},
 					"subtype": "Tabs",
-					"cssClass": null,
 					"section": "main",
 					"sequence": "10",
-					"dsn": "",
-					"query": "",
-					"params": "",
 					"layout": {
 						"en": "\\s('mode=\"horizontal\"')"
 					},
@@ -243,12 +236,10 @@
 						"guests": true
 					},
 					"subtype": "Table",
-					"cssClass": "stwTable",
 					"section": "rightSidebar",
 					"sequence": "1",
 					"dsn": "mysqlsample",
 					"query": "select * from offices",
-					"params": "",
 					"layout": {
 						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('-')b(';stw;insert')t('+')"
 					}
@@ -266,12 +257,8 @@
 						"guests": true
 					},
 					"subtype": "Calendar",
-					"cssClass": "",
 					"section": "leftSidebar",
 					"sequence": "1",
-					"dsn": "",
-					"query": "",
-					"params": "",
 					"layout": {
 						"en": "\\s('mode=\"month\" key=\"date\"')"
 					}
@@ -305,11 +292,9 @@
 					"visibility": {},
 					"subtype": "Table",
 					"cssClass": "stwTable",
-					"section": "",
 					"sequence": "1",
 					"dsn": "mysqlsample",
 					"query": "select * from products limit 3",
-					"params": "",
 					"layout": {
 						"en": "\\s('rows=\"10\" ')"
 					}
@@ -327,14 +312,12 @@
 						"guests": true
 					},
 					"subtype": "List",
-					"cssClass": "",
-					"section": "",
 					"sequence": "5",
 					"dsn": "objects",
 					"query": "$.({\"name\":name,\"color\":data.color})",
 					"params": "id=3&id=5&id=10",
 					"layout": {
-						"en": "\\s('header=\"This data comes from the API: https://api.restful-api.dev/objects\"')"
+						"en": "\\s('closable header=\"This data comes from the API: https://api.restful-api.dev/objects\"')"
 					}
 				},
 				{
@@ -348,12 +331,10 @@
 					},
 					"visibility": {},
 					"subtype": "Table",
-					"cssClass": "",
 					"section": "main",
 					"sequence": "1",
 					"dsn": "mysqlsample",
 					"query": "select *, 'collapsible' as foo from employees limit 3",
-					"params": "",
 					"layout": {
 						"en": "\\s('caption=\"Employees\" key=\"employeeNumber\" @@foo ')\nl('Name')a('dashboard')pp('fufi;@@foo')ff\nl('Ext.')f\nl('eMail')a('mailto:@@email')f\nlf\nlf\nl('Title')f"
 					}
@@ -453,13 +434,13 @@
 			"visibility": {
 				"guests": true
 			},
-			"dsn": "",
-			"query": "",
-			"params": "",
 			"subtype": "Breadcrumbs",
 			"cssClass": "stwBreadcrumbs",
 			"section": "header",
-			"sequence": "2"
+			"sequence": "2",
+			"layout": {
+				"en": "\\s('header='<i class=\"fa-light fa-sidebar\" onclick=\"toggleSidebar(event)\"></i>' footer='<i class=\"fa-light fa-sidebar-flip\" onclick=\"toggleSidebar(event)\"></i>'')j('function toggleSidebar(event){const sidebar=document.getElementById(event.target.className.indexOf(\"flip\") == -1 ? \"leftSidebar\" : \"rightSidebar\"); sidebar.style.display = sidebar.style.display === \"none\" ? \"flex\" : \"none\";}')"
+			}
 		},
 		{
 			"_id": "04aefc10-293b-11ee-92de-0fc9206ffad8",
@@ -477,13 +458,17 @@
 			"cssClass": "stwLanguages",
 			"section": "footer",
 			"sequence": "1",
-			"behavior": true,
 			"layout": {}
 		}
 	],
 	"visibility": {
 		"administrators": true,
-		"guests": true
+		"guests": false,
+		"users": false,
+		"editors": false,
+		"developers": false,
+		"moderators": false,
+		"contributors": false
 	},
 	"keywords": {
 		"en": "stw"

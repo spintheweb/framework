@@ -103,13 +103,13 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 					const result = origin.getLayout(session).handleAction(stwAction); // TODO
 					session.socket?.send(JSON.stringify({
 						method: "PUT",
-						section: "modal",
+						section: "stwShowModal",
 						body: `<label>Form data ${stwAction}</label><pre>${JSON.stringify(records, null, 4)}</pre>`
 					}));
 				} catch (error: any) {
 					session.socket?.send(JSON.stringify({
 						method: "PUT",
-						section: "modal",
+						section: "stwShowModal",
 						body: `<label>Error</label><pre>${error.message}</pre>`
 					}));
 				}

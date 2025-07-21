@@ -7,6 +7,7 @@
 **/
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
+import { STWSite } from "../stwElements/stwSite.ts";
 import { STWLayout } from "./wbll.ts";
 
 export class STWTabs extends STWContent {
@@ -33,7 +34,7 @@ export class STWTabs extends STWContent {
 				const element = session.site.find(session, option.ref || "");
 				if (element instanceof STWContent && element.isVisible(session)) {
 					const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-					body += `<dt data-ref="${element._id}"${id ? "" : " class=\"stwSelected\""}>${name}</dt>`;
+					body += `<dt data-ref="${element._id}"${id ? "" : " class=\"stwSelected\""}>${name}${closable(session, element._id)}</dt>`;
 					id = id || element._id;
 				}
 			}
@@ -52,6 +53,14 @@ export class STWTabs extends STWContent {
 					const tabs = self.document.getElementById(id);
 					tabs.querySelector("dl").addEventListener("click", event => {
 						event.stopImmediatePropagation();
+						
+						if (event.target.tagName === "I" && event.target.classList.contains("fa-xmark")) {
+							event.currentTarget.querySelector("article").remove();
+							event.target.closest("dt").previousElementSibling?.click();
+							event.target.closest("dt").remove();
+							return;
+						}
+
 						const target = event.target.closest("dt");
 						if (target && target.hasAttribute("data-ref")) {
 							event.currentTarget.querySelector("dd").innerHTML = '<article id="refreshSTWTab"></article>';
@@ -66,6 +75,13 @@ export class STWTabs extends STWContent {
 					});
 				}
 			</script>`;
+
+		function closable(session: STWSession, id: string): string {
+			const tab = STWSite.index.get(id);
+			if (tab instanceof STWContent && tab.getLayout(session).settings.get("closable") === "true")
+				return `&emsp;<i class="fa-light fa-xmark"></i>`;
+			return "";
+		}
 	}
 }
 

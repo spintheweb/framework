@@ -21,7 +21,7 @@ function stwStartWebsocket() {
 	stwWS.onopen = _event => {
 		stwWS.send(JSON.stringify({
 			method: "HEAD",
-			resource: self.document.location.pathname,
+			resource: document.location.pathname,
 			options: {
 				lang: navigator.language,
 				langs: navigator.languages,
@@ -30,7 +30,7 @@ function stwStartWebsocket() {
 		}));
 
 		// TODO: Update lang to reflect the session language, should each <article> have a lang attribute that reflects its language?
-		self.document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
+		document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
 	};
 
 	stwWS.onmessage = event => {
@@ -43,13 +43,13 @@ function stwStartWebsocket() {
 		}
 
 		if (data.placeholder) {
-			const placeholder = self.document.getElementById(data.placeholder);
+			const placeholder = document.getElementById(data.placeholder);
 			placeholder?.insertAdjacentHTML("afterend", data.body);
 			placeholder?.remove();
 
 		} else {
 			if (data.method === "PUT" || data.method === "DELETE") {
-				const element = self.document.getElementById(data.id);
+				const element = document.getElementById(data.id);
 				if (element && data.section === "")
 					element.insertAdjacentHTML("afterend", data.body);
 				element?.remove();
@@ -57,23 +57,15 @@ function stwStartWebsocket() {
 					return;
 			}
 
-			if (data.section === "stwModal" || data.section === "modal") {
-				// self.document.querySelector("dialog")?.remove();
-				self.document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-				if (data.section === "modal")
-					self.document.querySelector("dialog")?.showModal();
+			if (data.section === "stwShowModal" || data.section === "stwShow") {
+				// document.querySelector("dialog")?.remove();
+				document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
+				if (data.section === "stwShowModal")
+					document.querySelector("dialog")?.showModal();
 				else
-					self.document.querySelector("dialog")?.show();
-
-			} else if (data.section === "stwConsole") {
-				const stwConsole = self.document.getElementById("stwConsole");
-				if (stwConsole)
-					stwConsole.insertAdjacentHTML("beforeend", `<li onclick="this.remove()">${data.body}&#128473;</li>`);
-				else
-					self.document.body.insertAdjacentHTML("beforeend", `<ul id="stwConsole"><li onclick="this.remove()">${data.body}&#128473;</li></ul>`);
-
+					document.querySelector("dialog")?.show();
 			} else {
-				let insertion = self.document.getElementById(data.section);
+				let insertion = document.getElementById(data.section);
 				insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
 					if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
 						insertion = article;
@@ -83,18 +75,34 @@ function stwStartWebsocket() {
 		}
 
 		// Load articles
-		document.querySelectorAll("article[href]").forEach(article => {
+		document.body.querySelectorAll("article[href]").forEach(article => {
 			stwWS.send(JSON.stringify({ method: "PATCH", resource: article.getAttribute("href"), options: { placeholder: article.id } }));
 			article.removeAttribute("href");
 		});
 
 		// Load content script
-		const script = self.document.getElementById(data.id)?.querySelector("script[onload]");
+		document.body.querySelectorAll("script").forEach(script => {
+			if (document.head.querySelector(`script[name="${script.getAttribute("name")}"]`))
+				return;
+
+			const loadScript = document.createElement("script");
+			loadScript.setAttribute("name", script.getAttribute("name") || "");
+			if (script.src)
+				loadScript.src = script.src;
+			else
+				loadScript.textContent = script.textContent;
+			document.head.appendChild(loadScript);
+			if (typeof script.onload === "function")
+				script.onload();
+			script.remove();
+		});
+
+		const script = document.getElementById(data.id)?.querySelector("script[onload]");
 		if (script) {
 			if (typeof window[`fn${script.getAttribute("name")}`] !== "function") {
-				const element = self.document.createElement("script");
+				const element = document.createElement("script");
 				element.insertAdjacentText("afterbegin", script.innerText);
-				self.document.head.append(element);
+				document.head.append(element);
 			}
 			script.onload();
 			script.remove();
@@ -145,7 +153,9 @@ window.addEventListener("keydown", event => {
 // Handle resizing of the sidebar in studio mode
 document.addEventListener("mousedown", function (event) {
 	const splitter = event.target.closest(".stwSplitter");
+
 	if (!splitter) return;
+
 	const container = splitter.parentElement;
 	const aside = container.querySelector("aside");
 	const startX = event.clientX;
@@ -155,7 +165,7 @@ document.addEventListener("mousedown", function (event) {
 		const dx = e2.clientX - startX;
 		let newWidth = startWidth + dx;
 		newWidth = Math.max(100, Math.min(window.innerWidth * 0.5, newWidth));
-		container.style.gridTemplateColumns = `${newWidth}px 5px 1fr`;
+		aside.style.width = `${newWidth}px`;
 	}
 
 	function onMouseUp() {
@@ -202,3 +212,28 @@ window.addEventListener("popstate", function () {
 	stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
 });
 
+/*
+let isDragging = false;
+let offsetX, offsetY;
+
+const dialog = document.getElementById("dialog");
+const handle = document.getElementById("dialogHeader");
+
+handle.addEventListener("mousedown", (e) => {
+  offsetX = e.clientX - dialog.offsetLeft;
+  offsetY = e.clientY - dialog.offsetTop;
+  isDragging = true;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (isDragging) {
+	 dialog.style.position = "absolute";
+	 dialog.style.left = `${e.clientX - offsetX}px`;
+	 dialog.style.top = `${e.clientY - offsetY}px`;
+  }
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+*/

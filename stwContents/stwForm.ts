@@ -37,7 +37,7 @@ export class STWForm extends STWContent {
 		body += this.layout.get(session.lang)?.render(request, session, fields, placeholders, layout.acts(ACTIONS.stwany) && !isTruthy(layout.settings.get("disabled")));
 
 		// If the form is modal, method="dialog"
-		return `<form method="${this.section === "modal" ? "dialog" : "post"}">
+		return `<form method="${this.section === "stwShowModal" ? "dialog" : "post"}">
 			<input type="hidden" name="stwOrigin" value="${this._id}">
 			${body}
 		</form>`;

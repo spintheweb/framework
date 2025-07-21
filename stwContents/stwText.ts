@@ -29,7 +29,7 @@ export class STWText extends STWContent {
 			id: this._id,
 			section: (ref || this).section,
 			sequence: (ref || this).sequence,
-			body: this.render(req, session, await STWDatasources.query(session, this))
+			body: await this.render(req, session, await STWDatasources.query(session, this))
 		};
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 	}
@@ -40,8 +40,9 @@ export class STWText extends STWContent {
 		const layoutText = typeof layoutValue === "string" ? layoutValue : (layoutValue?.toString?.() ?? "");
 		if (records?.rows?.length) {
 			return records.rows.map(row => {
-				const merged = { ...Object.fromEntries(session.placeholders), ...row };
-				return wbpl(layoutText, merged);
+				const mergedObj = { ...Object.fromEntries(session.placeholders), ...row };
+				const mergedMap = new Map<string, string>(Object.entries(mergedObj).map(([k, v]) => [k, String(v)]));
+				return wbpl(layoutText, mergedMap);
 			}).join("");
 		}
 		return wbpl(layoutText, new Map(session.placeholders));

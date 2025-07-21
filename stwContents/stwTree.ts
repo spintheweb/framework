@@ -50,9 +50,11 @@ export class STWTree extends STWContent {
 			body = `<ul>${renderNode(treeData)}</ul>
 			<script name="STWTree" onload="fnSTWTree('${this._id}')">
 				function fnSTWTree(id) {
-					self.document.getElementById(id).querySelector("li>div").classList.add("stwSelected");
 					self.document.getElementById(id).addEventListener("click", event => {
-						const li = event.target.closest("li"), i = li.querySelector("i");
+						event.stopImmediatePropagation();
+						const li = event.target.closest("li");
+						if (!li) return;
+						const i = li.querySelector("i");
 						event.currentTarget.querySelector("div.stwSelected")?.classList.remove("stwSelected");
 						li.firstElementChild?.classList.add("stwSelected");
 						if (event.target.tagName !== "I") return;

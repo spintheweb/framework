@@ -11,10 +11,6 @@
 	color: var(--on-special) !important;
 }
 
-.stwCollapsible {
-	cursor: pointer;
-}
-
 .stwError {
 	font-size: small;
 	padding: var(--padding-reduced) !important;

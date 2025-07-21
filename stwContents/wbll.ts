@@ -287,7 +287,6 @@ export class STWLayout {
 					fldCursor();
 				}
 				const hasProtocol = /^[a-z]+:\\/\\//i.test(baseUrl);
-
 				const queryParams = new URLSearchParams();
 				let p_name, p_val;
 				${token.params.map(param => {
@@ -312,9 +311,8 @@ export class STWLayout {
 					const url = new URL(baseUrl, base);
 					queryParams.forEach((value, key) => url.searchParams.set(key, value));
 					href = url.href;
-				} else {
+				} else
 					href = baseUrl + (queryString ? '?' + queryString : '');
-				}
 				const textContent = (() => { let html=""; ${textCode} return html; })();
 				html+=\` <a href="\${href}"${attributes(token)}>\${textContent.trim()}</a>\`;
 			}`;

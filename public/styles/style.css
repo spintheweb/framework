@@ -9,7 +9,7 @@
 	/* Pastel tints using color-mix for a "rubber pastel" flavor */
 	--special-red: color-mix(in srgb, #ff6f61 70%, white);
 	--special-green: color-mix(in srgb, #6fcf97 70%, white);
-	--special-blue: color-mix(in srgb, #4f8cff 70%, white);
+	--special-blue: color-mix(in srgb, #4f8cff 90%, white);
 	--special-yellow: color-mix(in srgb, #ffe066 70%, white);
 	--special-purple: color-mix(in srgb, #b39ddb 70%, white);
 	--special-gray: color-mix(in srgb, #b0b0b0 60%, white);
@@ -38,7 +38,7 @@
 
 		--special-red: color-mix(in srgb, #ff6f61 60%, #222 40%);
 		--special-green: color-mix(in srgb, #6fcf97 60%, #222 40%);
-		--special-blue: color-mix(in srgb, #4f8cff 60%, #222 40%);
+		--special-blue: color-mix(in srgb, #4f8cff 100%, #222 0%);
 		--special-yellow: color-mix(in srgb, #ffe066 60%, #222 40%);
 		--special-purple: color-mix(in srgb, #b39ddb 60%, #222 40%);
 		--special-gray: color-mix(in srgb, #b0b0b0 50%, #222 50%);
@@ -54,25 +54,31 @@ body {
 
 h1 {
 	color: var(--special);
-	margin: var(--padding) 0;
+	margin: var(--padding);
 }
 
-dialog {
+dialog[open] {
+	position: fixed;
+	padding: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	font-size: smaller;
-	min-width: 25rem;
-	border: thin solid;
+	border: thin solid var(--border);
+	z-index: 1000;
+	max-width: 50rem;
 }
 
-dialog h1::after {
-	font-family: "Font Awesome 6 Pro";
-	content: "\e286";
-	float: right;
-	font-weight: 300;
+dialog h1 {
+	position: relative;
+	background-color: var(--special);
+	color: var(--on-special);
+	margin: 0;
+	padding: var(--padding);
 }
 
 article {
 	position: relative;
-	/*padding: var(--padding-compact);*/
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;

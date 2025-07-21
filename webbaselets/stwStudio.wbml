@@ -13,7 +13,7 @@
 	"children": [
 		{
 			"_id": "e29cfba0-2952-11ee-8a01-eb5d698379c5",
-			"type": "Area",
+			"type": "Page",
 			"name": {
 				"en": "Edit"
 			},
@@ -33,14 +33,11 @@
 					},
 					"visibility": {},
 					"subtype": "Form",
-					"cssClass": "stwFormCompact",
-					"section": "",
-					"sequence": "",
+					"section": "stwShow",
 					"dsn": "stw",
-					"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"Homepage\"]",
-					"params": "",
+					"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"mainpage\"]",
 					"layout": {
-						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-globe\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -54,14 +51,11 @@
 					},
 					"visibility": {},
 					"subtype": "Form",
-					"cssClass": "stwFormCompact",
-					"section": "",
-					"sequence": "",
+					"section": "stwShow",
 					"dsn": "stw",
-					"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
-					"params": "",
+					"query": "[\"_id\", \"name\", \"slug\", \"mainpage\"]",
 					"layout": {
-						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-folder\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Mainpage')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -75,14 +69,11 @@
 					},
 					"visibility": {},
 					"subtype": "Form",
-					"cssClass": "stwFormCompact",
-					"section": "",
-					"sequence": "",
+					"section": "stwShow",
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"template\"]",
-					"params": "",
 					"layout": {
-						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-page\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -96,14 +87,11 @@
 					},
 					"visibility": {},
 					"subtype": "Form",
-					"cssClass": "stwFormCompact",
-					"section": "",
-					"sequence": "",
+					"section": "stwShow",
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
-					"params": "",
 					"layout": {
-						"en": "\\s('key=\"_id\"')hl('Name')el('Slug')el('Type')el('Section')el('Sequence')el('DSN')el('Query')ml('Parameters')el('Layout')m\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-square\"></i> @@name' key=\"_id\"')hl('Name')e\\rl('Slug')e\\rl('Type')\\rD(';;1;Text;Table;Tree;List;Form;Calendar;Graph;Map;Plot')\\rl('Section')el('Sequence')e\\rl('DSN')e\\rl('Query')m\\rl('Parameters')e\\rl('Layout')m\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -116,7 +104,7 @@
 						"en": "datasource"
 					},
 					"visibility": {},
-					"subtype": "Form",
+					"subtype": "Table",
 					"cssClass": "stwFormCompact",
 					"section": "",
 					"sequence": "",
@@ -124,7 +112,25 @@
 					"query": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
 					"params": "",
 					"layout": {
-						"en": "\\s('key=\"name\"')l('Name')el('Type')d(';;2;mysql;mySQL;api;API')l('Host')el('Port')e\\a('type=\"number\"')l('User')el('Password')wl('Database')el('Content-Type')d(';;1;application/json')\\rb(';stw;update')t('Save')"
+						"en": "\\s('key=\"name\"')l('Name')el('Type')d(';;2;mysql;mySQL;api;API')l('Host')el('Port')e\\a('type=\"number\"')l('User')el('Password')wl('Database')el('Content-Type')d(';;1;application/json')b(';stw;update')t('Save')"
+					}
+				},
+				{
+					"_id": "e20cfba0-2952-11ee-8a11-eb5d698979c6",
+					"type": "Content",
+					"name": {
+						"en": "Edit roles"
+					},
+					"slug": {
+						"en": "roles"
+					},
+					"visibility": {},
+					"subtype": "List",
+					"dsn": "stw",
+					"query": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
+					"params": "",
+					"layout": {
+						"en": "\\s('key=\"name\"')l('Name')el('Visible')cb(';stw;insert')t('Save')b(';stw;update')t('Save')"
 					}
 				}
 			]
@@ -140,13 +146,9 @@
 			},
 			"visibility": {},
 			"subtype": "Accordion",
-			"cssClass": null,
-			"section": "",
-			"sequence": "1",
-			"dsn": "",
-			"query": "",
-			"params": "",
-			"layout": {"en": "\\s('header=\"&emsp;WEBBASE\"')"},
+			"layout": {
+				"en": "\\s('header=\"&emsp;WEBBASE\"')"
+			},
 			"options": [
 				{
 					"name": {
@@ -164,7 +166,7 @@
 					"name": {
 						"en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-fw fa-plus\" title=\"New role\"></i></span>"
 					},
-					"ref": "e29cfba0-2952-11ee-8a01-eb5d698979c6"
+					"ref": "e20cfba0-2952-11ee-8a11-eb5d698979c6"
 				}
 			]
 		},
@@ -180,7 +182,7 @@
 			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwFormCompact",
-			"section": "",
+			"section": "stwShowModal",
 			"sequence": "",
 			"dsn": "",
 			"query": "",
@@ -201,7 +203,7 @@
 			"visibility": {},
 			"subtype": "Form",
 			"cssClass": "stwFormCompact",
-			"section": "",
+			"section": "stwShowModal",
 			"sequence": "",
 			"dsn": "",
 			"query": "",

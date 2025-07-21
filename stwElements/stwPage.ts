@@ -36,7 +36,7 @@ export class STWPage extends STWElement {
 	 * @returns String array of contents ids
 	 */
 	public contents(_session: STWSession, recurse: boolean = true): string[] {
-		const contents = this.children.filter(content => !(content as unknown as STWContent).section.startsWith("stwModal") && content.isVisible(_session) & 1).map(content => content._id);
+		const contents = this.children.filter(content => !/(stwShowModal|stwShow)/.test((content as unknown as STWContent).section) && content.isVisible(_session) & 1).map(content => content._id);
 		if (recurse)
 			climb(this.parent, contents, recurse);
 		return contents;

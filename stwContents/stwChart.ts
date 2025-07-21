@@ -12,9 +12,6 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWChart extends STWContent {
-	// TODO: scripts should be loaded in the template, e.g. index.html
-	static scripts: string = `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`;
-
 	public constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -22,6 +19,7 @@ export class STWChart extends STWContent {
 	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<canvas id="Chart${this._id}"></canvas>
+			<script name="chart" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 			<script name="STWChart" onload="fnSTWChart('Chart${this._id}')">
 				function fnSTWChart(id) {
 					const ctx = self.document.getElementById(id);

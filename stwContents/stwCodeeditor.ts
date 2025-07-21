@@ -12,9 +12,6 @@ import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
 
 export class STWCodeeditor extends STWContent {
-	// TODO: scripts should be loaded in the template, e.g. index.html
-	static scripts: string = `<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/mode-html.js"></script>`;
-
 	public constructor(content: ISTWContent) {
 		super(content);
 	}
@@ -22,6 +19,7 @@ export class STWCodeeditor extends STWContent {
 	// deno-lint-ignore require-await
 	public override async render(_req: Request, _session: STWSession, _records: ISTWRecords): Promise<string> {
 		return `<div id="CodeEditor${this._id}"></div>
+			<script name="ace" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/mode-html.js"></script>
 			<script name="STWCodeeditor" onload="fnSTWCodeeditor('CodeEditor${this._id}')">
 				function fnSTWCodeeditor(id) {
 					if (typeof ace !== "undefined") {

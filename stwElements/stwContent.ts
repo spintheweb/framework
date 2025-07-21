@@ -55,12 +55,12 @@ export abstract class STWContent extends STWElement {
 		super(content);
 
 		this.type = content.subtype;
-		this.cssClass = content.cssClass;
-		this.section = content.section;
+		this.cssClass = content.cssClass || "";
+		this.section = content.section || "";
 		this.sequence = content.sequence || 0.0;
-		this.dsn = content.dsn;
-		this.query = content.query;
-		this.params = content.params;
+		this.dsn = content.dsn || "";
+		this.query = content.query || "";
+		this.params = content.params || "";
 		this.stateful = content.stateful || false;
 		this.cache = content.cache || 0;
 
@@ -153,22 +153,17 @@ export abstract class STWContent extends STWElement {
 				bodyHtml = layout?.settings.has("nodata") ? `<article id="${this._id}" data-sequence="${this.sequence}" class="stwNoData">${wbpl(layout?.settings.get("nodata") || "", placeholders)}</article>` : "";
 			} else
 				bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="${(ref || this).cssClass || "stw" + this.type}">
-					${layout?.settings.has("frame") ? `<fieldset><legend>${wbpl(layout?.settings.get("frame") || "", placeholders)}</legend>` : ""}
-					${!layout?.settings.has("frame") && layout?.settings.has("caption") ? `${collapsible()}${wbpl(layout?.settings.get("caption") || "", placeholders)}</h1>` : ""}
+					${layout?.settings.has("caption") ? `<h1>${collapsible()}${wbpl(layout?.settings.get("caption") || "", placeholders)}${closable(this.section)}</h1>` : ""}
 					<div>
 					${layout?.settings.has("header") ? `<header>${wbpl(layout?.settings.get("header") || "", placeholders)}</header>` : ""}
 					${bodyHtml}
 					${layout?.settings.has("footer") ? `<footer>${wbpl(layout?.settings.get("footer") || "", placeholders)}</footer>` : ""}
 					</div>
-					${layout?.settings.has("frame") ? "</fieldset>" : ""}
 				</article>`;
 
 		} catch (error) {
 			const safeStringify = (obj: any) => {
-				const keys = [
-					"subtype", "cssClass", "section", "sequence",
-					"dsn", "query", "params", "layout"
-				];
+				const keys = ["subtype", "cssClass", "section", "sequence", "dsn", "query", "params", "layout"];
 				const filtered: Record<string, unknown> = {};
 				for (const key of keys)
 					filtered[key] = obj[key];
@@ -193,7 +188,10 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? `<h1 class="stwCollapsible" onclick="stwToggleCollapse(event)"><i class="fa-light fa-fw fa-angle-down"></i>` : "<h1>";
+			return layout?.settings.has("collapsible") ? `<i class="fa-light fa-fw fa-angle-down" onclick="stwToggleCollapse(event)"></i> ` : "";
+		}
+		function closable(section: string): string {
+			return section.startsWith("stwShow") ? ` <i class="fa-light fa-fw fa-xmark" onclick="this.closest('dialog').close()" style="float:right"></i>` : "";
 		}
 	}
 

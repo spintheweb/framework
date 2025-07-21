@@ -5,15 +5,14 @@
 	bottom: 0;
 	right: 0;
 	display: grid;
-	grid-template-rows: 2rem 1fr 2rem; /* Header, content, footer */
+	grid-template-rows: auto 1fr auto;
 	overflow: hidden;
 	background-color: var(--bg);
 }
 
 #stwStudio > div {
 	display: grid;
-	/* Sidebar, splitter, main site view */
-	grid-template-columns: 300px 5px 1fr; 
+	grid-template-columns: auto 5px 1fr; 
 	overflow: hidden;
 }
 
