@@ -3,7 +3,7 @@
 # Spin the Web Project
 _A precise (π) yet fuzzy (σ) technology that eases web application developments_
 
-Spin the Web introduces the Webbase Description Language (WBDL). While HTML describes a single web page and is interpreted by client-side browsers, WBDL describes an entire web site and is interpreted by a server-side component called a web spinner. This project proposes that WBDL fills a crucial gap in the World Wide Web ecosystem.
+Spin the Web introduces the Webbase Description Language (WBDL). While HTML describes a single web page and is interpreted by client-side browsers, WBDL describes an entire web site and is interpreted by a server-side component called a web spinner. This project proposes that WBDL fills a crucial gap in the World Wide Web ecosystem!
 
 WBDL is not intended to replace existing technologies, but rather to coordinate them. Its focus is on _contents_ (data handling widgets): defining what they are, how they are organized, and where, how, and when they are rendered. Web spinners generate and deliver these contents on demand.
 
