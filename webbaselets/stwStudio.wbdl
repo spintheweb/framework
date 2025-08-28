@@ -37,7 +37,7 @@
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"mainpage\"]",
 					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-globe\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-globe\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -55,7 +55,7 @@
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"mainpage\"]",
 					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-folder\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Mainpage')e\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-folder\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Mainpage')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -73,7 +73,7 @@
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"template\"]",
 					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-page\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-page\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -91,7 +91,7 @@
 					"dsn": "stw",
 					"query": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"query\", \"params\", \"layout\"]",
 					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-fw fa-square\"></i> @@name' key=\"_id\"')hl('Name')e\\rl('Slug')e\\rl('Type')\\rD(';;1;Text;Table;Tree;List;Form;Calendar;Graph;Map;Plot')\\rl('Section')el('Sequence')e\\rl('DSN')e\\rl('Query')m\\rl('Parameters')e\\rl('Layout')m\\rb(';stw;update')t('Save')"
+						"en": "\\s('caption='<i class=\"fa-light fa-rectangle\"></i> @@name' key=\"_id\"')hl('Name')e\\rl('Slug')e\\rl('Type')\\rD(';;1;Text;Table;Tree;List;Form;Calendar;Graph;Map;Plot')\\rl('Section')el('Sequence')e\\rl('DSN')e\\rl('Query')m\\rl('Parameters')e\\rl('Layout')m\\rb(';stw;update')t('Save')"
 					}
 				},
 				{
@@ -119,18 +119,17 @@
 					"_id": "e20cfba0-2952-11ee-8a11-eb5d698979c6",
 					"type": "Content",
 					"name": {
-						"en": "Edit roles"
+						"en": "Role Visibility"
 					},
 					"slug": {
-						"en": "roles"
+						"en": "role-visibility"
 					},
 					"visibility": {},
-					"subtype": "List",
+					"subtype": "Table",
 					"dsn": "stw",
-					"query": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
-					"params": "",
+					"query": "$keys(visibility)\\@$v.{\"name\": $v,\"value\": $lookup(visibility, $v)}",
 					"layout": {
-						"en": "\\s('key=\"name\"')l('Name')el('Visible')cb(';stw;insert')t('Save')b(';stw;update')t('Save')"
+						"en": "\\s('key=\"name\"')l('Name')fl('Visible')d(';;2;1;True;0;False')b(';stw;update')t('Save')"
 					}
 				}
 			]
@@ -152,19 +151,19 @@
 			"options": [
 				{
 					"name": {
-						"en": "Web application <span style=\"float:right\"><i class=\"fa-light fa-fw fa-folder-plus\" title=\"New area\"></i> <i class=\"fa-light fa-fw fa-file-plus\" title=\"New page\"></i> <i class=\"fa-thin fa-fw fa-square-plus\" title=\"New content\"></i></span>"
+						"en": "Web application <span style=\"float:right\"><i class=\"fa-kit fa-light-folder-circle-plus\" aria-label=\"New area\"></i> <i class=\"fa-kit fa-light-file-circle-plus\" aria-label=\"New page\"></i> <i class=\"fa-kit fa-light-rectangle-circle-plus\" aria-label=\"New content\"></i></span>"
 					},
 					"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
 				},
 				{
 					"name": {
-						"en": "Data sources <span style=\"float:right\"><i class=\"fa-thin fa-fw fa-plus\" title=\"New data source\"></i></span>"
+						"en": "Data sources <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New data source\"></i></span>"
 					},
 					"ref": "e20cfba0-2952-11ee-8a01-eb5d698979c6"
 				},
 				{
 					"name": {
-						"en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-fw fa-plus\" title=\"New role\"></i></span>"
+						"en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New role\"></i></span>"
 					},
 					"ref": "e20cfba0-2952-11ee-8a11-eb5d698979c6"
 				}
@@ -245,19 +244,19 @@
 					"options": [
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-sitemap\" title=\"Webbase\"></i>"
+								"en": "<i class=\"fa-light fa-2x fa-sitemap\" aria-label=\"Webbase\"></i>"
 							},
 							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
 						},
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-search\" title=\"Search\"></i>"
+								"en": "<i class=\"fa-light fa-2x fa-search\" aria-label=\"Search\"></i>"
 							},
 							"ref": "c7a1e2b0-16b2-4e6a-9f2a-8d2e4c9b7f3a"
 						},
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-fw fa-2x fa-copy\" title=\"Explorer\"></i>"
+								"en": "<i class=\"fa-light fa-2x fa-copy\" aria-label=\"Explorer\"></i>"
 							},
 							"ref": "e29cfba0-2952-11fe-8a01-eb5d698379c5"
 						},
@@ -268,7 +267,7 @@
 						},
 						{
 							"name": {
-								"en": "<i class=\"fa-light fa-fw fa-2x fa-gear\" title=\"Settings\"></i>"
+								"en": "<i class=\"fa-light fa-2x fa-gear\" aria-label=\"Settings\"></i>"
 							},
 							"ref": "e29cfba0-2952-11fe-8a01-eb5e698379c5"
 						}
@@ -292,7 +291,7 @@
 					"query": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit/\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
 					"params": "",
 					"layout": {
-						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-fw fa-folder\"></i>;Page*;<i class=\"fa-light fa-fw fa-file\"></i>;Content*;<i class=\"fa-light fa-fw fa-cloud\"></i>;;<i class=\"fa-light fa-fw fa-square\"></i>')apf"
+						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-folder\"></i>;Page*;<i class=\"fa-light fa-file\"></i>;Content*;<i class=\"fa-light fa-cloud\"></i>;;<i class=\"fa-light fa-rectangle\"></i>')apf"
 					}
 				},
 				{

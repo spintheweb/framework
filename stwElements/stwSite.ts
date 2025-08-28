@@ -17,7 +17,7 @@ interface ISTWSite extends ISTWElement {
 	version: string;
 }
 export class STWSite extends STWElement {
-	static #wbml: ISTWSite;
+	static #wbdl: ISTWSite;
 	static #instance: STWSite;
 	static index: Map<string, STWElement> = new Map();
 
@@ -56,14 +56,14 @@ export class STWSite extends STWElement {
 		if (!STWSite.#instance) {
 			console.log(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
-			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbml";
-			this.#wbml = JSON.parse(Deno.readTextFileSync(webbase));
-			STWSite.#instance = new STWSite(this.#wbml);
+			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbdl";
+			this.#wbdl = JSON.parse(Deno.readTextFileSync(webbase));
+			STWSite.#instance = new STWSite(this.#wbdl);
 			if (!STWSite.#instance)
 				throw new Error(`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`);
 
-			STWSite.#instance.addWebbaselet(Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbml"); // uuid = 169ecfb1-2916-11ee-ad92-6bd31f953e80
-			STWSite.#instance.addWebbaselet(Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml"); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
+			STWSite.#instance.addWebbaselet(Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbdl"); // uuid = 169ecfb1-2916-11ee-ad92-6bd31f953e80
+			STWSite.#instance.addWebbaselet(Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbdl"); // uuid = e258daa0-293a-11ee-9729-21da0b1a268c
 
 			if (Deno.env.get("DEBUG") === "true")
 				STWSite.watchWebbases();
@@ -71,8 +71,8 @@ export class STWSite extends STWElement {
 		return STWSite.#instance;
 	}
 
-	static get wbml(): ISTWSite {
-		return this.#wbml;
+	static get wbdl(): ISTWSite {
+		return this.#wbdl;
 	}
 
 	/**
@@ -165,10 +165,10 @@ export class STWSite extends STWElement {
 		this.children.forEach(child => fragment += child.export());
 
 		return '<?xml version="1.0" encoding="utf-8"?>\n' +
-			'<wbml version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://webspinner.org" xsi:schemaLocation="https://webspinner.org/schemas wbol.xsd">\n' +
+			'<wbdl version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://webspinner.org" xsi:schemaLocation="https://webspinner.org/schemas wbol.xsd">\n' +
 			`<!--Spin the Web (TM) webbase generated ${(new Date()).toISOString()}-->\n` +
 			`<site id="${this._id}" language="${this.langs[0]}" languages="${this.langs}" mainpage="${this.mainpage}">\n${super.export()}${fragment}</site>\n` +
-			'</wbml>';
+			'</wbdl>';
 	}
 
 	// Build a site map (see sitemaps.org) that includes the urls of the visible pages in the site
@@ -196,9 +196,9 @@ export class STWSite extends STWElement {
 		this.#watcherStarted = true;
 
 		const webbasePath = [
-			Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbml",
-			Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbml",
-			Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbml"
+			Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbdl",
+			Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbdl",
+			Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbdl"
 		];
 		let reloadTimeout: number | undefined;
 

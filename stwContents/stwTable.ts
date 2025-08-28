@@ -41,9 +41,11 @@ export class STWTable extends STWContent {
 			body += `<th style="width:1rem;background-color:inherit"></th><tr>`;
 			tr = layout.render(request, session, fields, placeholders, true);
 			tr.matchAll(/<label(.*?)>(.*?)<\/label>(.*?)(?=<label|$)/g).forEach(match => body += `<td${match[1].trim()}>${match[3].trim()}</td>`);
-			body += `<th><i class="fa-light fa-fw fa-plus"></i></th>`;
+			body += `<th><i class="fa-light fa-plus"></i></th>`;
 		}
 		body += "</tr></thead><tbody>";
+
+		body = body.replace(/<thead><tr>(<th><\/th>)*<\/tr><\/thead>/, ""); // Empty header row
 
 		let row = 0;
 		while (true) {
@@ -56,7 +58,7 @@ export class STWTable extends STWContent {
 
 			// If the layout includes a delete button, allow records deletion
 			if (layout.acts(ACTIONS.stwdelete) && !isTruthy(layout.settings.get("disabled")))
-				body += `<th><i class="fa-light fa-fw fa-trash-can"></i></th>`;
+				body += `<th><i class="fa-light fa-trash-can"></i></th>`;
 
 			body += "</tr>";
 

@@ -10,19 +10,21 @@
 
 .stwTree li > div {
     padding: var(--padding-reduced);
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .stwTree li > div:hover {
   background-color: var(--special-hover);
   color: var(--on-special);
-  transition: background-color 0.3s ease;
 }
 
 .stwTree li:focus-within .stwSelected {
-  background-color: initial; /* Default color */
+  background-color: initial;
 }
 
 .stwTree .stwSelected {
-  background-color: gray !important; /* Gray when the article isn't focused */
+  background-color: var(--special) !important;
+  color: var(--on-special) !important;
+}
+.stwTree .stwSelected a {
+  color: inherit !important;
 }

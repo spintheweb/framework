@@ -170,7 +170,7 @@ export abstract class STWContent extends STWElement {
 				return JSON.stringify(filtered, null, 2);
 			};
 			bodyHtml = `<article tabindex="0" id="${this._id}" data-sequence="${this.sequence}" class="stwError">
-				<h1><i class="fa-light fa-fw fa-bug"></i> Error</h1>
+				<h1><i class="fa-light fa-bug"></i> Error</h1>
 				<header>${(error as Error).message}</header>
 				<pre>${safeStringify(this)}</pre>
 			</article>`;
@@ -188,10 +188,10 @@ export abstract class STWContent extends STWElement {
 		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
 
 		function collapsible(): string {
-			return layout?.settings.has("collapsible") ? `<i class="fa-light fa-fw fa-angle-down" onclick="stwToggleCollapse(event)"></i> ` : "";
+			return layout?.settings.has("collapsible") ? `<i class="fa-light fa-angle-down" onclick="stwToggleCollapse(event)"></i> ` : "";
 		}
 		function closable(section: string): string {
-			return section.startsWith("stwShow") ? ` <i class="fa-light fa-fw fa-xmark" onclick="this.closest('dialog').close()" style="float:right"></i>` : "";
+			return section.startsWith("stwShow") ? ` <i class="fa-light fa-xmark" onclick="this.closest('dialog').close()" style="float:right"></i>` : "";
 		}
 	}
 

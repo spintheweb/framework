@@ -1,0 +1,12 @@
+services:
+  spintheweb:
+    image: spintheweb:dev
+    build:
+      context: .
+    container_name: spintheweb
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

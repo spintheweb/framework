@@ -38,6 +38,7 @@
 	overflow: hidden; /* Let child elements manage their own scrolling */
 	display: flex;
 	flex-direction: column;
+	font-size: smaller;
 }
 
 /* Make direct children of the sidebar grow to fill available space */

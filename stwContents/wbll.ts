@@ -333,7 +333,7 @@ export class STWLayout {
 			const options = token.args.slice(3), mode = parseInt(options[0]);
 			let js: string = `value=wbpl("${token.args[2] ?? ''}", ph) || fieldValue, checked = (value === fieldValue ? " checked" : "");`
 			if (isNaN(mode)) 
-				return `html+=\`<input\${""}${attributes(token)}>\${checked}\`;`;
+				return `html+=\`<input${attributes(token)}\${checked}>\`;`;
 
 			js += `html+=\`<fieldset class="stwGroup">\`;`
 			if (mode === 1)
@@ -418,10 +418,11 @@ export class STWLayout {
 		handlers.set("m", (token) => {
 			const nameArg = token.args[0];
 			const valueArg = token.args[1];
-			token.attrs.set("name", `\${"${nameArg || ''}" || fieldName}`);
+			// Remove backslash before ${ so it will be interpolated by render-time code generator
+			token.attrs.set("name", `"${nameArg || ''}" || fieldName`);
 			if (!nameArg && !valueArg)
 				return `html+=\`<textarea${attributes(token)}>\${fieldValue}</textarea>\`;fldCursor();`;
-			return `html+=\`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph)}</textarea>\`;`;
+			return `html+=\`<textarea${attributes(token)}>\${wbpl("${valueArg ?? ''}", ph) || fieldValue}</textarea>\`;${!nameArg ? 'fldCursor();' : ''}`;
 		});
 
 		handlers.set("n", (token) => {
@@ -453,10 +454,9 @@ export class STWLayout {
 		handlers.set("y", noOpHandler);
 		handlers.set("z", noOpHandler);
 
-		const brHandler = () => `html+=\`<br>\`;`;
-		handlers.set("\\r", brHandler);
-		handlers.set("\\n", brHandler);
-		handlers.set("\\t", brHandler);
+		handlers.set("\\r", () => `html+="<br>";`);
+		handlers.set("\\n", () => `html+="<br>";`);
+		handlers.set("\\t", () => `html+="<label></label>";`);
 
 		handlers.set(">", () => `fldCursor();`);
 		handlers.set("<", () => `fldCursor(-1);`);

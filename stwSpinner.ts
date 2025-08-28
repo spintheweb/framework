@@ -2,7 +2,7 @@
  * Spin the Web server, a.k.a., Web Spinner 
  * 
  * This code runs on a web server and is responsible for spinning a Spin the Web 
- * site, i.e., serving its webbase (WBML)
+ * site, i.e., serving its webbase (WBDL)
  * 
  * Language: TypeScript for Deno
  * 

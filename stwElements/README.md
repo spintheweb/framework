@@ -1,13 +1,13 @@
 # Spin the Web elements
 
-This folder defines the core classes that define the base elements of WBML (Webbase Markup Language), the structural foundation of  Spin the Web. These elements form a hierarchical tree structure, enabling the modeling of a site, areas, pages, and content blocks.
+This folder defines the core classes that define the base elements of WBDL (Webbase Description Language), the structural foundation of  Spin the Web. These elements form a hierarchical tree structure, enabling the modeling of a site, areas, pages, and content blocks.
 
 A **Webbase** is the description of a web application, composed of these elements. The `STWSite` element is a singleton—there can be only one `STWSite` in a webbase. If a structure does not include an `STWSite`, it is referred to as a **Webbaselet**.
 
-## Core WBML Base Element
+## Core WBDL Base Element
 
-**STWElement**: The abstract base class for all WBML elements, providing the core properties and methods below.  
-All WBML elements derive from `STWElement` share a common set of properties:
+**STWElement**: The abstract base class for all WBDL elements, providing the core properties and methods below.  
+All WBDL elements derive from `STWElement` share a common set of properties:
 
 | Property     | Type             | Description                                                                 |
 |--------------|------------------|-----------------------------------------------------------------------------|
@@ -21,10 +21,10 @@ All WBML elements derive from `STWElement` share a common set of properties:
 
 ## Derived Elements
 
-`STWSite`, `STWArea`, `STWPage`, and `STWContent` represent the main structural nodes of a WBML document.
+`STWSite`, `STWArea`, `STWPage`, and `STWContent` represent the main structural nodes of a WBDL document.
 These elemets can contain children, allowing for nested site structures (e.g., a site contains areas, which contain pages, which contain contents). Children can include all types of elements except `STWSite`.
 
-- **STWSite**: Represents the root of a WBML site, containing metadata and top-level structure. Only one instance is allowed per webbase. Inherits from `STWArea`.
+- **STWSite**: Represents the root of a WBDL site, containing metadata and top-level structure. Only one instance is allowed per webbase. Inherits from `STWArea`.
 - **STWArea**: Groups related sub-areas, pages and contents.
 - **STWPage**: Represents an individual page and its contents.
 - **STWContent**: Abstract base for reusable content blocks or widgets, with concrete implementations in the `stwContents` folder.  
@@ -38,11 +38,11 @@ These elemets can contain children, allowing for nested site structures (e.g., a
 ## Usage
 
 These classes are used throughout the Spin the Web platform for:
-- Parsing and generating WBML files
+- Parsing and generating WBDL files
 - Building and manipulating the in-memory site tree
 - Rendering and exporting site structures
 - Providing a type-safe API for extensions and tools
 
 ---
 
-This folder is essential for the definition and manipulation of all WBML-based site structures in Spin the Web.
+This folder is essential for the definition and manipulation of all WBDL-based site structures in Spin the Web.

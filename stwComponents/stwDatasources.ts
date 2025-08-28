@@ -35,96 +35,147 @@ interface ISTWDatasource {
 	contentType: string // Content type (e.g., application/json)
 }
 export class STWDatasources {
-	static datasources: Map<string, STWSite | MySQLClient | ISTWDatasource> = new Map();
-	static #initializationPromise: Promise<void> | null = null;
+    static datasources: Map<string, STWSite | MySQLClient | ISTWDatasource> = new Map();
+    static #initializationPromise: Promise<void> | null = null;
+    // Keep DSN settings to reconnect when needed
+    private static mysqlConfigs = new Map<string, any>();
 
-	private static initialize(session: STWSession): Promise<void> {
-		if (!this.#initializationPromise) {
-			this.#initializationPromise = (async () => {
-				this.datasources.set("stw", session.site); // Webbase
+    private static initialize(session: STWSession): Promise<void> {
+        if (!this.#initializationPromise) {
+            this.#initializationPromise = (async () => {
+                this.datasources.set("stw", session.site); // Webbase
 
-				// TODO: Connection pools
-				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
-					try {
-						switch (settings.type) {
-							case "api":
-								this.datasources.set(settings.name, settings);
-								break;
-							case "mysql":
-								this.datasources.set(settings.name, await new MySQLClient().connect({
-									hostname: settings.host,
-									username: settings.user,
-									password: settings.password,
-									db: settings.database,
-								}));
-								break;
-							case "postgress":
-								break;
-							case "mongodb":
-								break;
-						}
-					} catch (error) {
-						console.error(`Error processing datasource configuration: ${error instanceof Error ? error.message : String(error)}`);
-						continue;
-					}
-				}
-			})();
-		}
-		return this.#initializationPromise;
-	}
+                // TODO: Connection pools
+                for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
+                    try {
+                        switch (settings.type) {
+                            case "api":
+                                this.datasources.set(settings.name, settings);
+                                break;
+                            case "mysql": {
+                                this.mysqlConfigs.set(settings.name, settings);
+                                const client = new MySQLClient();
+                                await client.connect({
+                                    hostname: settings.host,
+                                    username: settings.user,
+                                    password: settings.password,
+                                    db: settings.database,
+                                });
+                                this.datasources.set(settings.name, client);
+                                break;
+                            }
+                            case "postgress":
+                                break;
+                            case "mongodb":
+                                break;
+                        }
+                    } catch (error) {
+                        console.error(`Error processing datasource configuration: ${error instanceof Error ? error.message : String(error)}`);
+                        continue;
+                    }
+                }
+            })();
+        }
+        return this.#initializationPromise;
+    }
 
-	static async query(session: STWSession, content: STWContent): Promise<ISTWRecords> {
-		if (!content.dsn)
-			return { fields: [], rows: [] };
+    // Ensure a live MySQL connection; reconnect if needed
+    private static async getMySqlClient(name: string): Promise<MySQLClient | null> {
+        const ds = this.datasources.get(name);
+        if (!(ds instanceof MySQLClient)) return null;
 
-		const cacheKey = `${content._id}:${wbpl(content.params, session.placeholders)}`;
+        // Probe connection
+        try {
+            await ds.execute("SELECT 1");
+            return ds;
+        } catch {
+            // Reconnect using stored config
+            const cfg = this.mysqlConfigs.get(name);
+            if (!cfg) return null;
+            try {
+                const client = new MySQLClient();
+                await client.connect({
+                    hostname: cfg.host,
+                    username: cfg.user,
+                    password: cfg.password,
+                    db: cfg.database,
+                });
+                this.datasources.set(name, client);
+                return client;
+            } catch (e) {
+                console.warn(`MySQL reconnect failed for dsn "${name}": ${e instanceof Error ? e.message : String(e)}`);
+                return null;
+            }
+        }
+    }
 
-		if (content.cache && queryCache.has(cacheKey)) {
-			const cached = queryCache.get(cacheKey)!;
-			const isCacheValid = content.cache === -1 || (Date.now() - cached.timestamp < content.cache * 1000);
-			if (isCacheValid) {
-				return cached.data;
-			}
-		}
+    static async query(session: STWSession, content: STWContent): Promise<ISTWRecords> {
+        if (!content.dsn)
+            return { fields: [], rows: [] };
 
-		let records: ISTWRecords = { affectedRows: 0, fields: [], rows: [] };
-		try {
-			await this.initialize(session);
+        const cacheKey = `${content._id}:${wbpl(content.params, session.placeholders)}`;
 
-			const datasource = STWDatasources.datasources.get(content.dsn) || {};
-			if (content.dsn === "json") {
-				const json = JSON.parse(content.query);
-				records = {
-					affectedRows: 1,
-					fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name, type: 'string' })) : [],
-					rows: Array.isArray(json) ? json : [json]
-				};
-			} else if ("type" in datasource && datasource.type === "api") {
-				records = await fetchAPIData(session, content, datasource);
-			} else if (datasource instanceof STWSite) {
-				records = await fetchWebbaseData(session, content);
-			} else if (datasource instanceof MySQLClient) {
-				try {
-					records = await datasource.execute(wbpl(content.query, session.placeholders)) as ISTWRecords;
-				} catch (error) {
-					// If connection fails, return empty records for this content only
-					console.warn(`MySQL query failed for dsn "${content.dsn}": ${error instanceof Error ? error.message : String(error)}`);
-					records = { affectedRows: 0, fields: [], rows: [] };
-				}
-			}
-			// else: unknown datasource, leave records empty
-		} catch (error) {
-			// If initialization or any other error, return empty records for this content only
-			console.warn(`Datasource error for dsn "${content.dsn}": ${error instanceof Error ? error.message : String(error)}`);
-			records = { affectedRows: 0, fields: [], rows: [] };
-		}
+        if (content.cache && queryCache.has(cacheKey)) {
+            const cached = queryCache.get(cacheKey)!;
+            const isCacheValid = content.cache === -1 || (Date.now() - cached.timestamp < content.cache * 1000);
+            if (isCacheValid) {
+                return cached.data;
+            }
+        }
 
-		if (content.cache) {
-			queryCache.set(cacheKey, { data: records, timestamp: Date.now() });
-		}
+        let records: ISTWRecords = { affectedRows: 0, fields: [], rows: [] };
+        try {
+            await this.initialize(session);
 
-		return records;
-	}
+            const datasource = STWDatasources.datasources.get(content.dsn) || {};
+            if (content.dsn === "json") {
+                const json = JSON.parse(content.query);
+                records = {
+                    affectedRows: 1,
+                    fields: json && typeof json === "object" && !Array.isArray(json) ? Object.getOwnPropertyNames(json).map(name => ({ name, type: 'string' })) : [],
+                    rows: Array.isArray(json) ? json : [json]
+                };
+            } else if ("type" in datasource && (datasource as ISTWDatasource).type === "api") {
+                records = await fetchAPIData(session, content, datasource);
+            } else if (datasource instanceof STWSite) {
+                records = await fetchWebbaseData(session, content);
+            } else if (datasource instanceof MySQLClient) {
+                const sql = wbpl(content.query, session.placeholders);
+                // try execute; on "closed" error, reconnect and retry once
+                try {
+                    records = await datasource.execute(sql) as ISTWRecords;
+                } catch (error) {
+                    const msg = error instanceof Error ? error.message : String(error);
+                    if (/closed/i.test(msg) || /gone away/i.test(msg)) {
+                        const client = await this.getMySqlClient(content.dsn);
+                        if (client) {
+                            try {
+                                records = await client.execute(sql) as ISTWRecords;
+                            } catch (e2) {
+                                console.warn(`MySQL query failed after reconnect for dsn "${content.dsn}": ${e2 instanceof Error ? e2.message : String(e2)}`);
+                                records = { affectedRows: 0, fields: [], rows: [] };
+                            }
+                        } else {
+                            console.warn(`MySQL reconnect not available for dsn "${content.dsn}": ${msg}`);
+                            records = { affectedRows: 0, fields: [], rows: [] };
+                        }
+                    } else {
+                        console.warn(`MySQL query failed for dsn "${content.dsn}": ${msg}`);
+                        records = { affectedRows: 0, fields: [], rows: [] };
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn(`Datasource error for dsn "${content.dsn}": ${error instanceof Error ? error.message : String(error)}`);
+            records = { affectedRows: 0, fields: [], rows: [] };
+        }
+
+        if (content.cache) {
+            queryCache.set(cacheKey, { data: records, timestamp: Date.now() });
+        }
+
+        return records;
+    }
 }
 
 /**
@@ -142,14 +193,14 @@ async function fetchWebbaseData(session: STWSession, content: STWContent): Promi
 
 	if (!isArray) {
 		const expr = jsonata(wbpl(content.query, session.placeholders));
-		result = expr.evaluate(STWSite.wbml);
+		result = expr.evaluate(STWSite.wbdl);
 
 		if (result instanceof Promise)
 			result = await result;
 
 		return new Promise<ISTWRecords>(resolve => resolve({
-			affectedRows: 1,
-			fields: result && typeof result === "object" && !Array.isArray(result) ? Object.getOwnPropertyNames(result).map(name => ({ name })) : [],
+			affectedRows: result.length || 1,
+			fields: result && typeof result === "object" && !Array.isArray(result) ? Object.getOwnPropertyNames(result).map(name => ({ name })) : Object.keys(result[0] || {}).map(name => ({ name })),
 			rows: Array.isArray(result) ? result : [result]
 		}));
 	}
