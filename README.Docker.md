@@ -1,17 +1,36 @@
-### Building and running your application
+## Spin the Web – Docker Quickstart
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+This container runs the Deno-based Web Spinner for local development. You can start developing a portal by setting a single environment variable: PORTAL_URL.
 
-### Deploying your application to the cloud
+### Build the image
 
-First, build your image, e.g.: `docker build -t myapp .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t myapp .`.
+```bash
+docker build -t spintheweb:dev .
+```
 
-Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
+### Run with docker compose (recommended)
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+Pass the portal URL at run time; the container fetches it and stores it under `SITE_WEBBASE`.
+
+```bash
+PORTAL_URL=https://example.com/webapplication.wbdl docker compose up --build
+```
+
+Alternatively, set PORTAL_URL in an `.env` file next to `docker-compose.yml`.
+
+### Run with docker directly
+
+```bash
+docker run --rm -e PORTAL_URL=https://example.com/webapplication.wbdl -p 8080:8080 --name spintheweb spintheweb:dev
+```
+
+If you already have a local webbase JSON, you can mount it and skip `PORTAL_URL`:
+
+```bash
+docker run --rm -v %cd%/public/.data/webapplication.wbdl:/app/public/.data/webapplication.wbdl -e SITE_WEBBASE=./public/.data/webapplication.wbdl -p 8080:8080 --name spintheweb spintheweb:dev
+```
+
+Notes:
+- Default port is 8080; the container binds to 0.0.0.0 and respects `PORT`.
+- In Docker the app reads `.env.docker`; outside it reads `.env`.
+- If `DEBUG=true`, live-reload of webbase files is enabled.

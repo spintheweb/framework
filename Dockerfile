@@ -34,6 +34,6 @@ EXPOSE 443
 EXPOSE 80
 
 # Define the command to run your application.
-# Grant read access to the entire application directory './'
-# This is safe inside the container and allows dynamic module loading.
-CMD ["run", "--allow-net", "--allow-read=./", "--allow-env", "stwSpinner.ts"]
+# Grant read access to the entire application directory './' and write access for saving portal webbase JSON.
+# This is safe inside the container.
+CMD ["run", "--allow-net", "--allow-read=./", "--allow-write=./", "--allow-env", "stwSpinner.ts"]

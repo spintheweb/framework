@@ -7,6 +7,10 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8080
+      # Set your portal endpoint. Example: https://example.com/webapplication.wbdl
+      # This can also be provided via environment when running docker compose
+      # e.g., `PORTAL_URL=https://... docker compose up`
+      - PORTAL_URL
     ports:
       - "8080:8080"
     restart: unless-stopped
