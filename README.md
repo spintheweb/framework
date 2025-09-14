@@ -1,6 +1,6 @@
-<img src="./public/media/Logo-bn_128x128.png" width="100p">
+![status: work in progress](https://img.shields.io/badge/status-WIP-yellow)
 
-# Spin the Web Project
+# Spin the Web Framework
 _A precise (π) yet fuzzy (σ) technology that eases web application developments_
 
 Spin the Web introduces the Webbase Description Language (WBDL). While HTML describes a single web page and is interpreted by client-side browsers, WBDL describes an entire web site and is interpreted by a server-side component called a web spinner. This project proposes that WBDL fills a crucial gap in the World Wide Web ecosystem!
