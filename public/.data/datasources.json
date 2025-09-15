@@ -22,5 +22,40 @@
         "type": "api",
         "host": "https://api.restful-api.dev/objects",
         "contentType": "application/json"
+    },
+    {
+      "name": "pgMain",
+      "type": "postgres",
+      "host": "localhost",
+      "port": 5432,
+      "user": "stw_user",
+      "password": "stw_pass",
+      "database": "stw_db"
+    },
+    {
+      "name": "mssqlMain",
+      "type": "sqlserver",
+      "server": "localhost",
+      "port": 1433,
+      "user": "sa",
+      "password": "YourStrong!Passw0rd",
+      "database": "stw_db"
+    },
+    {
+      "name": "mongoMain",
+      "type": "mongodb",
+      "uri": "mongodb://stw_user:stw_pass@localhost:27017",
+      "database": "stw_db",
+      "collection": "stw_collection"
+    },
+    {
+      "name": "oracleMain",
+      "type": "oracle",
+      "mode": "cli",
+      "username": "stw_user",
+      "password": "stw_pass",
+      "host": "localhost",
+      "port": 1521,
+      "service": "ORCLPDB1"
     }
 ]
