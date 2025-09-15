@@ -1,61 +1,61 @@
 [
-    {
-        "name": "mysqlsample",
-        "type": "mysql",
-        "host": "lhcp3334.webapps.net",
-        "port": 3306,
-        "user": "qt3ul9nb_sampledb",
-        "password": "r#MM9!0Ght3(vM2",
-        "database": "qt3ul9nb_sampledb"
-    },
-    {
-        "name": "yuup",
-        "type": "mysql",
-        "host": "37.187.176.70",
-        "port": 3306,
-        "user": "ps_ext_user",
-        "password": "rN-m81&57cR",
-        "database": "rs3hmqg2_pres617"
-    },
-    {
-        "name": "objects",
-        "type": "api",
-        "host": "https://api.restful-api.dev/objects",
-        "contentType": "application/json"
-    },
-    {
-      "name": "pgMain",
-      "type": "postgres",
-      "host": "localhost",
-      "port": 5432,
-      "user": "stw_user",
-      "password": "stw_pass",
-      "database": "stw_db"
-    },
-    {
-      "name": "mssqlMain",
-      "type": "sqlserver",
-      "server": "localhost",
-      "port": 1433,
-      "user": "sa",
-      "password": "YourStrong!Passw0rd",
-      "database": "stw_db"
-    },
-    {
-      "name": "mongoMain",
-      "type": "mongodb",
-      "uri": "mongodb://stw_user:stw_pass@localhost:27017",
-      "database": "stw_db",
-      "collection": "stw_collection"
-    },
-    {
-      "name": "oracleMain",
-      "type": "oracle",
-      "mode": "cli",
-      "username": "stw_user",
-      "password": "stw_pass",
-      "host": "localhost",
-      "port": 1521,
-      "service": "ORCLPDB1"
-    }
+  {
+    "name": "mysqlsample",
+    "type": "mysql",
+    "host": "lhcp3334.webapps.net",
+    "port": 3306,
+    "user": "qt3ul9nb_sampledb",
+    "password": "r#MM9!0Ght3(vM2",
+    "database": "qt3ul9nb_sampledb"
+  },
+  {
+    "name": "yuup",
+    "type": "mysql",
+    "host": "37.187.176.70",
+    "port": 3306,
+    "user": "ps_ext_user",
+    "password": "rN-m81&57cR",
+    "database": "rs3hmqg2_pres617"
+  },
+  {
+    "name": "objects",
+    "type": "api",
+    "host": "https://api.restful-api.dev/objects",
+    "contentType": "application/json"
+  },
+  {
+    "name": "pgMain",
+    "type": "postgres",
+    "host": "ep-weathered-snowflake-123456.eu-central-1.aws.neon.tech",
+    "port": 5432,
+    "user": "neon_user",
+    "password": "neon_pass",
+    "database": "pagila"
+  },
+  {
+    "name": "mssqlMain",
+    "type": "sqlserver",
+    "server": "samplesql.database.windows.net",
+    "port": 1433,
+    "user": "sqladmin",
+    "password": "SamplePass!123",
+    "database": "AdventureWorksLT"
+  },
+  {
+    "name": "mongoMain",
+    "type": "mongodb",
+    "uri": "mongodb+srv://readonly:readonly@sample-mflix.mongodb.net",
+    "database": "sample_mflix",
+    "collection": "movies"
+  },
+  {
+    "name": "oracleMain",
+    "type": "oracle",
+    "mode": "cli",
+    "username": "hr",
+    "password": "hr",
+    "host": "oracle.freesqldatabase.com",
+    "port": 1521,
+    "service": "FREEPDB1"
+  }
 ]
