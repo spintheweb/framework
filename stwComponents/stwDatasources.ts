@@ -11,16 +11,9 @@ import { STWSession } from "./stwSession.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
 import { wbpl } from "./wbpl.ts";
+import { ISTWRecords } from "./stwDBAdapters/adapter.ts";
 import { Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import jsonata from "https://esm.sh/jsonata@latest";
-
-export interface ISTWRecords {
-	fields: { name: string; type?: string }[];
-	rows: Record<string, any>[];
-	affectedRows?: number;
-	stwOrigin?: string;
-	stwAction?: string;
-}
 
 // Global cache for query results
 const queryCache = new Map<string, { data: ISTWRecords, timestamp: number }>();
