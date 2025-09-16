@@ -1,10 +1,6 @@
-/**
- * Spin the Web Tabs content
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwTabs.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 import { STWSite } from "../stwElements/stwSite.ts";

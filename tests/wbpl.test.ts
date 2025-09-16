@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Test suite: wbpl.test
+
 import { assertEquals } from "@std/assert";
 import { wbpl } from "../stwComponents/wbpl.ts";
 

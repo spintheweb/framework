@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Oracle database adapter (SQLcl/CLI) for Spin the Web
+
 // Oracle adapter (CLI via SQLcl). Requires `sql` in PATH.
 // Supports: execute (batch script), listObjects, getObjectDetails.
 import { ISTWAdapter, ISTWRecords } from "./adapter.ts";

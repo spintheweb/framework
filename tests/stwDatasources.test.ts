@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Test suite: stwDatasources.test
+
 import { assertEquals, assert, assertFalse } from "@std/assert";
 import jsonata from "https://esm.sh/jsonata@latest";
 import { STWDatasources } from "../stwComponents/stwDatasources.ts";

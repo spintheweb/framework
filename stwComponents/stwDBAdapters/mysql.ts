@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// MySQL database adapter for Spin the Web
+
 import { Client } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
 import { ISTWAdapter, ISTWRecords } from "./adapter.ts";
 

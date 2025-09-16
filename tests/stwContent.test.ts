@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Test suite: stwContent.test
+
 import { assertEquals } from "@std/assert";
 import { STWText } from "../stwContents/stwText.ts";
 import { STWSite } from "../stwElements/stwSite.ts";

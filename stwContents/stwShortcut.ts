@@ -1,12 +1,6 @@
-/**
- * Spin the Web Shortcut content
- * 
- * A STWShortcut points to a content somewhere in the webbase
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwShortcut.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWSite } from "../stwElements/stwSite.ts";

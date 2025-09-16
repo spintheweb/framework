@@ -1,10 +1,6 @@
-/**
- * Spin the Web Accordion content
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2025 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwAccordion.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 

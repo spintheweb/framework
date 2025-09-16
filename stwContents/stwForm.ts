@@ -1,12 +1,6 @@
-/**
- * Spin the Web Form content
- * 
- * A form content 
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwForm.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ACTIONS, STWLayout, isTruthy } from "../stwContents/wbll.ts";

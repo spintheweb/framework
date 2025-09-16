@@ -1,12 +1,6 @@
-/**
- * Spin the Web Datasources
- * 
- * STWDatasources manages Spin the Web connection to datasources in general.
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web component: stwDatasources
+
 import { STWSession } from "./stwSession.ts";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWContent } from "../stwElements/stwContent.ts";

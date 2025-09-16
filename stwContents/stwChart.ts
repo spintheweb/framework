@@ -1,12 +1,6 @@
-/**
- * Spin the Web Chart content
- * 
- * This content uses Chart.js for plotting data https://www.chartjs.org/
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwChart.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";

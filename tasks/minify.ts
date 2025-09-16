@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Build/development task: minify
+
 import { minify } from "minify";
 
 const inputJs = await Deno.readTextFile("./public/scripts/stwClient.js");

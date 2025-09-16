@@ -1,13 +1,6 @@
-/**
- * Spin the Web server, a.k.a., Web Spinner 
- * 
- * This code runs on a web server and is responsible for spinning a Spin the Web 
- * site, i.e., serving its webbase (WBDL)
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
- **/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwSpinner.ts
+
 import { getCookies } from "@std/http/cookie";
 import { config } from "https://deno.land/x/dotenv@v3.2.2/mod.ts";
 import { STWSession } from "./stwComponents/stwSession.ts";

@@ -1,10 +1,5 @@
-/**
- * Spin the Web Site miscellanea functions
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web component: wbpl
 
 /**
  * Webbase Placeholders Language replaces placeholders in the given text with values from the provided map.

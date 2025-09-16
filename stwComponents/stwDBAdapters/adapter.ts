@@ -1,8 +1,5 @@
-/**
- * Spin the Web Adapter Interface
- * 
- * Language: TypeScript for Deno
- */
+// SPDX-License-Identifier: MIT
+// Database adapter interface for Spin the Web
 
 export interface ISTWRecords {
 	fields: { name: string; type?: string }[];

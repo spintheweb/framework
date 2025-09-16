@@ -1,10 +1,6 @@
-/**
- * Spin the Web Site element
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web element: stwElement
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent } from "./stwContent.ts";
 import { STWSite } from "./stwSite.ts";

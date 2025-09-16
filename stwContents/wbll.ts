@@ -1,13 +1,6 @@
-/**
- * Spin the Web WBLL - Webbabse Layout Language
- * 
- * Given a text layout, tokenize it (lex it), the tokenized layout is then ready to be rendered.
- * Rendering is session specific, first all placeholders are replaced then content specific renderings are applied.
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/wbll.ts
+
 import { STWSession } from "../stwComponents/stwSession.ts";
 import { wbpl } from "../stwComponents/wbpl.ts";
 

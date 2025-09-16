@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Build/development task: merge-css
+
 // Watches stwStyles, merges and minifies all .css files into stwStyle.css on change
 // Usage: deno run --allow-read --allow-write tasks/merge-css.ts
 

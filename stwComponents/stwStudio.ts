@@ -1,12 +1,6 @@
-/**
- * STW Studio is a REST API for managing files in the public folder of the web application.
- * It allows to create, read, update, and delete files, as well as manage directories.
- *
- * @module stwStudio
- * @author Giancarlo Trevisan
- * @license MIT
- * @version 1.0.0
- */
+// SPDX-License-Identifier: MIT
+// Spin the Web component: stwStudio
+
 import { serveFile } from "@std/http/file-server";
 
 async function listDirRecursive(dir: string, base = ""): Promise<any[]> {

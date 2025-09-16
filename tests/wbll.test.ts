@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Test suite: wbll.test
+
 import { assertEquals } from "@std/assert";
 import { STWLayout } from "../stwContents/wbll.ts";
 

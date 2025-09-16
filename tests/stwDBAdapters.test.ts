@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Test suite: stwDBAdapters.test
+
 import { assertEquals } from "@std/assert";
 import { STWMySQLAdapter } from "../stwComponents/stwDBAdapters/mysql.ts";
 // ...import other adapters as needed

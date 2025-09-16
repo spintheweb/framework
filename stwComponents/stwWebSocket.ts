@@ -1,10 +1,6 @@
-/**
- * Spin the Web web socket handler
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2025 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web component: stwWebSocket
+
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWPage } from "../stwElements/stwPage.ts";
 import { STWContent } from "../stwElements/stwContent.ts";

@@ -1,12 +1,6 @@
-/**
- * Spin the Web Geomap content
- * 
- * This content used OpenLayers to render maps
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web module: stwContents/stwGeomap.ts
+
 import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDatasources.ts";

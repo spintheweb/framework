@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Build/development task: dev
+
 // Runs all development tasks in parallel (e.g., CSS watcher, etc.)
 // Usage: $ deno run --allow-read --allow-write tasks/dev.ts
 

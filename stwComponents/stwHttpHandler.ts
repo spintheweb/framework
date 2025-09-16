@@ -1,10 +1,6 @@
-/**
- * Spin the Web Http handler
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2025 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web component: stwHttpHandler
+
 import { serveFile } from "@std/http/file-server";
 import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";

@@ -1,10 +1,6 @@
-/**
- * Spin the Web Content element
- * 
- * Language: TypeScript for Deno
- * 
- * MIT License. Copyright (c) 2024 Giancarlo Trevisan
-**/
+// SPDX-License-Identifier: MIT
+// Spin the Web element: stwContent
+
 import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
 import { STWSession } from "../stwComponents/stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";

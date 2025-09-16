@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SQL Server database adapter for Spin the Web
+
 import { ISTWAdapter, ISTWRecords } from "./adapter.ts";
 import { connect } from "https://deno.land/x/odbc@v2.4.1/mod.ts";
 
