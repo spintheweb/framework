@@ -42,11 +42,11 @@ COPY --chown=deno:deno --from=builder /deno-dir /deno-dir/
 EXPOSE 80 443
 
 # OCI compliant labels for better metadata in registries (GHCR)
-LABEL org.opencontainers.image.title="SpinTheWeb Framework" \
-			org.opencontainers.image.description="SpinTheWeb Deno-based web portal framework sandbox container" \
+LABEL org.opencontainers.image.title="WebSpinner" \
+			org.opencontainers.image.description="WebSpinner Deno-based web portal framework sandbox container" \
 			org.opencontainers.image.version="${APP_VERSION}" \
-			org.opencontainers.image.url="https://github.com/spintheweb/framework" \
-			org.opencontainers.image.source="https://github.com/spintheweb/framework" \
+			org.opencontainers.image.url="https://github.com/spintheweb/webspinner" \
+			org.opencontainers.image.source="https://github.com/spintheweb/webspinner" \
 			org.opencontainers.image.revision="${GIT_COMMIT_SHA:-unknown}" \
 			org.opencontainers.image.licenses="MIT"
 

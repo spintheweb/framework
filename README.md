@@ -42,11 +42,11 @@ A web spinner&mdash;a web server that understands WBDL&mdash;receives a request 
 
 ## Container Image (GitHub Packages)
 
-The framework is published as a container image on GitHub Container Registry (GHCR) so you can quickly spin up a sandbox spinner.
+The framework is published as a container image on GitHub Container Registry (GHCR) so you can quickly spin up a sandbox web spinner.
 
 Image name:
 
-	ghcr.io/spintheweb/framework:latest
+	ghcr.io/spintheweb/webspinner:latest
 
 ### Tags
 * `latest` – tip of `main`
@@ -56,8 +56,8 @@ Image name:
 
 ### Pull & Run
 ```bash
-docker pull ghcr.io/spintheweb/framework:latest
-docker run --rm -p 8080:80 --name stw ghcr.io/spintheweb/framework:latest
+docker pull ghcr.io/spintheweb/webspinner:latest
+docker run --rm -p 8080:80 --name webspinner ghcr.io/spintheweb/webspinner:latest
 ```
 Then open http://localhost:8080
 
@@ -67,13 +67,13 @@ Then open http://localhost:8080
 
 Override at run time:
 ```bash
-docker run -e SPINNER_ENV=localdev -p 8080:80 ghcr.io/spintheweb/framework:latest
+docker run -e SPINNER_ENV=localdev -p 8080:80 ghcr.io/spintheweb/webspinner:latest
 ```
 
 ### Persisting / Inspecting Data
 If the spinner writes generated artifacts to the working directory you can mount a volume:
 ```bash
-docker run --rm -p 8080:80 -v $(pwd)/webbase:/app/webbase ghcr.io/spintheweb/framework:latest
+docker run --rm -p 8080:80 -v $(pwd)/webbase:/app/webbase ghcr.io/spintheweb/webspinner:latest
 ```
 
 ### Health Check
@@ -92,15 +92,4 @@ echo "$GITHUB_TOKEN" | docker login ghcr.io -u <your-username> --password-stdin
 ```
 
 The publish workflow lives in `.github/workflows/publish-image.yml`.
-
-### Future / Optional Enhancements
-* Add image vulnerability scanning (e.g. Trivy or Grype) in CI
-* Sign images with cosign (keyless) for supply-chain integrity
-* Add SBOM export (syft or docker buildx --sbom) and attach as artifact
-* Add a dedicated `/health` endpoint and update HEALTHCHECK
-* Introduce semantic-release (or release-please) to automate version bumps & changelog
-* Push provenance attestation to OCI (already partially enabled via `attest-build-provenance`)
-* Maintain separate runtime stage with minimal permissions (distroless base) if footprint becomes a concern
-* Add Dependabot updates for GitHub Actions versions
-* Provide a compose file for local portal data persistence & extension development
 
