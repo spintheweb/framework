@@ -40,3 +40,67 @@ A web spinner&mdash;a web server that understands WBDL&mdash;receives a request 
 * Else it receives a resource
 * The _session context_ stores the connected user, its associated roles and locale. When a new session is established, the user is preset to _guest_ and roles to _guests_.
 
+## Container Image (GitHub Packages)
+
+The framework is published as a container image on GitHub Container Registry (GHCR) so you can quickly spin up a sandbox spinner.
+
+Image name:
+
+	ghcr.io/spintheweb/framework:latest
+
+### Tags
+* `latest` – tip of `main`
+* `vX.Y.Z` – semantic release tags
+* `sha-<gitsha>` – immutable per commit
+* `<branch>` – non-main branches (for previews)
+
+### Pull & Run
+```bash
+docker pull ghcr.io/spintheweb/framework:latest
+docker run --rm -p 8080:80 --name stw ghcr.io/spintheweb/framework:latest
+```
+Then open http://localhost:8080
+
+### Environment Variables
+* `SPINNER_ENV` (default: `docker`)
+* `SPINNER_VERSION` (injected from build)
+
+Override at run time:
+```bash
+docker run -e SPINNER_ENV=localdev -p 8080:80 ghcr.io/spintheweb/framework:latest
+```
+
+### Persisting / Inspecting Data
+If the spinner writes generated artifacts to the working directory you can mount a volume:
+```bash
+docker run --rm -p 8080:80 -v $(pwd)/webbase:/app/webbase ghcr.io/spintheweb/framework:latest
+```
+
+### Health Check
+The image defines a Docker `HEALTHCHECK` hitting `/` on port 80. Adjust in `Dockerfile` if a dedicated `/health` endpoint is added.
+
+### Building Locally (debugging)
+```bash
+docker build -t stw:local .
+docker run --rm -p 8080:80 stw:local
+```
+
+### Authentication to GHCR (if needed)
+Public images can be pulled anonymously. For private images:
+```bash
+echo "$GITHUB_TOKEN" | docker login ghcr.io -u <your-username> --password-stdin
+```
+
+The publish workflow lives in `.github/workflows/publish-image.yml`.
+
+### Future / Optional Enhancements
+* Add image vulnerability scanning (e.g. Trivy or Grype) in CI
+* Sign images with cosign (keyless) for supply-chain integrity
+* Add SBOM export (syft or docker buildx --sbom) and attach as artifact
+* Add a dedicated `/health` endpoint and update HEALTHCHECK
+* Introduce semantic-release (or release-please) to automate version bumps & changelog
+* Push provenance attestation to OCI (already partially enabled via `attest-build-provenance`)
+* Maintain separate runtime stage with minimal permissions (distroless base) if footprint becomes a concern
+* Add Dependabot updates for GitHub Actions versions
+* Provide a compose file for local portal data persistence & extension development
+
