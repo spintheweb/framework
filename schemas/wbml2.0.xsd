@@ -5,7 +5,7 @@
         <xs:documentation xml:lang="en">
       WBDL 2.0 (Webbase Description Language Schema) https://github.com/spintheweb/schemas/wbdl2.0.xsd
       The purpose of this schema is to formalize the description of a web site in terms of structure, navigation and contents.
-      Copyright (c) 2016 KeyVisions (TM)
+      Copyright (c) 2016 Giancarlo Trevisan. All Rights Reserved.
         </xs:documentation>
     </xs:annotation>
     <xs:element name="wbdl">

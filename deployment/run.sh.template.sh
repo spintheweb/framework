@@ -2,7 +2,7 @@
 set -e
 
 # --- Configuration ---
-IMAGE_NAME="keyvisions/spintheweb:latest"
+IMAGE_NAME="spintheweb/webspinner:latest"
 CONTAINER_NAME="stw-container"
 
 # --- Host Directories for Persistent Data ---

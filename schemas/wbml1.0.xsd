@@ -6,7 +6,7 @@
         <xsd:documentation><![CDATA[
 wbdl 1.0 (Webbase Description Language Schema) http://www.spintheweb.org/schemas/wbdl1.xsd
 The purpose of this schema is to formalize the description of a web site in terms of structure, navigation and contents.
-Copyright (c) 2005 KeyVisions (TM) di Trevisan Giancarlo. All Rights Reserved.
+Copyright (c) 2005 Giancarlo Trevisan. All Rights Reserved.
 ]]>
         </xsd:documentation>
     </xsd:annotation>
