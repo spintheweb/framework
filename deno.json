@@ -8,11 +8,10 @@
     "dev": "deno run --watch --allow-net --allow-read --allow-env stwSpinner.ts",
     "cache": "deno cache stwSpinner.ts",
     "build": "deno run --allow-read --allow-write ./tasks/minify.ts",
-    "headers": "deno run --allow-read --allow-write ./tasks/ensure-headers.ts",
-    "up": "deno run -A ./tasks/up.ts",
+  "headers": "deno run --allow-read --allow-write ./tasks/ensure-headers.ts",
 
     "docker:build": "docker build -t spintheweb/webspinner:latest .",
-  "docker:push": "docker push spintheweb/webspinner:latest"
+    "docker:push": "docker push spintheweb/webspinner:latest"
   },
 
   "imports": {
