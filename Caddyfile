@@ -1,0 +1,11 @@
+sandbox.spintheweb.org {
+    encode zstd gzip
+
+    # Forward all traffic to the app service
+    reverse_proxy spintheweb:8080
+
+    @health {
+        path "/health" "/_health" "/healthz" "/readyz"
+    }
+    respond @health 200
+}

@@ -85,6 +85,22 @@ docker build -t stw:local .
 docker run --rm -p 8080:80 stw:local
 ```
 
+## Run in GitHub Codespaces (ephemeral share)
+
+This repo includes a `.devcontainer` for Codespaces. Ports are configured so `8080` is public and will generate a shareable URL.
+
+Steps:
+
+1. Create a Codespace: GitHub → Code → Codespaces → New on `main`.
+2. When the container is ready, start the dev server:
+	```bash
+	deno task dev
+	```
+3. When the “WebSpinner” port 8080 forwards, GitHub will open the public URL automatically. Share that URL with anyone. It’s ephemeral and tied to this Codespace session.
+
+To stop, close the browser tab and stop the Codespace. For a persistent public URL and TLS on your own host, use the provided `docker-compose.yml` with `Caddyfile` and point your DNS to that host.
+
+
 ### Authentication to GHCR (if needed)
 Public images can be pulled anonymously. For private images:
 ```bash
