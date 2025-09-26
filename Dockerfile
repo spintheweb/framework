@@ -45,7 +45,10 @@ LABEL org.opencontainers.image.title="WebSpinner" \
 			org.opencontainers.image.url="https://github.com/spintheweb/webspinner" \
 			org.opencontainers.image.source="https://github.com/spintheweb/webspinner" \
 			org.opencontainers.image.revision="${GIT_COMMIT_SHA}" \
-			org.opencontainers.image.licenses="MIT"
+			org.opencontainers.image.licenses="MIT" \
+			org.opencontainers.image.authors="ops@spintheweb.org" \
+			org.opencontainers.image.vendor="Spin the Web" \
+			org.opencontainers.image.documentation="https://github.com/spintheweb/webspinner#readme"
 
 # Healthcheck using Deno (no wget/curl needed)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

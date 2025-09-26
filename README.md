@@ -96,3 +96,7 @@ echo "$GITHUB_TOKEN" | docker login ghcr.io -u <your-username> --password-stdin
 
 The publish workflow lives in `.github/workflows/publish-image.yml`.
 
+## Security
+
+If you discover a vulnerability, please email security@spintheweb.org. See SECURITY.md for our policy. Our public contact per RFC 9116 is available at `/.well-known/security.txt` on deployed instances.
+

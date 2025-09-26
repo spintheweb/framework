@@ -1,0 +1,9 @@
+{
+    # ACME/Let's Encrypt contact email
+    email ops@spintheweb.org
+}
+
+# Single site for the sandbox – proxy to the Webspinner runtime
+sandbox.spintheweb.org {
+    reverse_proxy localhost:8080
+}

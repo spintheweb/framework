@@ -27,6 +27,9 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    environment:
+      # Domain Caddy should serve. Example: sandbox.spintheweb.org
+      - SITE_DOMAIN=${SITE_DOMAIN}
     restart: unless-stopped
 
 volumes:

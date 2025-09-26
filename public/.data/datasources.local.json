@@ -2,7 +2,7 @@
   {
     "name": "mysqlsample",
     "type": "mysql",
-    "host": "sandbox.spintheweb.org",
+    "host": "localhost",
     "port": 3306,
     "user": "qt3ul9nb_sampledb",
     "password": "r#MM9!0Ght3(vM2",
@@ -17,7 +17,7 @@
   {
     "name": "pgMain",
     "type": "postgres",
-    "host": "sandbox.spintheweb.org",
+    "host": "localhost",
     "port": 5432,
     "user": "neon_user",
     "password": "neon_pass",
@@ -26,7 +26,7 @@
   {
     "name": "mssqlMain",
     "type": "sqlserver",
-    "server": "sandbox.spintheweb.org",
+    "server": "localhost",
     "port": 1433,
     "user": "sa",
     "password": "SamplePass!123",
@@ -35,7 +35,7 @@
   {
     "name": "mongoMain",
     "type": "mongodb",
-    "uri": "mongodb://readonly:readonly@sandbox.spintheweb.org:27017",
+    "uri": "mongodb://readonly:readonly@localhost:27017",
     "database": "sample_mflix",
     "collection": "movies"
   },
@@ -45,7 +45,7 @@
     "mode": "cli",
     "username": "hr",
     "password": "hr",
-    "host": "sandbox.spintheweb.org",
+    "host": "localhost",
     "port": 1521,
     "service": "FREEPDB1"
   }

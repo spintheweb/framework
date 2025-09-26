@@ -1,0 +1,4 @@
+Contact: mailto:security@spintheweb.org
+Preferred-Languages: en
+Policy: https://github.com/spintheweb/webspinner/blob/main/SECURITY.md
+Canonical: https://sandbox.spintheweb.org/.well-known/security.txt

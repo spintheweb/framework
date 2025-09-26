@@ -1,6 +1,6 @@
 # Public Directory
 
-This directory contains the static assets for the web application. Files here are served directly by the web server and are not processed by the application's build pipeline.
+This directory contains the static assets for the portal. Files here are served directly by the web server and are not processed by the application's build pipeline.
 
 ## Key Files
 

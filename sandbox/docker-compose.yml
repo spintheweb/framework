@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # MySQL - Optimized for Raspberry Pi 5 (shared with webspinner)
+  mysql-sample:
+    image: mysql:8.0
+    container_name: spintheweb-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: qt3ul9nb_sampledb
+      MYSQL_USER: qt3ul9nb_sampledb
+      MYSQL_PASSWORD: "r#MM9!0Ght3(vM2"
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./databases/mysql:/docker-entrypoint-initdb.d
+    command: 
+      - --innodb_buffer_pool_size=400M
+      - --innodb_log_file_size=64M
+      - --max_connections=75
+      - --innodb_flush_method=O_DIRECT
+      - --table_open_cache=200
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # PostgreSQL - ARM64 optimized (shared Pi resources)
+  postgres-sample:
+    image: postgres:15
+    container_name: spintheweb-postgres
+    environment:
+      POSTGRES_DB: pagila
+      POSTGRES_USER: neon_user
+      POSTGRES_PASSWORD: neon_pass
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./databases/postgres:/docker-entrypoint-initdb.d
+    command:
+      - postgres
+      - -c shared_buffers=200MB
+      - -c effective_cache_size=800MB
+      - -c max_connections=75
+      - -c wal_buffers=8MB
+      - -c checkpoint_completion_target=0.9
+      - -c random_page_cost=1.1
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # SQL Server - Memory constrained (sharing Pi with webspinner)
+  sqlserver-sample:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: spintheweb-sqlserver
+    environment:
+      SA_PASSWORD: "SamplePass!123"
+      ACCEPT_EULA: Y
+      MSSQL_DB: AdventureWorksLT
+      MSSQL_MEMORY_LIMIT_MB: 800
+      MSSQL_PID: Express
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./databases/sqlserver:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # MongoDB - Lightweight (sharing Pi resources with webspinner)
+  mongodb-sample:
+    image: mongo:7.0
+    container_name: spintheweb-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: readonly
+      MONGO_INITDB_ROOT_PASSWORD: readonly
+      MONGO_INITDB_DATABASE: sample_mflix
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./databases/mongodb:/docker-entrypoint-initdb.d
+    command: >
+      mongod 
+      --wiredTigerCacheSizeGB 0.4
+      --wiredTigerCollectionBlockCompressor snappy
+      --wiredTigerIndexPrefixCompression true
+      --maxConns 50
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # Oracle - Memory optimized (sharing Pi with webspinner app)
+  oracle-sample:
+    image: gvenzl/oracle-free:23-slim
+    container_name: spintheweb-oracle
+    environment:
+      ORACLE_RANDOM_PASSWORD: true
+      ORACLE_PASSWORD: hr
+      APP_USER: hr
+      APP_USER_PASSWORD: hr
+      ORACLE_CHARACTERSET: AL32UTF8
+      ORACLE_DATABASE: FREEPDB1
+    ports:
+      - "127.0.0.1:1521:1521"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./databases/oracle:/container-entrypoint-initdb.d
+    shm_size: 768m
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # Adminer - Lightweight database management
+  adminer:
+    image: adminer:4.8.1
+    container_name: spintheweb-adminer
+    ports:
+      - "127.0.0.1:8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql-sample
+      ADMINER_DESIGN: pepa-linha
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+    depends_on:
+      - mysql-sample
+      - postgres-sample
+      - sqlserver-sample
+      - mongodb-sample
+      - oracle-sample
+
+  # Portainer - Optional container management UI
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: spintheweb-portainer
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    restart: unless-stopped
+    networks:
+      - spintheweb-db
+
+  # Webspinner Application - Main application server
+  webspinner-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: spintheweb-app
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ../public:/app/public:ro
+      - ../stwComponents:/app/stwComponents:ro
+      - ../stwContents:/app/stwContents:ro
+      - ../stwElements:/app/stwElements:ro
+      - ../stwStyles:/app/stwStyles:ro
+      - ../webbaselets:/app/webbaselets:ro
+    environment:
+      - DENO_ENV=production
+      - DB_HOST=mysql-sample
+      - PG_HOST=postgres-sample
+      - MONGO_HOST=mongodb-sample
+      - MSSQL_HOST=sqlserver-sample
+      - ORACLE_HOST=oracle-sample
+    restart: unless-stopped
+    depends_on:
+      - mysql-sample
+      - postgres-sample
+      - sqlserver-sample
+      - mongodb-sample
+      - oracle-sample
+    networks:
+      - spintheweb-db
+
+networks:
+  spintheweb-db:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: spintheweb-br
+
+volumes:
+  mysql_data:
+    driver: local
+  postgres_data:
+    driver: local
+  sqlserver_data:
+    driver: local
+  mongodb_data:
+    driver: local
+  oracle_data:
+    driver: local
+  portainer_data:
+    driver: local

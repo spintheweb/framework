@@ -1,4 +1,4 @@
-sandbox.spintheweb.org {
+{$SITE_DOMAIN} {
     encode zstd gzip
 
     # Forward all traffic to the app service
