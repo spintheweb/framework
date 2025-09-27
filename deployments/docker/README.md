@@ -83,4 +83,14 @@ Then:
 
 ```bash
 docker compose -f deployments/docker/docker-compose.yml up --build -d
+
+Local MySQL service
+-------------------
+
+The compose quickstart now includes a `mysql` service for a ready-to-go relational database used by example webbaselets.
+
+- Default credentials are configured in `.env.docker` (DB_USER, DB_PASSWORD, DB_NAME) and in the compose env for MySQL.
+- Initialization SQL files are placed in `deployments/docker/mysql-init/` and are executed on first container start.
+
+Security note: the bundled MySQL service is intended for local development. For production, run a managed database or bind the DB to loopback and secure credentials.
 ```

@@ -15,6 +15,8 @@ services:
     expose:
       - "8080"
     restart: unless-stopped
+    depends_on:
+      - mysql
 
   caddy:
     image: caddy:2-alpine
@@ -32,6 +34,21 @@ services:
       # Domain Caddy should serve. Example: sandbox.spintheweb.org
       - SITE_DOMAIN=${SITE_DOMAIN}
     restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: webspinner_mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=change_me_root_password
+      - MYSQL_DATABASE=webspinner
+      - MYSQL_USER=webspinner
+      - MYSQL_PASSWORD=webspinner_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
 
 volumes:
   caddy_data:
