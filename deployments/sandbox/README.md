@@ -35,7 +35,7 @@ All containers communicate via internal Docker networks, with external access th
 - **Adminer** - Database playground interface
 - **Portainer** - Container management interface
 
-## Hardware Requirements ✅
+## Hardware Requirements
 
 Your Raspberry Pi 5 specs are perfect for the Spin the Web sandbox:
 - **8GB RAM** - Sufficient for Webspinner + all playground datasources + OS
@@ -47,15 +47,10 @@ Your Raspberry Pi 5 specs are perfect for the Spin the Web sandbox:
 
 ### Production Sandbox (sandbox.spintheweb.org):
 - **Spin the Web Framework**: `https://sandbox.spintheweb.org`
-- **Database Playground**: `https://sandbox.spintheweb.org:8081`
-- **Container Management**: `https://sandbox.spintheweb.org:9000`
+- Databases and admin tools are not exposed publicly. Use SSH tunnels or local access only.
 
 ### Database Access Points:
-- **MySQL**: `sandbox.spintheweb.org:3306` (E-commerce sample)
-- **PostgreSQL**: `sandbox.spintheweb.org:5432` (Media/rental sample)
-- **SQL Server**: `sandbox.spintheweb.org:1433` (Business sample)
-- **MongoDB**: `sandbox.spintheweb.org:27017` (Movie database)
-- **Oracle**: `sandbox.spintheweb.org:1521` (Enterprise/HR sample)
+- For security, database ports are bound to localhost on the host. Access them locally on the Pi or via SSH tunnels.
 
 ### Local Development (when running locally):
 - **MySQL**: `localhost:3306`
@@ -142,37 +137,38 @@ Based on Pi 5 with 8GB RAM (Spin the Web Sandbox):
 
 1. **Copy sandbox files to Pi:**
 ```bash
-scp -r sandbox/ pi@sandbox.spintheweb.org:~/webspinner/
+scp -r deployments/sandbox/ pi@sandbox.spintheweb.org:~/webspinner/
 ```
 
 2. **Deploy complete sandbox:**
 ```bash
 ssh pi@sandbox.spintheweb.org
-cd ~/webspinner/sandbox
+cd ~/webspinner/deployments/sandbox
 ./deploy.sh
 ```
 
 3. **Access the sandbox playground:**
 ```bash
-https://sandbox.spintheweb.org         # Main framework sandbox
-https://sandbox.spintheweb.org:8081    # Database playground (Adminer)
-https://sandbox.spintheweb.org:9000    # Container management (Portainer)
+https://sandbox.spintheweb.org         # Main framework sandbox (public via Caddy)
+# Adminer and Portainer are bound to localhost on the Pi. Use SSH tunnels if needed:
+#   ssh -N -L 8081:127.0.0.1:8081 pi@sandbox.spintheweb.org  # Adminer
+#   ssh -N -L 9000:127.0.0.1:9000 pi@sandbox.spintheweb.org  # Portainer
 ```
 
 ### 2. Local Development
 
 1. **Start all containers:**
 ```bash
-cd sandbox/
+cd deployments/sandbox/
 docker compose up -d
 ```
 
 2. **Wait for initialization** (may take 5-10 minutes for first run)
 
-3. **Access locally:**
+3. **Access locally (on the Pi host):**
 - Framework: `http://localhost:8080`
-- Database admin: `http://localhost:8081`
-- Container admin: `http://localhost:9000`
+- Database admin (Adminer): `http://localhost:8081`
+- Container admin (Portainer): `http://localhost:9000`
 
 ## Management Commands
 
@@ -248,7 +244,7 @@ For production deployment:
 ## File Structure
 
 ```
-sandbox/
+deployments/sandbox/
 ├── docker-compose.yml           # Complete sandbox environment
 ├── deploy.sh                   # Automated deployment script
 ├── Caddyfile                   # Reverse proxy configuration
@@ -301,9 +297,8 @@ cd ~/webspinner/sandbox
 
 3. **Access the sandbox playground:**
 ```bash
-https://sandbox.spintheweb.org         # Main framework sandbox
-https://sandbox.spintheweb.org:8081    # Database playground
-https://sandbox.spintheweb.org:9000    # Container management
+https://sandbox.spintheweb.org         # Main framework sandbox (public via Caddy)
+# Adminer/Portainer are not exposed publicly. Use SSH tunnels as needed.
 ```
 
 ## Example Sandbox Usage
@@ -327,4 +322,4 @@ https://sandbox.spintheweb.org/api/datasources
 wss://sandbox.spintheweb.org/ws/live-data
 ```
 
-Your Pi becomes a complete **Spin the Web framework playground** accessible at `https://sandbox.spintheweb.org`! 🎮🚀
+Your Pi becomes a complete **Spin the Web framework playground** accessible at `https://sandbox.spintheweb.org`.

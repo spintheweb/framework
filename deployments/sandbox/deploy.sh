@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🚀 Deploying Spin the Web Sandbox to Raspberry Pi 5..."
+echo "Deploying Spin the Web Sandbox to Raspberry Pi 5..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -52,17 +52,17 @@ if [ "$AVAILABLE_SPACE" -lt 10485760 ]; then # 10GB in KB
 fi
 
 # Create project directory
-WEBSPINNER_DIR="$HOME/webspinner"
+WEBSPINNER_DIR="$HOME/webspinner/deployments/sandbox"
 mkdir -p "$WEBSPINNER_DIR"
 cd "$WEBSPINNER_DIR"
 
-echo "📁 Working directory: $WEBSPINNER_DIR"
+echo "Working directory: $WEBSPINNER_DIR"
 
 # Check if database-init directory exists
 if [ ! -d "databases" ]; then
     echo -e "${RED}Error: databases directory not found. Please copy it from your development machine.${NC}"
     echo "Run this on your Windows machine:"
-    echo "scp -r sandbox/databases/ pi@$(hostname -I | awk '{print $1}'):~/webspinner/sandbox/"
+    echo "scp -r deployments/sandbox/databases/ pi@$(hostname -I | awk '{print $1}'):~/webspinner/deployments/sandbox/"
     exit 1
 fi
 
@@ -70,25 +70,24 @@ fi
 if [ ! -f "docker-compose.yml" ]; then
     echo -e "${RED}Error: docker-compose.yml not found. Please copy it from your development machine.${NC}"
     echo "Run this on your Windows machine:"
-    echo "scp docker-compose.yml pi@$(hostname -I | awk '{print $1}'):~/webspinner/sandbox/"
+    echo "scp docker-compose.yml pi@$(hostname -I | awk '{print $1}'):~/webspinner/deployments/sandbox/"
     exit 1
 fi
 
-# Check if Dockerfile exists for webspinner app
-if [ ! -f "Dockerfile" ]; then
-    echo -e "${RED}Error: Dockerfile not found. Please copy the entire webspinner project.${NC}"
-    echo "Run this on your Windows machine:"
-    echo "scp -r . pi@$(hostname -I | awk '{print $1}'):~/webspinner/"
+# Check if Dockerfile exists for webspinner app (under deployments/docker two levels up)
+if [ ! -f "../../deployments/docker/Dockerfile" ]; then
+    echo -e "${RED}Error: ../../deployments/docker/Dockerfile not found. Please copy the entire webspinner project root to ~/webspinner.${NC}"
+    echo "From your development machine, copy the repo root (containing deployments/docker/Dockerfile) to the Pi."
     exit 1
 fi
 
 # System optimization for databases
-echo "⚙️  Optimizing system for database workloads..."
+echo "Optimizing system for database workloads..."
 
 # Increase swap if needed
 CURRENT_SWAP=$(free -m | awk 'NR==3{print $2}')
 if [ "$CURRENT_SWAP" -lt 2048 ]; then
-    echo "🔄 Increasing swap to 2GB..."
+    echo "Increasing swap to 2GB..."
     sudo dphys-swapfile swapoff || true
     sudo sed -i 's/CONF_SWAPSIZE=.*/CONF_SWAPSIZE=2048/' /etc/dphys-swapfile
     sudo dphys-swapfile setup
@@ -96,7 +95,7 @@ if [ "$CURRENT_SWAP" -lt 2048 ]; then
 fi
 
 # Optimize kernel parameters
-echo "🔧 Optimizing kernel parameters..."
+echo "Optimizing kernel parameters..."
 sudo tee /etc/sysctl.d/99-database.conf > /dev/null << 'EOF'
 # Database optimizations for Pi 5
 vm.swappiness=10
@@ -109,14 +108,14 @@ EOF
 sudo sysctl -p /etc/sysctl.d/99-database.conf
 
 # Pull all images first (this takes time)
-echo "📦 Pulling Docker images for sandbox environment (may take 10-15 minutes)..."
+echo "Pulling Docker images for sandbox environment (may take 10-15 minutes)..."
 docker compose -f docker-compose.yml pull
 
 # Create and start containers
-echo "🚀 Starting Spin the Web sandbox environment..."
+echo "Starting Spin the Web sandbox environment..."
 docker compose -f docker-compose.yml up -d --build
 
-echo "⏳ Waiting for sandbox services to initialize (10-15 minutes)..."
+echo "Waiting for sandbox services to initialize (10-15 minutes)..."
 
 # Function to check if a container is healthy
 check_container() {
@@ -140,80 +139,79 @@ containers=("spintheweb-mysql" "spintheweb-postgres" "spintheweb-mongodb" "spint
 for container in "${containers[@]}"; do
     echo -n "Checking $container"
     if check_container "$container"; then
-        echo -e " ${GREEN}✓${NC}"
+    echo -e " ${GREEN}OK${NC}"
     else
-        echo -e " ${RED}✗${NC}"
+    echo -e " ${RED}FAIL${NC}"
     fi
 done
 
 # Test database connections
-echo "🔍 Testing database connections..."
+echo "Testing database connections..."
 
 # MySQL
 if docker exec spintheweb-mysql mysql -u root -prootpass123 -e "SELECT 'MySQL OK'" >/dev/null 2>&1; then
-    echo -e "MySQL: ${GREEN}✓ Connected${NC}"
+    echo -e "MySQL: ${GREEN}Connected${NC}"
 else
-    echo -e "MySQL: ${YELLOW}⚠ Still initializing${NC}"
+    echo -e "MySQL: ${YELLOW}Still initializing${NC}"
 fi
 
 # PostgreSQL
 if docker exec spintheweb-postgres psql -U neon_user -d pagila -c "SELECT 'PostgreSQL OK'" >/dev/null 2>&1; then
-    echo -e "PostgreSQL: ${GREEN}✓ Connected${NC}"
+    echo -e "PostgreSQL: ${GREEN}Connected${NC}"
 else
-    echo -e "PostgreSQL: ${YELLOW}⚠ Still initializing${NC}"
+    echo -e "PostgreSQL: ${YELLOW}Still initializing${NC}"
 fi
 
 # MongoDB
 if docker exec spintheweb-mongodb mongosh --quiet --eval "db.runCommand('ping')" >/dev/null 2>&1; then
-    echo -e "MongoDB: ${GREEN}✓ Connected${NC}"
+    echo -e "MongoDB: ${GREEN}Connected${NC}"
 else
-    echo -e "MongoDB: ${YELLOW}⚠ Still initializing${NC}"
+    echo -e "MongoDB: ${YELLOW}Still initializing${NC}"
 fi
 
 # Webspinner Runtime
 if curl -s https://sandbox.spintheweb.org >/dev/null 2>&1; then
-    echo -e "Webspinner Runtime: ${GREEN}✓ WBDL interpreter running${NC}"
+    echo -e "Webspinner Runtime: ${GREEN}WBDL interpreter running${NC}"
 elif curl -s http://localhost:8080 >/dev/null 2>&1; then
-    echo -e "Webspinner Runtime: ${GREEN}✓ Running (HTTP only)${NC}"
+    echo -e "Webspinner Runtime: ${GREEN}Running (HTTP only)${NC}"
 else
-    echo -e "Webspinner Runtime: ${YELLOW}⚠ Still initializing${NC}"
+    echo -e "Webspinner Runtime: ${YELLOW}Still initializing${NC}"
 fi
 
 # Show status
-echo "📊 Container Status:"
+echo "Container Status:"
 docker compose -f docker-compose.yml ps
 
 # Show resource usage
-echo "💻 Resource Usage:"
+echo "Resource Usage:"
 docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
 
 # Get Pi IP address and domain
 PI_IP=$(hostname -I | awk '{print $1}')
 PI_DOMAIN="sandbox.spintheweb.org"
 
-echo -e "\n🎉 ${GREEN}Spin the Web Sandbox Deployment Complete!${NC}"
-echo -e "\n📍 Access your sandbox playground at:"
-echo -e "   ${GREEN}🌐 https://$PI_DOMAIN${NC} - Spin the Web sandbox environment"
-echo -e "   ${GREEN}📊 https://$PI_DOMAIN:8081${NC} - Database playground (Adminer)"
-echo -e "   ${GREEN}🐳 https://$PI_DOMAIN:9000${NC} - Container management (Portainer)"
+echo -e "\n${GREEN}Spin the Web Sandbox Deployment Complete!${NC}"
+echo -e "\nPublic access (via Caddy/TLS):"
+echo -e "   ${GREEN}https://$PI_DOMAIN${NC} - Spin the Web sandbox (Webspinner)"
 
-echo -e "\n📍 Playground datasources for WBDL experiments:"
-echo -e "   MySQL:       ${GREEN}$PI_DOMAIN:3306${NC} (E-commerce sample)"
-echo -e "   PostgreSQL:  ${GREEN}$PI_DOMAIN:5432${NC} (Media/rental sample)"
-echo -e "   SQL Server:  ${GREEN}$PI_DOMAIN:1433${NC} (Business sample - may take a few minutes)"
-echo -e "   MongoDB:     ${GREEN}$PI_DOMAIN:27017${NC} (Movie database sample)"
-echo -e "   Oracle:      ${GREEN}$PI_DOMAIN:1521${NC} (HR/enterprise sample - may take a few minutes)"
+echo -e "\nLocal management on the Pi (or via SSH tunnels):"
+echo -e "   Webspinner (HTTP): ${GREEN}http://localhost:8080${NC}"
+echo -e "   Adminer (DB UI):   ${GREEN}http://localhost:8081${NC}"
+echo -e "   Portainer (UI):    ${GREEN}http://localhost:9000${NC}"
 
-echo -e "\n📍 Alternative access (direct IP):"
-echo -e "   Webspinner:  ${GREEN}http://$PI_IP:8080${NC}"
-echo -e "   Adminer:     ${GREEN}http://$PI_IP:8081${NC}"
-echo -e "   Portainer:   ${GREEN}http://$PI_IP:9000${NC}"
+echo -e "\nDatabase ports (bound to localhost on the host for security):"
+echo -e "   MySQL:       ${GREEN}localhost:3306${NC}"
+echo -e "   PostgreSQL:  ${GREEN}localhost:5432${NC}"
+echo -e "   SQL Server:  ${GREEN}localhost:1433${NC}"
+echo -e "   MongoDB:     ${GREEN}localhost:27017${NC}"
+echo -e "   Oracle:      ${GREEN}localhost:1521${NC}"
 
-echo -e "\n📝 Your sandbox datasources are configured and ready:"
-echo -e "   Production: ${GREEN}sandbox.spintheweb.org${NC} (datasources.json)"
-echo -e "   Local Dev:  ${GREEN}localhost${NC} (datasources.local.json)"
+echo -e "\nTip: To access Adminer/Portainer or DB ports remotely, create SSH tunnels, e.g.:"
+echo -e "   ssh -N -L 8081:127.0.0.1:8081 pi@$PI_DOMAIN"
+echo -e "   ssh -N -L 9000:127.0.0.1:9000 pi@$PI_DOMAIN"
+echo -e "   ssh -N -L 3306:127.0.0.1:3306 pi@$PI_DOMAIN  # and similar for other DB ports"
 
-echo -e "\n🔧 Useful sandbox management commands:"
+echo -e "\nUseful sandbox management commands (run on the Pi):"
 echo -e "   View logs:    ${YELLOW}docker compose -f docker-compose.yml logs -f${NC}"
 echo -e "   Stop sandbox: ${YELLOW}docker compose -f docker-compose.yml down${NC}"
 echo -e "   Restart all:  ${YELLOW}docker compose -f docker-compose.yml restart${NC}"
@@ -221,7 +219,7 @@ echo -e "   Resource use: ${YELLOW}docker stats${NC}"
 echo -e "   Webspinner:   ${YELLOW}docker logs spintheweb-app${NC}"
 
 # Create systemd service for auto-start
-read -p "🤖 Do you want to enable auto-start on boot? (y/N): " -n 1 -r
+read -p "Do you want to enable auto-start on boot? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     sudo tee /etc/systemd/system/webspinner-sandbox.service > /dev/null << EOF
@@ -233,7 +231,7 @@ Requires=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=$WEBSPINNER_DIR/sandbox
+WorkingDirectory=$WEBSPINNER_DIR
 ExecStart=/usr/bin/docker compose -f docker-compose.yml up -d
 ExecStop=/usr/bin/docker compose -f docker-compose.yml down
 User=$USER
@@ -244,12 +242,12 @@ EOF
 
     sudo systemctl daemon-reload
     sudo systemctl enable webspinner-sandbox.service
-    echo -e "${GREEN}✓ Auto-start enabled for sandbox${NC}"
+    echo -e "${GREEN}Auto-start enabled for sandbox${NC}"
 fi
 
-echo -e "\n🎯 Your Raspberry Pi is now running the Spin the Web Sandbox!"
-echo -e "   ${GREEN}✓ Playground Environment${NC} - Complete framework sandbox at sandbox.spintheweb.org"
-echo -e "   ${GREEN}✓ Webspinner Runtime${NC} - WBDL interpreter with HTTP/WebSocket endpoints"
-echo -e "   ${GREEN}✓ Rich Datasources${NC} - 5 databases with realistic sample data for experiments"
-echo -e "   ${GREEN}✓ Management Tools${NC} - Database and container administration interfaces"
-echo -e "\n   Start exploring the Spin the Web framework! 🎮🚀"
+echo -e "\nYour Raspberry Pi is now running the Spin the Web Sandbox!"
+echo -e "   ${GREEN}Playground Environment${NC} - Complete framework sandbox at sandbox.spintheweb.org"
+echo -e "   ${GREEN}Webspinner Runtime${NC} - WBDL interpreter with HTTP/WebSocket endpoints"
+echo -e "   ${GREEN}Rich Datasources${NC} - 5 databases with sample data for experiments"
+echo -e "   ${GREEN}Management Tools${NC} - Database and container administration interfaces"
+echo -e "\n   Start exploring the Spin the Web framework!"

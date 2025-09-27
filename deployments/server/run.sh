@@ -14,14 +14,11 @@ CERT_DIR="${BASE_DIR}/.cert"
 ENV_FILE="${BASE_DIR}/.env"
 
 # --- Create directories if they don't exist ---
-mkdir -p $PUBLIC_DIR
-mkdir -p $WEBBASE_DIR
-mkdir -p $CERT_DIR
+mkdir -p "$PUBLIC_DIR" "$WEBBASE_DIR" "$CERT_DIR"
 
-# --- Run the Container ---
 echo "Starting container: $CONTAINER_NAME"
 docker run -d \
-  --name $CONTAINER_NAME \
+  --name "$CONTAINER_NAME" \
   --restart always \
   -p 443:443 \
   -p 8000:8000 \
@@ -29,6 +26,6 @@ docker run -d \
   -v "${WEBBASE_DIR}:/app/webbase" \
   -v "${CERT_DIR}:/app/.cert:ro" \
   -v "${ENV_FILE}:/app/.env:ro" \
-  $IMAGE_NAME
+  "$IMAGE_NAME"
 
 echo "Container started successfully."

@@ -7,7 +7,7 @@ The companion reverse proxy (Caddy) is configured via SITE_DOMAIN, so you can se
 ### Build the image
 
 ```bash
-docker build -t spintheweb:dev .
+docker build -t spintheweb:dev -f deployments/docker/Dockerfile .
 ```
 
 ### Run with docker compose (recommended)
@@ -15,15 +15,15 @@ docker build -t spintheweb:dev .
 Pass the portal URL at run time; the container fetches it and stores it under `SITE_WEBBASE`.
 
 ```bash
-PORTAL_URL=https://example.com/webapplication.wbdl docker compose up --build
+PORTAL_URL=https://example.com/webapplication.wbdl docker compose -f deployments/docker/docker-compose.yml up --build
 ```
 
-Alternatively, set PORTAL_URL in an `.env` file next to `docker-compose.yml`.
+Alternatively, set PORTAL_URL in an `.env` file next to the compose file.
 
 To expose the service on a specific domain via Caddy, also set `SITE_DOMAIN`:
 
 ```bash
-SITE_DOMAIN=sandbox.spintheweb.org PORTAL_URL=https://example.com/webapplication.wbdl docker compose up --build
+SITE_DOMAIN=sandbox.spintheweb.org PORTAL_URL=https://example.com/webapplication.wbdl docker compose -f deployments/docker/docker-compose.yml up --build
 ```
 
 ### Run with docker directly
@@ -82,5 +82,5 @@ PORTAL_URL=https://example.com/webapplication.wbdl
 Then:
 
 ```bash
-docker compose up --build -d
+docker compose -f deployments/docker/docker-compose.yml up --build -d
 ```

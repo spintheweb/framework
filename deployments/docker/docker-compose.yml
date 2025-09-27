@@ -2,7 +2,8 @@ services:
   spintheweb:
     image: spintheweb:dev
     build:
-      context: .
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
     container_name: spintheweb
     environment:
       - HOST=0.0.0.0

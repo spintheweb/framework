@@ -148,18 +148,18 @@ services:
   # Webspinner Application - Main application server
   webspinner-app:
     build:
-      context: ..
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
     container_name: spintheweb-app
     ports:
       - "127.0.0.1:8080:8080"
     volumes:
-      - ../public:/app/public:ro
-      - ../stwComponents:/app/stwComponents:ro
-      - ../stwContents:/app/stwContents:ro
-      - ../stwElements:/app/stwElements:ro
-      - ../stwStyles:/app/stwStyles:ro
-      - ../webbaselets:/app/webbaselets:ro
+      - ../../public:/app/public:ro
+      - ../../stwComponents:/app/stwComponents:ro
+      - ../../stwContents:/app/stwContents:ro
+      - ../../stwElements:/app/stwElements:ro
+      - ../../stwStyles:/app/stwStyles:ro
+      - ../../webbaselets:/app/webbaselets:ro
     environment:
       - DENO_ENV=production
       - DB_HOST=mysql-sample
