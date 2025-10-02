@@ -1,19 +1,24 @@
-# Webspinner Type C Release: Self-Extracting Installer
+# Webspinner Server Release: Self-Extracting Installer
 
 ## Overview
 
-Type C releases provide a **self-extracting bash installer** that bundles the complete Webspinner runtime with an interactive configuration wizard. This is the recommended deployment method for production Linux servers.
+Server releases provide a **self-extracting bash installer** that bundles the complete Webspinner runtime with an interactive configuration wizard. This is the recommended deployment method for production Linux servers.
+
+**Default Configuration**: The installer defaults to `labs.spintheweb.org` but can be customized for any domain during installation.
 
 ## What's Included
 
-The Type C installer includes:
+The server installer includes:
 - Complete Webspinner runtime (all TypeScript sources)
-- Default `.env` configuration (from `.env.example` with safe defaults)
-- Interactive configuration wizard (can customize the `.env`)
+- System webbaselets (`stwStudio.wbdl`, `stwCommon.wbdl`)
+- Default `.env` configuration (from `.env.example`)
+- Interactive configuration wizard (defaults to labs.spintheweb.org)
 - Automatic `.env` generation/customization
 - Optional systemd service setup
 - Dependency validation
 - Default data file initialization
+
+**Note:** System webbaselets (`stwStudio.wbdl` and `stwCommon.wbdl`) are centrally managed and will be updated during upgrades. Custom webbaselets stored in `public/.data/` are always preserved. These system webbaselets could also be served from a CDN for instant updates across all portals.
 
 ## System Requirements
 
@@ -46,7 +51,7 @@ The Type C installer includes:
 Run the Type C release script from the repository root:
 
 ```bash
-./tasks/release-type-c.sh
+./deployments/scripts/release-type-c.sh
 ```
 
 The script will:
@@ -58,7 +63,7 @@ The script will:
 
 ### Output Files
 
-The script generates in `deployments/deploy/`:
+The script generates in `deployments/release/`:
 - `webspinner-installer-v1.0.0.sh` - Self-extracting installer (~5-10MB)
 - `webspinner-installer-v1.0.0.sh.sha256` - Checksum file
 

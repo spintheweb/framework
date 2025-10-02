@@ -1,7 +1,7 @@
 #!/bin/bash
-# Webspinner Type C Release Script
+# Webspinner Server Release Script
 # Creates a self-extracting installer with embedded runtime and configuration wizard
-# Usage: ./tasks/release-type-c.sh
+# Usage: ./deployments/scripts/server.sh
 
 set -e  # Exit on error
 
@@ -12,7 +12,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Webspinner Type C Installer Release Generator${NC}"
+echo -e "${BLUE}Webspinner Server Installer Release Generator${NC}"
 echo "=============================================="
 echo ""
 
@@ -41,7 +41,7 @@ else
 fi
 
 # Get current directory (should be repo root)
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 echo "Repository: $REPO_ROOT"
@@ -111,7 +111,7 @@ tar -czf "$PAYLOAD_TAR" -C "$TEMP_DIR" webspinner-payload
 echo -e "${GREEN}Payload archive created: $(du -h "$PAYLOAD_TAR" | cut -f1)${NC}"
 
 # Create the installer script
-OUTPUT_DIR="$REPO_ROOT/deployments/deploy"
+OUTPUT_DIR="$REPO_ROOT/deployments/release"
 mkdir -p "$OUTPUT_DIR"
 INSTALLER_FILE="$OUTPUT_DIR/webspinner-installer-$VERSION.sh"
 
@@ -169,19 +169,100 @@ if [ -n "$USER_INSTALL_DIR" ]; then
     INSTALL_DIR="$USER_INSTALL_DIR"
 fi
 
+# Check if this is an upgrade
+UPGRADE_MODE=false
+if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then
+    UPGRADE_MODE=true
+    echo -e "${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║     Existing Installation Detected            ║${NC}"
+    echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo "Found existing Webspinner installation at: $INSTALL_DIR"
+    echo ""
+    echo -e "${BLUE}Upgrade mode:${NC}"
+    echo "  ✓ Your data (.env, public/.data/, .cert/) will be preserved"
+    echo "  ✓ Webspinner core files will be updated"
+    echo "  ✓ Service will be restarted if running"
+    echo ""
+    read -p "Continue with upgrade? (y/n) [y]: " CONTINUE_UPGRADE
+    CONTINUE_UPGRADE=${CONTINUE_UPGRADE:-y}
+    if [[ ! "$CONTINUE_UPGRADE" =~ ^[Yy]$ ]]; then
+        echo "Upgrade cancelled."
+        exit 0
+    fi
+    
+    # Backup user data before upgrade
+    echo ""
+    echo -e "${BLUE}Creating backup...${NC}"
+    BACKUP_DIR="$INSTALL_DIR/.backup-$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$BACKUP_DIR"
+    
+    # Backup critical user data
+    [ -f "$INSTALL_DIR/.env" ] && cp "$INSTALL_DIR/.env" "$BACKUP_DIR/"
+    [ -d "$INSTALL_DIR/public/.data" ] && cp -r "$INSTALL_DIR/public/.data" "$BACKUP_DIR/"
+    [ -d "$INSTALL_DIR/.cert" ] && cp -r "$INSTALL_DIR/.cert" "$BACKUP_DIR/"
+    
+    echo -e "${GREEN}✓ Backup created: $BACKUP_DIR${NC}"
+    
+    # Stop service if running
+    if [ "$SERVICE_INSTALL" = true ] && systemctl is-active --quiet webspinner; then
+        echo -e "${BLUE}Stopping webspinner service...${NC}"
+        systemctl stop webspinner
+        RESTART_SERVICE=true
+    fi
+fi
+
 # Create installation directory
 mkdir -p "$INSTALL_DIR"
 echo -e "${GREEN}Installation directory: $INSTALL_DIR${NC}"
 
 # Extract payload
 echo ""
-echo -e "${BLUE}Extracting files...${NC}"
+if [ "$UPGRADE_MODE" = true ]; then
+    echo -e "${BLUE}Updating Webspinner core files...${NC}"
+else
+    echo -e "${BLUE}Extracting files...${NC}"
+fi
+
 ARCHIVE_LINE=$(awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0;}' "$0")
-tail -n+$ARCHIVE_LINE "$0" | base64 -d | tar -xzf - -C "$INSTALL_DIR" --strip-components=1
 
-echo -e "${GREEN}✓ Files extracted${NC}"
+# Extract to temporary location first
+TEMP_EXTRACT=$(mktemp -d)
+tail -n+$ARCHIVE_LINE "$0" | base64 -d | tar -xzf - -C "$TEMP_EXTRACT" --strip-components=1
 
-# Configuration wizard
+# In upgrade mode, selectively copy files
+if [ "$UPGRADE_MODE" = true ]; then
+    # Update core Webspinner files only
+    cp -r "$TEMP_EXTRACT/stwSpinner.ts" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/stwComponents" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/stwContents" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/stwElements" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/stwStyles" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/deno.json" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/deno.lock" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/LICENSE" "$INSTALL_DIR/"
+    cp -r "$TEMP_EXTRACT/README.md" "$INSTALL_DIR/"
+    
+    # Update system webbaselets (preserve custom)
+    cp "$TEMP_EXTRACT/webbaselets/stw"*.wbdl "$INSTALL_DIR/webbaselets/" 2>/dev/null || true
+    
+    # Update public files BUT preserve .data directory
+    rsync -av --exclude='.data' "$TEMP_EXTRACT/public/" "$INSTALL_DIR/public/" 2>/dev/null || cp -r "$TEMP_EXTRACT/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
+    
+    # Skip .env extraction (keep existing)
+    echo -e "${GREEN}✓ Core files updated${NC}"
+    echo -e "${BLUE}✓ Preserved: .env, public/.data/, .cert/, custom webbaselets${NC}"
+else
+    # Fresh install - copy everything
+    cp -r "$TEMP_EXTRACT"/* "$INSTALL_DIR/"
+    echo -e "${GREEN}✓ Files extracted${NC}"
+fi
+
+# Clean up temp directory
+rm -rf "$TEMP_EXTRACT"
+
+# Configuration wizard (skip if upgrade)
+if [ "$UPGRADE_MODE" = false ]; then
 echo ""
 echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║          Configuration Wizard                 ║${NC}"
@@ -189,14 +270,14 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 # Prompt for configuration values
-read -p "Domain/Hostname [localhost]: " HOST
-HOST=${HOST:-localhost}
+read -p "Domain/Hostname [labs.spintheweb.org]: " HOST
+HOST=${HOST:-labs.spintheweb.org}
 
-read -p "Port [8080]: " PORT
-PORT=${PORT:-8080}
+read -p "Port [443]: " PORT
+PORT=${PORT:-443}
 
-read -p "Use TLS/HTTPS? (y/n) [n]: " USE_TLS
-USE_TLS=${USE_TLS:-n}
+read -p "Use TLS/HTTPS? (y/n) [y]: " USE_TLS
+USE_TLS=${USE_TLS:-y}
 
 if [[ "$USE_TLS" =~ ^[Yy]$ ]]; then
     read -p "Certificate file path: " CERTFILE
@@ -245,6 +326,9 @@ ALLOW_DEV=$ALLOW_DEV
 EOF
 
 echo -e "${GREEN}✓ Configuration saved to $INSTALL_DIR/.env${NC}"
+
+# Close the upgrade mode conditional (configuration wizard was skipped if upgrade)
+fi
 
 # Create default data files if they don't exist
 mkdir -p "$INSTALL_DIR/public/.data"
@@ -330,28 +414,63 @@ fi
 
 # Final instructions
 echo ""
-echo -e "${GREEN}╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Installation Complete!                    ║${NC}"
-echo -e "${GREEN}╚═══════════════════════════════════════════════╝${NC}"
+if [ "$UPGRADE_MODE" = true ]; then
+    echo -e "${GREEN}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║     Upgrade Complete!                         ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${BLUE}What was updated:${NC}"
+    echo "  ✓ Webspinner core engine and framework files"
+    echo "  ✓ System webbaselets"
+    echo "  ✓ Dependencies (deno.json/lock)"
+    echo ""
+    echo -e "${BLUE}What was preserved:${NC}"
+    echo "  ✓ Your configuration (.env)"
+    echo "  ✓ Your data (public/.data/)"
+    echo "  ✓ Your certificates (.cert/)"
+    echo "  ✓ Your custom webbaselets"
+    echo ""
+    echo -e "Backup location: ${BLUE}$BACKUP_DIR${NC}"
+    echo ""
+    
+    # Restart service if it was running
+    if [ -n "$RESTART_SERVICE" ] && [ "$RESTART_SERVICE" = true ]; then
+        echo -e "${BLUE}Restarting webspinner service...${NC}"
+        systemctl start webspinner
+        sleep 2
+        if systemctl is-active --quiet webspinner; then
+            echo -e "${GREEN}✓ Service restarted successfully${NC}"
+        else
+            echo -e "${RED}⚠ Service failed to restart. Check logs: journalctl -u webspinner${NC}"
+        fi
+    fi
+else
+    echo -e "${GREEN}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║     Installation Complete!                    ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════════════╝${NC}"
+fi
+
 echo ""
 echo -e "Installation directory: ${BLUE}$INSTALL_DIR${NC}"
 echo -e "Configuration file: ${BLUE}$INSTALL_DIR/.env${NC}"
 echo ""
 
-if [ "$SERVICE_INSTALL" = false ]; then
+if [ "$SERVICE_INSTALL" = false ] && [ "$UPGRADE_MODE" = false ]; then
     echo -e "${YELLOW}To start Webspinner:${NC}"
     echo "  cd $INSTALL_DIR"
     echo "  ./start.sh"
     echo ""
 fi
 
-echo -e "${YELLOW}Access your site at:${NC}"
-if [[ "$USE_TLS" =~ ^[Yy]$ ]]; then
-    echo "  https://$HOST:$PORT"
-else
-    echo "  http://$HOST:$PORT"
+if [ "$UPGRADE_MODE" = false ]; then
+    echo -e "${YELLOW}Access your site at:${NC}"
+    if [[ "$USE_TLS" =~ ^[Yy]$ ]]; then
+        echo "  https://$HOST:$PORT"
+    else
+        echo "  http://$HOST:$PORT"
+    fi
+    echo ""
 fi
-echo ""
 
 exit 0
 

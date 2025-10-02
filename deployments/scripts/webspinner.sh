@@ -1,7 +1,7 @@
 #!/bin/bash
-# Webspinner Type A Release Script
+# Webspinner Release Script
 # Creates a sanitized release archive and publishes to GitHub
-# Usage: ./tasks/release-type-a.sh
+# Usage: ./deployments/scripts/webspinner.sh
 
 set -e  # Exit on error
 
@@ -12,7 +12,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Webspinner Type A Release Generator${NC}"
+echo -e "${BLUE}Webspinner Release Generator${NC}"
 echo "===================================="
 echo ""
 
@@ -36,7 +36,7 @@ else
 fi
 
 # Get current directory (should be repo root)
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 echo "Repository: $REPO_ROOT"
@@ -70,7 +70,7 @@ if git rev-parse "$VERSION" >/dev/null 2>&1; then
 fi
 
 # Define output paths
-DEPLOY_DIR="deployments/deploy"
+DEPLOY_DIR="deployments/release"
 ZIPNAME="webspinner-${VERSION}.zip"
 ZIPPATH="${DEPLOY_DIR}/${ZIPNAME}"
 CHECKSUMPATH="${ZIPPATH}.sha256"

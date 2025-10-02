@@ -7,6 +7,7 @@ Automated script to create sanitized Webspinner releases and publish to GitHub.
 1. **Prompts for version** (e.g., v1.0.0)
 2. **Creates sanitized zip archive** containing:
    - `public/`, `stwComponents/`, `stwContents/`, `stwElements/`, `stwStyles/`
+   - `webbaselets/stwStudio.wbdl`, `webbaselets/stwCommon.wbdl` (system webbaselets)
    - `LICENSE`, `stwSpinner.ts`
    - `.env` (from `.env.example` with safe defaults - ready to run!)
    - `.cert/README.md` (instructions only, no private keys)
@@ -30,19 +31,19 @@ Optional (for GitHub release):
 Run from repository root:
 
 ```bash
-./tasks/release-type-a.sh
+./deployments/scripts/release-type-a.sh
 ```
 
 The script will:
 1. Prompt you for a version number
-2. Create the release artifacts in `deployments/deploy/`
+2. Create the release artifacts in `deployments/release/`
 3. Ask if you want to create a git tag
 4. Ask if you want to create a GitHub release
 
 ## Example Session
 
 ```bash
-$ ./tasks/release-type-a.sh
+$ ./deployments/scripts/release-type-a.sh
 Webspinner Type A Release Generator
 ====================================
 
@@ -52,10 +53,10 @@ Enter version (e.g., v1.0.0): 1.2.3
 Creating release for version: v1.2.3
 
 Creating release archive...
-✓ Created: deployments/deploy/webspinner-v1.2.3.zip
+✓ Created: deployments/release/webspinner-v1.2.3.zip
 
 Generating SHA256 checksum...
-✓ Created: deployments/deploy/webspinner-v1.2.3.zip.sha256
+✓ Created: deployments/release/webspinner-v1.2.3.zip.sha256
 
 Verifying archive integrity...
 ✓ Archive integrity verified
@@ -77,8 +78,8 @@ Enter release notes (press Ctrl+D when done):
 ## Output
 
 The script creates:
-- `deployments/deploy/webspinner-vX.Y.Z.zip` (release archive)
-- `deployments/deploy/webspinner-vX.Y.Z.zip.sha256` (checksum)
+- `deployments/release/webspinner-vX.Y.Z.zip` (release archive)
+- `deployments/release/webspinner-vX.Y.Z.zip.sha256` (checksum)
 
 ## Security Notes
 
@@ -107,8 +108,8 @@ If `gh` CLI is not available, create the release manually:
 Or use `gh` CLI:
 ```bash
 gh release create v1.2.3 \
-  deployments/deploy/webspinner-v1.2.3.zip \
-  deployments/deploy/webspinner-v1.2.3.zip.sha256 \
+  deployments/release/webspinner-v1.2.3.zip \
+  deployments/release/webspinner-v1.2.3.zip.sha256 \
   -t "Webspinner v1.2.3" \
   -n "Release notes..."
 ```

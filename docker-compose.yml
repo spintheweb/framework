@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  webspinner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spintheweb/webspinner:latest
+    container_name: webspinner
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Server Configuration
+      - HOST=0.0.0.0
+      - PORT=8080
+      
+      # TLS/SSL (optional - uncomment and provide cert paths if using HTTPS)
+      # - CERTFILE=/app/.cert/cert.pem
+      # - KEYFILE=/app/.cert/key.pem
+      
+      # Session Configuration
+      - SESSION_TIMEOUT=24
+      - MAX_USERS=0
+      
+      # Site Configuration
+      - SITE_ROOT=./public
+      - SITE_WEBBASE=./public/.data/webapplication.wbdl
+      - COMMON_WEBBASE=./webbaselets/stwCommon.wbdl
+      - STUDIO_WEBBASE=./webbaselets/stwStudio.wbdl
+      
+      # Upload Configuration
+      - MAX_UPLOADSIZE=200
+      
+      # Security
+      - SECURITY=./public/.data/users.json
+      - ALLOW_DEV=false
+      
+      # Database Connection (if using external database)
+      # - DB_HOST=mysql
+      # - DB_PORT=3306
+      # - DB_USER=webspinner
+      # - DB_PASSWORD=secret
+      # - DB_NAME=webspinner
+    
+    volumes:
+      # Persist application data
+      - webspinner-data:/app/public/.data
+      
+      # Optional: Mount custom webbaselets
+      # - ./custom-webbaselets:/app/webbaselets/custom:ro
+      
+      # Optional: Mount certificates (for HTTPS)
+      # - ./certs:/app/.cert:ro
+      
+      # Optional: Mount custom public files
+      # - ./custom-public:/app/public/custom:ro
+    
+    networks:
+      - webspinner-network
+    
+    # Optional: Add health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Optional: MySQL Database Service
+  # Uncomment if you need a database
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: webspinner-mysql
+  #   restart: unless-stopped
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=rootsecret
+  #     - MYSQL_DATABASE=webspinner
+  #     - MYSQL_USER=webspinner
+  #     - MYSQL_PASSWORD=secret
+  #   volumes:
+  #     - mysql-data:/var/lib/mysql
+  #   networks:
+  #     - webspinner-network
+  #   ports:
+  #     - "3306:3306"
+
+  # Optional: PostgreSQL Database Service
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: webspinner-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_DB=webspinner
+  #     - POSTGRES_USER=webspinner
+  #     - POSTGRES_PASSWORD=secret
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - webspinner-network
+  #   ports:
+  #     - "5432:5432"
+
+volumes:
+  webspinner-data:
+    driver: local
+  # mysql-data:
+  #   driver: local
+  # postgres-data:
+  #   driver: local
+
+networks:
+  webspinner-network:
+    driver: bridge
