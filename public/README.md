@@ -11,5 +11,3 @@ This directory contains the static assets for the portal. Files here are served 
 ## Usage
 
 Place any static assets that do not require processing, such as images, fonts, or third-party libraries, in this directory. They can be referenced from `index.html` using an absolute path from the root.
-
-**Note:** For assets that should be bundled and optimized with the rest of your application (like component-specific images or styles), place them within the `src` directory and import them directly into your components or style sheets.

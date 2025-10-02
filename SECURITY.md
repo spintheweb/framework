@@ -1,6 +1,6 @@
 # Security Policy
 
-We value responsible disclosure. If you believe you’ve found a security issue in Spin the Web or the Webspinner sandbox,
+We value responsible disclosure. If you believe you’ve found a security issue in Spin the Web or the Webspinner labs,
 please email:
 
 - security contact: security@spintheweb.org

@@ -14,19 +14,19 @@ Step 3: Generate the Certificate Files
 
 $ `cd .cert`
 
-In my case I use sandbox.spintheweb.org
+In my case I use labs.spintheweb.org
 
-$ `mkcert sandbox.spintheweb.org`
+$ `mkcert labs.spintheweb.org`
 
 This will create two files in your .cert directory:
-- sandbox.spintheweb.org.pem (the certificate)
-- sandbox.spintheweb.org-key.pem (the private key)
+- labs.spintheweb.org.pem (the certificate)
+- labs.spintheweb.org-key.pem (the private key)
 
 Edit your .env file:
 
 ```
-HOST=sandbox.spintheweb.org
+HOST=labs.spintheweb.org
 PORT=443
-CERTFILE=.cert/sandbox.spintheweb.org.pem
-KEYFILE=.cert/sandbox.spintheweb.org-key.pem
+CERTFILE=.cert/labs.spintheweb.org.pem
+KEYFILE=.cert/labs.spintheweb.org-key.pem
 ```

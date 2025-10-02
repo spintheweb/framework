@@ -2,7 +2,7 @@
   {
     "name": "mysqlsample",
     "type": "mysql",
-    "host": "sandbox.spintheweb.org",
+    "host": "labs.spintheweb.org",
     "port": 3306,
     "user": "qt3ul9nb_sampledb",
     "password": "r#MM9!0Ght3(vM2",
@@ -13,40 +13,5 @@
     "type": "api",
     "host": "https://api.restful-api.dev/objects",
     "contentType": "application/json"
-  },
-  {
-    "name": "pgMain",
-    "type": "postgres",
-    "host": "sandbox.spintheweb.org",
-    "port": 5432,
-    "user": "neon_user",
-    "password": "neon_pass",
-    "database": "pagila"
-  },
-  {
-    "name": "mssqlMain",
-    "type": "sqlserver",
-    "server": "sandbox.spintheweb.org",
-    "port": 1433,
-    "user": "sa",
-    "password": "SamplePass!123",
-    "database": "AdventureWorksLT"
-  },
-  {
-    "name": "mongoMain",
-    "type": "mongodb",
-    "uri": "mongodb://readonly:readonly@sandbox.spintheweb.org:27017",
-    "database": "sample_mflix",
-    "collection": "movies"
-  },
-  {
-    "name": "oracleMain",
-    "type": "oracle",
-    "mode": "cli",
-    "username": "hr",
-    "password": "hr",
-    "host": "sandbox.spintheweb.org",
-    "port": 1521,
-    "service": "FREEPDB1"
   }
 ]
