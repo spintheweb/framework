@@ -8,7 +8,7 @@ Automated script to create sanitized Webspinner releases and publish to GitHub.
 2. **Creates sanitized zip archive** containing:
    - `public/`, `stwComponents/`, `stwContents/`, `stwElements/`, `stwStyles/`
    - `LICENSE`, `stwSpinner.ts`
-   - `.env.example` (NOT `.env` with secrets)
+   - `.env` (from `.env.example` with safe defaults - ready to run!)
    - `.cert/README.md` (instructions only, no private keys)
 3. **Generates SHA256 checksum**
 4. **Verifies archive integrity**

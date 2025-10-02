@@ -90,6 +90,10 @@ fi
 
 # Create the release archive
 echo -e "${BLUE}Creating release archive...${NC}"
+
+# First, create a temporary copy of .env.example as .env for the archive
+cp .env.example .env.temp
+
 zip -r "$ZIPPATH" \
     public \
     stwComponents \
@@ -98,7 +102,7 @@ zip -r "$ZIPPATH" \
     stwStyles \
     LICENSE \
     stwSpinner.ts \
-    .env.example \
+    .env.temp \
     .cert/README.md \
     -x "*.git*" \
     -x "*node_modules*" \
@@ -106,6 +110,13 @@ zip -r "$ZIPPATH" \
     -x "*.key" \
     -x "*/.DS_Store" \
     > /dev/null
+
+# Rename .env.temp to .env inside the zip
+echo -e "${BLUE}Renaming .env.temp to .env in archive...${NC}"
+printf "@ .env.temp\n@=.env\n" | zipnote -w "$ZIPPATH" > /dev/null 2>&1
+
+# Clean up temporary file
+rm -f .env.temp
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Error: Failed to create zip archive${NC}"
