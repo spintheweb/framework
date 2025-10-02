@@ -42,32 +42,10 @@ cd "$REPO_ROOT"
 echo "Repository: $REPO_ROOT"
 echo ""
 
-# Prompt for version
-read -p "Enter version (e.g., v1.0.0): " VERSION
-
-if [ -z "$VERSION" ]; then
-    echo -e "${RED}Error: Version cannot be empty${NC}"
-    exit 1
-fi
-
-# Ensure version starts with 'v'
-if [[ ! "$VERSION" =~ ^v ]]; then
-    VERSION="v${VERSION}"
-fi
-
+# Use fixed version
+VERSION="v1.0.0"
 echo -e "${BLUE}Creating release for version: ${VERSION}${NC}"
 echo ""
-
-# Check if tag already exists
-if git rev-parse "$VERSION" >/dev/null 2>&1; then
-    echo -e "${YELLOW}Warning: Git tag '${VERSION}' already exists${NC}"
-    read -p "Continue anyway? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Aborted."
-        exit 1
-    fi
-fi
 
 # Define output paths
 DEPLOY_DIR="deployments/release"

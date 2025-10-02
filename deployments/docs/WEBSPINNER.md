@@ -1,4 +1,4 @@
-# Type A Release Script
+# Webspinner Release Script (ZIP Archive)
 
 Automated script to create sanitized Webspinner releases and publish to GitHub.
 
@@ -31,7 +31,7 @@ Optional (for GitHub release):
 Run from repository root:
 
 ```bash
-./deployments/scripts/release-type-a.sh
+./deployments/scripts/webspinner.sh
 ```
 
 The script will:
@@ -43,8 +43,8 @@ The script will:
 ## Example Session
 
 ```bash
-$ ./deployments/scripts/release-type-a.sh
-Webspinner Type A Release Generator
+$ ./deployments/scripts/webspinner.sh
+Webspinner Release Generator
 ====================================
 
 Repository: /path/to/webspinner

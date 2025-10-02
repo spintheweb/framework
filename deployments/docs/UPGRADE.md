@@ -114,11 +114,11 @@ kubectl rollout undo deployment/webspinner
 
 ```bash
 # 1. Download new installer
-wget https://github.com/spintheweb/webspinner/releases/download/v1.1.0/webspinner-installer-v1.1.0.sh
-chmod +x webspinner-installer-v1.1.0.sh
+wget https://github.com/spintheweb/webspinner/releases/download/v1.1.0/webspinner-installer.sh
+chmod +x webspinner-installer.sh
 
 # 2. Run installer (it will detect existing installation)
-sudo ./webspinner-installer-v1.1.0.sh
+sudo ./webspinner-installer.sh
 
 # The installer will:
 # - Detect existing installation
@@ -147,7 +147,7 @@ sudo systemctl stop webspinner
 sudo cp -r /opt/webspinner /opt/webspinner.backup
 
 # Run installer with same installation directory
-sudo ./webspinner-installer-v1.1.0.sh
+sudo ./webspinner-installer.sh
 # Choose: /opt/webspinner
 # Confirm upgrade: y
 
@@ -240,7 +240,7 @@ sudo systemctl start webspinner
 cp production/.env test/.env
 
 # 2. Install new version in test directory
-./webspinner-installer-v1.1.0.sh
+./webspinner-installer.sh
 # Choose different directory: /opt/webspinner-test
 
 # 3. Test thoroughly

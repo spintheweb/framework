@@ -31,7 +31,7 @@ The server installer includes:
 - Root/sudo access (for systemd service)
 - systemd init system
 
-## Creating a Type C Release
+## Creating a Server Release
 
 ### Prerequisites
 1. Ensure you have the required tools:
@@ -48,10 +48,10 @@ The server installer includes:
 
 ### Generate the Installer
 
-Run the Type C release script from the repository root:
+Run the server release script from the repository root:
 
 ```bash
-./deployments/scripts/release-type-c.sh
+./deployments/scripts/server.sh
 ```
 
 The script will:
@@ -64,8 +64,10 @@ The script will:
 ### Output Files
 
 The script generates in `deployments/release/`:
-- `webspinner-installer-v1.0.0.sh` - Self-extracting installer (~5-10MB)
-- `webspinner-installer-v1.0.0.sh.sha256` - Checksum file
+- `webspinner-installer.sh` - Self-extracting installer (overwrites previous version)
+- `webspinner-installer.sh.sha256` - Checksum file
+
+**Note:** Each run overwrites the previous installer. The version is tracked via git tags, not filename.
 
 ## Installation Guide
 
@@ -75,21 +77,21 @@ The script generates in `deployments/release/`:
 
 ```bash
 # Download from GitHub releases
-wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer-v1.0.0.sh
-wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer-v1.0.0.sh.sha256
+wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer.sh
+wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer.sh.sha256
 ```
 
 #### 2. Verify Integrity
 
 ```bash
-sha256sum -c webspinner-installer-v1.0.0.sh.sha256
-# Should output: webspinner-installer-v1.0.0.sh: OK
+sha256sum -c webspinner-installer.sh.sha256
+# Should output: webspinner-installer.sh: OK
 ```
 
 #### 3. Make Executable
 
 ```bash
-chmod +x webspinner-installer-v1.0.0.sh
+chmod +x webspinner-installer.sh
 ```
 
 #### 4. Run the Installer
@@ -97,7 +99,7 @@ chmod +x webspinner-installer-v1.0.0.sh
 ##### System-Wide Installation (with systemd service)
 
 ```bash
-sudo ./webspinner-installer-v1.0.0.sh
+sudo ./webspinner-installer.sh
 ```
 
 This will:
@@ -108,7 +110,7 @@ This will:
 ##### User Installation (no systemd)
 
 ```bash
-./webspinner-installer-v1.0.0.sh
+./webspinner-installer.sh
 ```
 
 This will:
@@ -270,8 +272,8 @@ To upgrade to a new version:
 
 2. **Run new installer**:
    ```bash
-   # The installer will prompt to overwrite
-   sudo ./webspinner-installer-v2.0.0.sh
+   # Download and run the latest installer
+   sudo ./webspinner-installer.sh
    ```
 
 3. **Restore your configuration** (if needed):
@@ -302,10 +304,10 @@ source ~/.bashrc
 
 ```bash
 # Make installer executable
-chmod +x webspinner-installer-v1.0.0.sh
+chmod +x webspinner-installer.sh
 
 # For system-wide installation, use sudo
-sudo ./webspinner-installer-v1.0.0.sh
+sudo ./webspinner-installer.sh
 ```
 
 ### Port Already in Use

@@ -34,7 +34,7 @@ deployments/
 └── release/                      # Generated release artifacts (gitignored)
     ├── webspinner-v*.zip
     ├── webspinner-docker-v*.tar.gz
-    └── webspinner-installer-v*.sh
+    └── webspinner-installer.sh
 ```
     ├── webspinner-docker-v*.tar.gz
     └── webspinner-installer-v*.sh
@@ -129,8 +129,8 @@ docker run -d -p 8080:8080 spintheweb/webspinner:latest
 4. Creates GitHub Release
 
 **Output:**
-- `deployments/release/webspinner-installer-v1.0.0.sh` (self-extracting)
-- `deployments/release/webspinner-installer-v1.0.0.sh.sha256`
+- `deployments/release/webspinner-installer.sh` (self-extracting, overwrites previous)
+- `deployments/release/webspinner-installer.sh.sha256`
 - GitHub Release with installer
 
 **End users then:** Download installer and run on their server
@@ -138,16 +138,16 @@ docker run -d -p 8080:8080 spintheweb/webspinner:latest
 **Install (by end user on remote server):**
 ```bash
 # Download from GitHub
-wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer-v1.0.0.sh
+wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer.sh
 
 # Verify
-sha256sum -c webspinner-installer-v1.0.0.sh.sha256
+sha256sum -c webspinner-installer.sh.sha256
 
 # Run on server (system-wide with systemd service)
-sudo ./webspinner-installer-v1.0.0.sh
+sudo ./webspinner-installer.sh
 
 # Or user installation (no systemd)
-./webspinner-installer-v1.0.0.sh
+./webspinner-installer.sh
 ```
 
 **What the installer does:**
@@ -211,16 +211,16 @@ docker run -d -p 8080:8080 spintheweb/webspinner:latest
 ```
 
 **Output:**
-- `deployments/release/webspinner-installer-v1.0.0.sh`
-- `deployments/release/webspinner-installer-v1.0.0.sh.sha256`
+- `deployments/release/webspinner-installer.sh` (overwrites previous)
+- `deployments/release/webspinner-installer.sh.sha256`
 
 **Install:**
 ```bash
 # System-wide with systemd service
-sudo ./webspinner-installer-v1.0.0.sh
+sudo ./webspinner-installer.sh
 
 # User installation
-./webspinner-installer-v1.0.0.sh
+./webspinner-installer.sh
 ```
 
 **Documentation:** [docs/SERVER.md](docs/SERVER.md)
@@ -323,7 +323,7 @@ docker-compose down && docker-compose up -d
 **Server (Automatic!):**
 ```bash
 # Just run the new installer - it detects upgrades!
-sudo ./webspinner-installer-v1.1.0.sh
+sudo ./webspinner-installer.sh
 # Automatically: backs up, updates core, preserves data, restarts
 ```
 

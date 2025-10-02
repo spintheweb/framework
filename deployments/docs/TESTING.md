@@ -79,14 +79,14 @@ cd /d/Projects/spintheweb/webspinner
 ```
 
 Output:
-- `deployments/release/webspinner-installer-v0.0.1.sh`
-- `deployments/release/webspinner-installer-v0.0.1.sh.sha256`
+- `deployments/release/webspinner-installer.sh`
+- `deployments/release/webspinner-installer.sh.sha256`
 
 ### 2. Transfer to Raspberry Pi
 
 ```bash
 # From your development machine
-scp deployments/release/webspinner-installer-v0.0.1.sh* pi@<raspberry-pi-ip>:~/
+scp deployments/release/webspinner-installer.sh* pi@<raspberry-pi-ip>:~/
 
 # Or use a USB drive, GitHub release, etc.
 ```
@@ -98,13 +98,13 @@ scp deployments/release/webspinner-installer-v0.0.1.sh* pi@<raspberry-pi-ip>:~/
 ssh pi@<raspberry-pi-ip>
 
 # Verify checksum
-sha256sum -c webspinner-installer-v0.0.1.sh.sha256
+sha256sum -c webspinner-installer.sh.sha256
 
 # Make executable
-chmod +x webspinner-installer-v0.0.1.sh
+chmod +x webspinner-installer.sh
 
 # Run installer with sudo (for systemd service)
-sudo ./webspinner-installer-v0.0.1.sh
+sudo ./webspinner-installer.sh
 ```
 
 ### 4. Interactive Configuration
@@ -174,12 +174,12 @@ echo "// Test upgrade" >> stwSpinner.ts
 
 ```bash
 # Transfer to Pi
-scp deployments/release/webspinner-installer-v0.0.2.sh* pi@<raspberry-pi-ip>:~/
+scp deployments/release/webspinner-installer.sh* pi@<raspberry-pi-ip>:~/
 
 # SSH and run
 ssh pi@<raspberry-pi-ip>
-chmod +x webspinner-installer-v0.0.2.sh
-sudo ./webspinner-installer-v0.0.2.sh
+chmod +x webspinner-installer.sh
+sudo ./webspinner-installer.sh
 ```
 
 ### 3. Verify Upgrade

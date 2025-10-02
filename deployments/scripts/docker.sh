@@ -37,24 +37,14 @@ cd "$REPO_ROOT"
 echo "Repository: $REPO_ROOT"
 echo ""
 
-# Prompt for version
-read -p "Enter version (e.g., v1.0.0): " VERSION
-
-if [ -z "$VERSION" ]; then
-    echo -e "${RED}Error: Version cannot be empty${NC}"
-    exit 1
-fi
-
-# Ensure version starts with 'v'
-if [[ ! "$VERSION" =~ ^v ]]; then
-    VERSION="v$VERSION"
-fi
-
-echo -e "${GREEN}Creating Docker release for version: $VERSION${NC}"
-echo ""
+# Use fixed version
+VERSION="v1.0.0"
 
 # Extract version without 'v' prefix for Docker tags
 VERSION_NUM="${VERSION#v}"
+
+echo -e "${GREEN}Creating Docker release for version: $VERSION${NC}"
+echo ""
 
 # Prompt for Docker registry/repository
 echo "Docker image naming:"
