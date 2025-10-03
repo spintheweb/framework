@@ -1,348 +1,122 @@
 # Webspinner Deployment
 
-This directory contains all deployment-related files, scripts, and documentation for Webspinner.
-
-**⚠️ Note:** Webspinner is in active development. Use these deployment scripts to test real-world deployment scenarios and discover missing features. All deployment types support **upgrade-aware installations** that preserve your data.
-
-## System Webbaselets
-
-All Webspinner deployments include two **critical system webbaselets** that are managed centrally by the project:
-
-- **`stwStudio.wbdl`** - The Studio/management interface for portal administration
-- **`stwCommon.wbdl`** - Fundamental contents and components useful to all portals
-
-These webbaselets are **always replaced during upgrades** to ensure all portals benefit from improvements and bug fixes. They should be loaded by all portal applications.
-
-**CDN Deployment:** Since these are centrally managed system webbaselets, they could be deployed to a CDN (e.g., `https://cdn.spintheweb.org/webbaselets/stwStudio.wbdl`) allowing all portals to load the latest versions directly from a central source without needing local updates.
-
-Custom webbaselets created by users are stored in `public/.data/` alongside `webapplication.wbdl` and are **always preserved** during upgrades.
+Production-ready deployment tools and documentation for Webspinner.
 
 ## Directory Structure
 
 ```
 deployments/
-├── README.md                     # This file (overview of all releases)
-├── scripts/                      # Release automation scripts
-│   ├── webspinner.sh            # Generic ZIP release
-│   ├── docker.sh                # Docker container release
-│   └── server.sh                # Linux server installer (upgrade-aware!)
-├── docs/                         # Release documentation
-│   ├── WEBSPINNER.md            # Webspinner release docs
-│   ├── DOCKER.md                # Docker release docs
-│   ├── SERVER.md                # Server installer docs
-│   └── UPGRADE.md               # Upgrade procedures for all types
-└── release/                      # Generated release artifacts (gitignored)
-    ├── webspinner-v*.zip
-    ├── webspinner-docker-v*.tar.gz
-    └── webspinner-installer.sh
-```
-    ├── webspinner-docker-v*.tar.gz
-    └── webspinner-installer-v*.sh
-```
+├── README.md          # Deployment overview
+├── scripts/           # Release generators
+│   ├── webspinner.sh # ZIP release
+│   ├── docker.sh     # Docker release
+│   └── server.sh     # Server installer generator
+├── docs/              # Documentation
+│   ├── WEBSPINNER.md # ZIP release docs
+│   ├── DOCKER.md     # Docker docs
+│   └── SERVER.md     # Server installer docs
+└── release/           # Generated artifacts (gitignored)
 ```
 
 ## Release Types
 
-Webspinner supports three release types for different deployment scenarios:
+### 1. Webspinner (ZIP)
 
-**Note:** `webspinner.sh` and `docker.sh` are **build/release tools** executed by maintainers to create releases. The `server.sh` script **generates an installer** that end users run on their servers.
+**Purpose:** Development, evaluation, manual deployment
 
-### 1. Webspinner Release (ZIP Archive)
-
-**Best for:** Development, evaluation, manual deployment, any OS with Deno
-
-**Executed by:** Maintainers (locally)
-
-**Create:**
-```bash
-./deployments/scripts/webspinner.sh
-```
-
-**What it does:**
-1. Creates sanitized ZIP archive
-2. Generates SHA256 checksum
-3. Creates git tag
-4. Creates GitHub Release
-
-**Output:**
-- `deployments/release/webspinner-v1.0.0.zip`
-- `deployments/release/webspinner-v1.0.0.zip.sha256`
-- GitHub Release with downloadable assets
-
-**End users then:** Download ZIP from GitHub Releases, extract, and run
-
-**Documentation:** [docs/WEBSPINNER.md](docs/WEBSPINNER.md)
-
----
-
-### 2. Docker Release (Container)
-
-**Best for:** Kubernetes, cloud platforms, containerized deployments
-
-**Executed by:** Maintainers (locally)
-
-**Create:**
-```bash
-./deployments/scripts/docker.sh
-```
-
-**What it does:**
-1. Builds Docker image with multi-stage Dockerfile
-2. Tags versions (`:1.0.0`, `:v1.0.0`, `:latest`)
-3. **Pushes to Docker Hub** (spintheweb/webspinner)
-4. Exports offline tar.gz archive
-5. Creates GitHub Release (with offline archive)
-
-**Output:**
-- Docker Hub: `spintheweb/webspinner:1.0.0`, `:latest`
-- GitHub Release: `webspinner-docker-v1.0.0.tar.gz` (for offline use)
-
-**End users then:** Pull from Docker Hub or load offline archive
-
-**Quick Start (for end users):**
-```bash
-docker pull spintheweb/webspinner:latest
-docker run -d -p 8080:8080 spintheweb/webspinner:latest
-```
-
-**Documentation:** [docs/DOCKER.md](docs/DOCKER.md)
-
----
-
-### 3. Server Release (Installer)
-
-**Best for:** Production Linux servers, systemd-managed deployments
-
-**Executed by:** End users (on their remote server/VM)
-
-**Default Configuration:** labs.spintheweb.org:443 with HTTPS (customizable)
-
-**Create (by maintainer):**
-```bash
-./deployments/scripts/server.sh
-```
-
-**What it does:**
-1. Bundles complete Webspinner runtime
-2. Creates self-extracting bash installer
-3. Generates SHA256 checksum
-4. Creates GitHub Release
-
-**Output:**
-- `deployments/release/webspinner-installer.sh` (self-extracting, overwrites previous)
-- `deployments/release/webspinner-installer.sh.sha256`
-- GitHub Release with installer
-
-**End users then:** Download installer and run on their server
-
-**Install (by end user on remote server):**
-```bash
-# Download from GitHub
-wget https://github.com/spintheweb/webspinner/releases/download/v1.0.0/webspinner-installer.sh
-
-# Verify
-sha256sum -c webspinner-installer.sh.sha256
-
-# Run on server (system-wide with systemd service)
-sudo ./webspinner-installer.sh
-
-# Or user installation (no systemd)
-./webspinner-installer.sh
-```
-
-**What the installer does:**
-- Interactive configuration wizard (defaults to labs.spintheweb.org)
-- Extracts runtime files
-- Generates `.env` configuration
-- Sets up systemd service (optional)
-- Configures auto-start
-
-**Documentation:** [docs/SERVER.md](docs/SERVER.md)
-
-### 1. Webspinner Release (ZIP Archive)
-
-**Best for:** Development, evaluation, manual deployment, any OS with Deno
-
-**Create:**
+**Generate:**
 ```bash
 ./deployments/scripts/webspinner.sh
 ```
 
 **Output:**
-- `deployments/release/webspinner-v1.0.0.zip`
-- `deployments/release/webspinner-v1.0.0.zip.sha256`
-
-**Documentation:** [docs/WEBSPINNER.md](docs/WEBSPINNER.md)
-
----
-
-### 2. Docker Release (Container)
-
-**Best for:** Kubernetes, cloud platforms, containerized deployments
-
-**Create:**
-```bash
-./deployments/scripts/docker.sh
-```
-
-**Output:**
-- Docker images: `spintheweb/webspinner:1.0.0`, `:latest`
-- Offline: `deployments/release/webspinner-docker-v1.0.0.tar.gz`
-
-**Quick Start:**
-```bash
-docker pull spintheweb/webspinner:latest
-docker run -d -p 8080:8080 spintheweb/webspinner:latest
-```
-
-**Documentation:** [docs/DOCKER.md](docs/DOCKER.md)
-
----
-
-### 3. Server Release (Installer)
-
-**Best for:** Production Linux servers, systemd-managed deployments
-
-**Default Configuration:** labs.spintheweb.org:443 with HTTPS (customizable)
-
-**Create:**
-```bash
-./deployments/scripts/server.sh
-```
-
-**Output:**
-- `deployments/release/webspinner-installer.sh` (overwrites previous)
-- `deployments/release/webspinner-installer.sh.sha256`
+- `webspinner-v3.1.4.zip`
+- `webspinner-v3.1.4.zip.sha256`
 
 **Install:**
 ```bash
-# System-wide with systemd service
-sudo ./webspinner-installer.sh
-
-# User installation
-./webspinner-installer.sh
+unzip webspinner-v3.1.4.zip
+cd webspinner
+deno run --allow-all stwSpinner.ts
 ```
 
-**Documentation:** [docs/SERVER.md](docs/SERVER.md)
+**Docs:** [docs/WEBSPINNER.md](docs/WEBSPINNER.md)
 
 ---
 
-## Quick Reference
+### 2. Docker (Container)
 
-### Create All Releases
+**Purpose:** Kubernetes, cloud platforms, containers
 
+**Generate:**
 ```bash
-# Create all three release types with the same version
-VERSION="v1.0.0"
-
-# 1. Webspinner (ZIP)
-./deployments/scripts/webspinner.sh
-# Enter: v1.0.0
-
-# 2. Docker (Container)
 ./deployments/scripts/docker.sh
-# Enter: v1.0.0
-
-# 3. Server (Installer)
-./deployments/scripts/server.sh
-# Enter: v1.0.0
 ```
 
-### Release Checklist
+**Output:**
+- Docker Hub: `spintheweb/webspinner:3.1.4`, `:latest`
+- Offline: `webspinner-docker-v3.1.4.tar.gz`
 
-Before creating releases:
-
-- [ ] Update version in `deno.json`
-- [ ] Update CHANGELOG.md
-- [ ] Run tests: `deno task test`
-- [ ] Commit all changes
-- [ ] Pull latest from main branch
-
-After creating releases:
-
-- [ ] Verify all artifacts generated
-- [ ] Test each release type
-- [ ] Upload to GitHub releases
-- [ ] Update documentation if needed
-- [ ] Announce release
-
-## Comparison Matrix
-
-| Feature | Webspinner | Docker | Server |
-|---------|------------|--------|--------|
-| **Format** | ZIP | Container | Self-extracting installer |
-| **Executed By** | Maintainer (local) | Maintainer (local) | End user (remote server) |
-| **Creates** | GitHub Release | Docker Hub + GitHub | GitHub Release |
-| **Publishes To** | GitHub Releases | Docker Hub | GitHub Releases |
-| **End User Gets** | ZIP download | Docker pull | Installer download |
-| **OS** | Any with Deno | Any with Docker | Linux only |
-| **Setup** | Extract & run | docker run | Interactive wizard |
-| **Service Management** | Manual | Docker/systemd | systemd (auto) |
-| **Default Config** | localhost:8080 | 0.0.0.0:8080 | labs.spintheweb.org:443 |
-| **Best For** | Dev/testing | Cloud/K8s | Production servers |
-
-## Configuration
-
-### Webspinner Release
-- Copy `.env.example` to `.env` (already included in release)
-- Edit `.env` as needed
-- Run: `deno run --allow-all stwSpinner.ts`
-
-### Docker Release
-- Set environment variables in `docker-compose.yml` or `docker run`
-- Mount volumes for data persistence
-- See: `docker-compose.yml` for examples
-
-### Server Release
-- Interactive wizard prompts for all configuration
-- Defaults to labs.spintheweb.org but fully customizable
-- Automatically creates systemd service
-
-## Upgrades
-
-**All deployment types support zero-downtime upgrades that preserve your data!**
-
-### What Gets Preserved
-- ✅ `.env` configuration
-- ✅ `public/.data/` user data, webapplication.wbdl, and custom webbaselets
-- ✅ `.cert/` TLS certificates
-
-### Quick Upgrade
-
-**Webspinner (ZIP):**
-```bash
-# Backup, download new version, copy data, restart
-```
-
-**Docker:**
+**Install:**
 ```bash
 docker pull spintheweb/webspinner:latest
-docker-compose down && docker-compose up -d
+docker run -d -p 8080:8080 spintheweb/webspinner:latest
 ```
 
-**Server (Automatic!):**
+**Docs:** [docs/DOCKER.md](docs/DOCKER.md)
+
+---
+
+### 3. Server (Installer)
+
+**Purpose:** Production Linux servers with automated setup
+
+**Generate:**
 ```bash
-# Just run the new installer - it detects upgrades!
-sudo ./webspinner-installer.sh
-# Automatically: backs up, updates core, preserves data, restarts
+./deployments/scripts/server.sh
 ```
 
-**Full documentation:** [docs/UPGRADE.md](docs/UPGRADE.md)
+Creates self-extracting installer with:
+- Complete Webspinner runtime
+- Deno auto-installer
+- nginx + Let's Encrypt + PostgreSQL
+- Systemd service configuration
+- Upgrade detection
 
-## Support
+**Output:**
+- `webspinner-server.sh` (overwrites previous)
+- `webspinner-server.sh.sha256`
 
-For detailed information on each release type, see the documentation in `docs/`:
+**Install:**
+```bash
+wget https://github.com/spintheweb/webspinner/releases/latest/download/webspinner-server.sh
+chmod +x webspinner-server.sh
+sudo ./webspinner-server.sh
+```
 
-- **Overview**: This README
-- **Webspinner**: [docs/WEBSPINNER.md](docs/WEBSPINNER.md)
-- **Docker**: [docs/DOCKER.md](docs/DOCKER.md)
-- **Server**: [docs/SERVER.md](docs/SERVER.md)
-- **Upgrades**: [docs/UPGRADE.md](docs/UPGRADE.md)
+**What Happens:**
+1. Updates system packages
+2. Installs Deno, nginx, certbot, PostgreSQL
+3. Prompts for installation directory and domain
+4. Configures nginx reverse proxy
+5. Obtains Let's Encrypt SSL certificate
+6. Creates PostgreSQL database with random password
+7. Creates and starts systemd service
 
-For issues or questions:
-- GitHub Issues: https://github.com/spintheweb/webspinner/issues
-- Documentation: https://github.com/spintheweb/webspinner/wiki
+**Result:**
+- Public: `https://yourdomain.com` (nginx port 443)
+- Internal: Webspinner on `localhost:8080`
+- Database: PostgreSQL on `localhost:5432`
+- Service: `systemctl status webspinner`
 
-## License
+**Docs:** [docs/SERVER.md](docs/SERVER.md)
 
-See LICENSE file in repository root.
+---
+
+## References
+
+- Repository: https://github.com/spintheweb/webspinner
+- Issues: https://github.com/spintheweb/webspinner/issues
+- Releases: https://github.com/spintheweb/webspinner/releases
+- Live Demo: https://labs.spintheweb.org
+
