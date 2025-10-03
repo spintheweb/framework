@@ -12,9 +12,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Webspinner Server Installer Release Generator${NC}"
-echo "=============================================="
-echo ""
+echo -e "Webspinner Server Installer Release Generator"
 
 # Check prerequisites
 if ! command -v base64 &> /dev/null; then
@@ -44,11 +42,9 @@ fi
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
-echo "Repository: $REPO_ROOT"
-echo ""
-
-# Use fixed version
-VERSION="v1.0.0"
+# Prompt for version
+read -p "Release version [v3.1.4]: " VERSION
+VERSION=${VERSION:-v3.1.4}
 echo -e "${GREEN}Creating server installer for version: $VERSION${NC}"
 echo ""
 
@@ -92,10 +88,9 @@ echo -e "${GREEN}Payload archive created: $(du -h "$PAYLOAD_TAR" | cut -f1)${NC}
 # Create the installer script
 OUTPUT_DIR="$REPO_ROOT/deployments/release"
 mkdir -p "$OUTPUT_DIR"
-INSTALLER_FILE="$OUTPUT_DIR/webspinner-installer.sh"
+INSTALLER_FILE="$OUTPUT_DIR/webspinner-server.sh"
 
 echo -e "${BLUE}Step 2: Generating self-extracting installer...${NC}"
-echo -e "${YELLOW}Note: Creating single installer file (overwrites previous version)${NC}"
 
 # Write installer header
 cat > "$INSTALLER_FILE" << 'INSTALLER_HEADER'
@@ -106,64 +101,139 @@ cat > "$INSTALLER_FILE" << 'INSTALLER_HEADER'
 
 set -e
 
-# Colors for output
+# Colors for output (only for errors)
 RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║     Webspinner Installation Wizard           ║${NC}"
-echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-echo ""
-
-# Check if running as root
-if [ "$EUID" -eq 0 ]; then
-    echo -e "${YELLOW}Warning: Running as root. Installation will be system-wide.${NC}"
-    INSTALL_DIR="/opt/webspinner"
-    SERVICE_INSTALL=true
-else
-    echo -e "${YELLOW}Running as user. Installation will be in your home directory.${NC}"
-    INSTALL_DIR="$HOME/webspinner"
-    SERVICE_INSTALL=false
-fi
-
-# Check prerequisites
-echo -e "${BLUE}Checking prerequisites...${NC}"
-
-if ! command -v deno &> /dev/null; then
-    echo -e "${RED}Error: Deno is not installed.${NC}"
-    echo "Please install Deno from: https://deno.land/"
-    echo "  curl -fsSL https://deno.land/install.sh | sh"
+# Must run as root
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}Error: This installer must be run as root.${NC}"
+    echo "Please run: sudo $0"
     exit 1
 fi
 
-DENO_VERSION=$(deno --version | head -n1)
-echo -e "${GREEN}✓ $DENO_VERSION${NC}"
+echo "Webspinner Server Installer"
 
-# Prompt for installation directory
-echo ""
-read -p "Installation directory [$INSTALL_DIR]: " USER_INSTALL_DIR
-if [ -n "$USER_INSTALL_DIR" ]; then
-    INSTALL_DIR="$USER_INSTALL_DIR"
+INSTALL_DIR="/opt/webspinner"
+SERVICE_INSTALL=true
+
+# Update package lists
+echo "Updating package lists..."
+if command -v apt-get &> /dev/null; then
+    apt-get update -qq
+elif command -v yum &> /dev/null; then
+    yum check-update -q
+elif command -v dnf &> /dev/null; then
+    dnf check-update -q
+elif command -v pacman &> /dev/null; then
+    pacman -Sy --noconfirm
+fi
+
+# Check prerequisites
+
+if ! command -v deno &> /dev/null; then
+    echo "Installing Deno..."
+    
+    # Detect architecture
+    ARCH=$(uname -m)
+    case "$ARCH" in
+        x86_64) DENO_ARCH="x86_64-unknown-linux-gnu" ;;
+        aarch64|arm64) DENO_ARCH="aarch64-unknown-linux-gnu" ;;
+        *) echo -e "${RED}Error: Unsupported architecture: $ARCH${NC}"; exit 1 ;;
+    esac
+    
+    # Download latest Deno release directly to /usr/local/bin
+    DENO_URL="https://github.com/denoland/deno/releases/latest/download/deno-${DENO_ARCH}.zip"
+    
+    if command -v curl &> /dev/null; then
+        curl -fsSL "$DENO_URL" -o /tmp/deno.zip
+    elif command -v wget &> /dev/null; then
+        wget -qO /tmp/deno.zip "$DENO_URL"
+    else
+        echo -e "${RED}Error: Neither curl nor wget found. Cannot auto-install Deno.${NC}"
+        exit 1
+    fi
+    
+    # Extract to /usr/local/bin
+    unzip -q -o /tmp/deno.zip -d /usr/local/bin
+    chmod +x /usr/local/bin/deno
+    rm /tmp/deno.zip
+    
+    # Verify installation
+    if ! command -v deno &> /dev/null; then
+        echo -e "${RED}Error: Deno installation failed.${NC}"
+        exit 1
+    fi
+fi
+
+# Auto-install nginx if missing
+if ! command -v nginx &> /dev/null; then
+    echo "Installing nginx..."
+    
+    # Detect package manager and install
+    if command -v apt-get &> /dev/null; then
+        apt-get install -y nginx >/dev/null 2>&1
+    elif command -v yum &> /dev/null; then
+        yum install -y nginx >/dev/null 2>&1
+    elif command -v dnf &> /dev/null; then
+        dnf install -y nginx >/dev/null 2>&1
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm nginx >/dev/null 2>&1
+    else
+        echo -e "${RED}Error: Could not detect package manager.${NC}"
+        exit 1
+    fi
+    
+    # Enable and start nginx
+    systemctl enable nginx >/dev/null 2>&1
+    systemctl start nginx
+fi
+
+# Auto-install certbot if missing
+if ! command -v certbot &> /dev/null; then
+    echo "Installing certbot..."
+    
+    # Detect package manager and install
+    if command -v apt-get &> /dev/null; then
+        apt-get install -y certbot python3-certbot-nginx >/dev/null 2>&1
+    elif command -v yum &> /dev/null; then
+        yum install -y certbot python3-certbot-nginx >/dev/null 2>&1
+    elif command -v dnf &> /dev/null; then
+        dnf install -y certbot python3-certbot-nginx >/dev/null 2>&1
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm certbot certbot-nginx >/dev/null 2>&1
+    fi
+fi
+
+# Auto-install PostgreSQL if missing
+if ! command -v psql &> /dev/null; then
+    echo "Installing PostgreSQL..."
+    
+    # Detect package manager and install
+    if command -v apt-get &> /dev/null; then
+        apt-get install -y postgresql postgresql-contrib >/dev/null 2>&1
+    elif command -v yum &> /dev/null; then
+        yum install -y postgresql-server postgresql-contrib >/dev/null 2>&1
+        postgresql-setup --initdb >/dev/null 2>&1
+    elif command -v dnf &> /dev/null; then
+        dnf install -y postgresql-server postgresql-contrib >/dev/null 2>&1
+        postgresql-setup --initdb >/dev/null 2>&1
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm postgresql >/dev/null 2>&1
+        su - postgres -c "initdb -D /var/lib/postgres/data" >/dev/null 2>&1
+    fi
+    
+    # Enable and start PostgreSQL
+    systemctl enable postgresql >/dev/null 2>&1
+    systemctl start postgresql
 fi
 
 # Check if this is an upgrade
 UPGRADE_MODE=false
 if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then
     UPGRADE_MODE=true
-    echo -e "${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}║     Existing Installation Detected            ║${NC}"
-    echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
     echo ""
-    echo "Found existing Webspinner installation at: $INSTALL_DIR"
-    echo ""
-    echo -e "${BLUE}Upgrade mode:${NC}"
-    echo "  ✓ Your data (.env, public/.data/, .cert/) will be preserved"
-    echo "  ✓ Webspinner core files will be updated"
-    echo "  ✓ Service will be restarted if running"
-    echo ""
+    echo "Existing installation detected at: $INSTALL_DIR"
     read -p "Continue with upgrade? (y/n) [y]: " CONTINUE_UPGRADE
     CONTINUE_UPGRADE=${CONTINUE_UPGRADE:-y}
     if [[ ! "$CONTINUE_UPGRADE" =~ ^[Yy]$ ]]; then
@@ -172,8 +242,6 @@ if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then
     fi
     
     # Backup user data before upgrade
-    echo ""
-    echo -e "${BLUE}Creating backup...${NC}"
     BACKUP_DIR="$INSTALL_DIR/.backup-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$BACKUP_DIR"
     
@@ -182,11 +250,8 @@ if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then
     [ -d "$INSTALL_DIR/public/.data" ] && cp -r "$INSTALL_DIR/public/.data" "$BACKUP_DIR/"
     [ -d "$INSTALL_DIR/.cert" ] && cp -r "$INSTALL_DIR/.cert" "$BACKUP_DIR/"
     
-    echo -e "${GREEN}✓ Backup created: $BACKUP_DIR${NC}"
-    
     # Stop service if running
     if [ "$SERVICE_INSTALL" = true ] && systemctl is-active --quiet webspinner; then
-        echo -e "${BLUE}Stopping webspinner service...${NC}"
         systemctl stop webspinner
         RESTART_SERVICE=true
     fi
@@ -194,16 +259,8 @@ fi
 
 # Create installation directory
 mkdir -p "$INSTALL_DIR"
-echo -e "${GREEN}Installation directory: $INSTALL_DIR${NC}"
 
 # Extract payload
-echo ""
-if [ "$UPGRADE_MODE" = true ]; then
-    echo -e "${BLUE}Updating Webspinner core files...${NC}"
-else
-    echo -e "${BLUE}Extracting files...${NC}"
-fi
-
 ARCHIVE_LINE=$(awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0;}' "$0")
 
 # Extract to temporary location first
@@ -228,14 +285,9 @@ if [ "$UPGRADE_MODE" = true ]; then
     
     # Update public files BUT preserve .data directory
     rsync -av --exclude='.data' "$TEMP_EXTRACT/public/" "$INSTALL_DIR/public/" 2>/dev/null || cp -r "$TEMP_EXTRACT/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
-    
-    # Skip .env extraction (keep existing)
-    echo -e "${GREEN}✓ Core files updated${NC}"
-    echo -e "${BLUE}✓ Preserved: .env, public/.data/, .cert/, custom webbaselets${NC}"
 else
     # Fresh install - copy everything
     cp -r "$TEMP_EXTRACT"/* "$INSTALL_DIR/"
-    echo -e "${GREEN}✓ Files extracted${NC}"
 fi
 
 # Clean up temp directory
@@ -244,53 +296,28 @@ rm -rf "$TEMP_EXTRACT"
 # Configuration wizard (skip if upgrade)
 if [ "$UPGRADE_MODE" = false ]; then
 echo ""
-echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║          Configuration Wizard                 ║${NC}"
-echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-echo ""
 
-# Prompt for configuration values
+# Only prompt for domain/hostname
 read -p "Domain/Hostname [labs.spintheweb.org]: " HOST
 HOST=${HOST:-labs.spintheweb.org}
 
-read -p "Port [443]: " PORT
-PORT=${PORT:-443}
-
-read -p "Use TLS/HTTPS? (y/n) [y]: " USE_TLS
-USE_TLS=${USE_TLS:-y}
-
-if [[ "$USE_TLS" =~ ^[Yy]$ ]]; then
-    read -p "Certificate file path: " CERTFILE
-    read -p "Private key file path: " KEYFILE
-    PORT=${PORT:-443}
-else
-    CERTFILE=""
-    KEYFILE=""
-fi
-
-read -p "Session timeout (hours) [24]: " SESSION_TIMEOUT
-SESSION_TIMEOUT=${SESSION_TIMEOUT:-24}
-
-read -p "Max concurrent users (0=unlimited) [0]: " MAX_USERS
-MAX_USERS=${MAX_USERS:-0}
-
-read -p "Max upload size (MB) [200]: " MAX_UPLOADSIZE
-MAX_UPLOADSIZE=${MAX_UPLOADSIZE:-200}
-
-read -p "Allow dev/studio mode? (y/n) [n]: " ALLOW_DEV
-if [[ "$ALLOW_DEV" =~ ^[Yy]$ ]]; then
-    ALLOW_DEV="true"
-else
-    ALLOW_DEV="false"
-fi
+# Auto-configure everything else
+USE_NGINX_PROXY=true
+WEBSPINNER_PORT=8080
+PORT=$WEBSPINNER_PORT
+USE_TLS=y
+CERTFILE=""
+KEYFILE=""
+SESSION_TIMEOUT=24
+MAX_USERS=0
+MAX_UPLOADSIZE=200
+ALLOW_DEV="false"
 
 # Create .env file
-echo ""
-echo -e "${BLUE}Creating .env configuration...${NC}"
 cat > "$INSTALL_DIR/.env" << EOF
 # Webspinner Environment Configuration
 # Generated during installation
-HOST=$HOST
+HOST=localhost
 PORT=$PORT
 CERTFILE=$CERTFILE
 KEYFILE=$KEYFILE
@@ -305,7 +332,76 @@ SECURITY="./public/.data/users.json"
 ALLOW_DEV=$ALLOW_DEV
 EOF
 
-echo -e "${GREEN}✓ Configuration saved to $INSTALL_DIR/.env${NC}"
+# Setup PostgreSQL database
+echo "Setting up PostgreSQL database..."
+DB_NAME="webspinner"
+DB_USER="webspinner"
+DB_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+
+# Create database and user
+su - postgres -c "psql -c \"CREATE DATABASE $DB_NAME;\"" 2>/dev/null || true
+su - postgres -c "psql -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';\"" 2>/dev/null || true
+su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;\"" 2>/dev/null
+
+# Update .env with database connection
+cat >> "$INSTALL_DIR/.env" << EOF
+
+# Database Configuration
+DB_TYPE=postgresql
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=$DB_NAME
+DB_USER=$DB_USER
+DB_PASS=$DB_PASS
+EOF
+
+# Setup nginx reverse proxy
+NGINX_CONF="/etc/nginx/sites-available/webspinner"
+cat > "$NGINX_CONF" << 'NGINXEOF'
+server {
+    listen 80;
+    server_name $HOST;
+    
+    # Proxy settings (certbot will add HTTPS later)
+    location / {
+        proxy_pass http://localhost:$WEBSPINNER_PORT;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+    }
+    
+    # Increase upload size
+    client_max_body_size ${MAX_UPLOADSIZE}M;
+}
+NGINXEOF
+
+# Substitute variables in nginx config
+sed -i "s/\$HOST/$HOST/g" "$NGINX_CONF"
+sed -i "s/\$WEBSPINNER_PORT/$WEBSPINNER_PORT/g" "$NGINX_CONF"
+sed -i "s/\${MAX_UPLOADSIZE}/$MAX_UPLOADSIZE/g" "$NGINX_CONF"
+
+# Enable site
+ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/webspinner
+
+# Test and reload nginx
+if nginx -t 2>/dev/null; then
+    systemctl reload nginx
+    
+    # Obtain Let's Encrypt certificate automatically
+    echo "Obtaining SSL certificate..."
+    if certbot --nginx -d "$HOST" --non-interactive --agree-tos --register-unsafely-without-email 2>/dev/null; then
+        systemctl enable certbot.timer 2>/dev/null
+    else
+        echo "Note: SSL certificate setup failed. Run manually: sudo certbot --nginx -d $HOST"
+    fi
+else
+    echo -e "${RED}Error: Nginx configuration test failed${NC}"
+fi
 
 # Close the upgrade mode conditional (configuration wizard was skipped if upgrade)
 fi
@@ -319,7 +415,6 @@ if [ ! -f "$INSTALL_DIR/public/.data/users.json" ]; then
   "users": []
 }
 EOF
-    echo -e "${GREEN}✓ Created default users.json${NC}"
 fi
 
 if [ ! -f "$INSTALL_DIR/public/.data/datasources.json" ]; then
@@ -328,19 +423,11 @@ if [ ! -f "$INSTALL_DIR/public/.data/datasources.json" ]; then
   "datasources": []
 }
 EOF
-    echo -e "${GREEN}✓ Created default datasources.json${NC}"
 fi
 
-# Install systemd service (if root)
+# Install systemd service automatically (if root)
 if [ "$SERVICE_INSTALL" = true ]; then
-    echo ""
-    read -p "Install systemd service for auto-start? (y/n) [y]: " INSTALL_SERVICE
-    INSTALL_SERVICE=${INSTALL_SERVICE:-y}
-    
-    if [[ "$INSTALL_SERVICE" =~ ^[Yy]$ ]]; then
-        echo -e "${BLUE}Creating systemd service...${NC}"
-        
-        cat > /etc/systemd/system/webspinner.service << EOF
+    cat > /etc/systemd/system/webspinner.service << EOF
 [Unit]
 Description=Webspinner Web Application Server
 After=network.target
@@ -349,7 +436,7 @@ After=network.target
 Type=simple
 User=$SUDO_USER
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/bin/env deno run --allow-all stwSpinner.ts
+ExecStart=/usr/local/bin/deno run --allow-all stwSpinner.ts
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -359,97 +446,37 @@ StandardError=journal
 WantedBy=multi-user.target
 EOF
 
-        systemctl daemon-reload
-        systemctl enable webspinner
-        
-        echo -e "${GREEN}✓ Systemd service installed${NC}"
-        echo -e "${YELLOW}Service management:${NC}"
-        echo "  Start:   sudo systemctl start webspinner"
-        echo "  Stop:    sudo systemctl stop webspinner"
-        echo "  Status:  sudo systemctl status webspinner"
-        echo "  Logs:    sudo journalctl -u webspinner -f"
-        echo ""
-        
-        read -p "Start service now? (y/n) [y]: " START_NOW
-        START_NOW=${START_NOW:-y}
-        if [[ "$START_NOW" =~ ^[Yy]$ ]]; then
-            systemctl start webspinner
-            echo -e "${GREEN}✓ Service started${NC}"
-        fi
-    fi
+    systemctl daemon-reload
+    systemctl enable webspinner >/dev/null 2>&1
+    systemctl start webspinner
 fi
 
 # Create start script for non-service installations
 if [ "$SERVICE_INSTALL" = false ]; then
-    echo ""
-    echo -e "${BLUE}Creating start script...${NC}"
     cat > "$INSTALL_DIR/start.sh" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
 deno run --allow-all stwSpinner.ts
 EOF
     chmod +x "$INSTALL_DIR/start.sh"
-    echo -e "${GREEN}✓ Start script created: $INSTALL_DIR/start.sh${NC}"
 fi
 
 # Final instructions
 echo ""
 if [ "$UPGRADE_MODE" = true ]; then
-    echo -e "${GREEN}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     Upgrade Complete!                         ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "${BLUE}What was updated:${NC}"
-    echo "  ✓ Webspinner core engine and framework files"
-    echo "  ✓ System webbaselets"
-    echo "  ✓ Dependencies (deno.json/lock)"
-    echo ""
-    echo -e "${BLUE}What was preserved:${NC}"
-    echo "  ✓ Your configuration (.env)"
-    echo "  ✓ Your data (public/.data/)"
-    echo "  ✓ Your certificates (.cert/)"
-    echo "  ✓ Your custom webbaselets"
-    echo ""
-    echo -e "Backup location: ${BLUE}$BACKUP_DIR${NC}"
-    echo ""
+    echo "Upgrade complete!"
     
     # Restart service if it was running
     if [ -n "$RESTART_SERVICE" ] && [ "$RESTART_SERVICE" = true ]; then
-        echo -e "${BLUE}Restarting webspinner service...${NC}"
         systemctl start webspinner
-        sleep 2
-        if systemctl is-active --quiet webspinner; then
-            echo -e "${GREEN}✓ Service restarted successfully${NC}"
-        else
-            echo -e "${RED}⚠ Service failed to restart. Check logs: journalctl -u webspinner${NC}"
+        sleep 1
+        if ! systemctl is-active --quiet webspinner; then
+            echo -e "${RED}Error: Service failed to restart. Check: journalctl -u webspinner${NC}"
         fi
     fi
 else
-    echo -e "${GREEN}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     Installation Complete!                    ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════════╝${NC}"
-fi
-
-echo ""
-echo -e "Installation directory: ${BLUE}$INSTALL_DIR${NC}"
-echo -e "Configuration file: ${BLUE}$INSTALL_DIR/.env${NC}"
-echo ""
-
-if [ "$SERVICE_INSTALL" = false ] && [ "$UPGRADE_MODE" = false ]; then
-    echo -e "${YELLOW}To start Webspinner:${NC}"
-    echo "  cd $INSTALL_DIR"
-    echo "  ./start.sh"
-    echo ""
-fi
-
-if [ "$UPGRADE_MODE" = false ]; then
-    echo -e "${YELLOW}Access your site at:${NC}"
-    if [[ "$USE_TLS" =~ ^[Yy]$ ]]; then
-        echo "  https://$HOST:$PORT"
-    else
-        echo "  http://$HOST:$PORT"
-    fi
-    echo ""
+    echo "Installation complete!"
+    echo "Access your site at: https://$HOST"
 fi
 
 exit 0
@@ -483,87 +510,124 @@ echo -e "${BLUE}Installer size: $INSTALLER_SIZE${NC}"
 rm -rf "$TEMP_DIR"
 echo -e "${GREEN}✓ Cleaned up temporary files${NC}"
 
-# Git tag (force-update strategy)
+# Git tag and GitHub release
 echo ""
-echo -e "${BLUE}Step 4: Updating Git tag...${NC}"
-echo -e "${YELLOW}Note: Tag $VERSION is permanent and will be moved to this commit${NC}"
-read -p "Update tag '$VERSION' to current commit? (y/n) [y]: " CREATE_TAG
-CREATE_TAG=${CREATE_TAG:-y}
+echo -e "${BLUE}Step 4: Creating Git tag and GitHub release...${NC}"
 
-if [[ "$CREATE_TAG" =~ ^[Yy]$ ]]; then
-    # Delete existing tag locally if it exists
-    if git rev-parse "$VERSION" >/dev/null 2>&1; then
+# Check if tag already exists
+FORCE_TAG=n
+if git rev-parse "$VERSION" >/dev/null 2>&1; then
+    echo -e "${YELLOW}Warning: Tag $VERSION already exists${NC}"
+    read -p "Force-update tag (will overwrite)? (y/n) [n]: " FORCE_TAG
+    FORCE_TAG=${FORCE_TAG:-n}
+    
+    if [[ "$FORCE_TAG" =~ ^[Yy]$ ]]; then
         git tag -d "$VERSION" 2>/dev/null || true
         echo -e "${YELLOW}✓ Deleted old local tag${NC}"
-    fi
-    
-    # Create new tag at current commit
-    git tag -a "$VERSION" -m "Release $VERSION (Server Installer) - $(date +'%Y-%m-%d %H:%M:%S')"
-    echo -e "${GREEN}✓ Git tag created: $VERSION${NC}"
-    
-    read -p "Force-push tag to remote (updates release)? (y/n) [y]: " PUSH_TAG
-    PUSH_TAG=${PUSH_TAG:-y}
-    if [[ "$PUSH_TAG" =~ ^[Yy]$ ]]; then
-        # Force push to move remote tag
-        git push origin "$VERSION" --force
-        echo -e "${GREEN}✓ Tag force-pushed to remote${NC}"
-    fi
-fi
-
-# GitHub Release
-echo ""
-if [ "$GH_AVAILABLE" = true ]; then
-    echo -e "${BLUE}Step 5: Creating GitHub Release...${NC}"
-    read -p "Create GitHub release? (y/n) [y]: " CREATE_RELEASE
-    CREATE_RELEASE=${CREATE_RELEASE:-y}
-    
-    if [[ "$CREATE_RELEASE" =~ ^[Yy]$ ]]; then
-        RELEASE_NOTES="## Webspinner $VERSION - Server Installer
-
-### Self-Extracting Installer
-This is a self-extracting bash installer that includes:
-- Complete Webspinner runtime
-- Interactive configuration wizard
-- Automatic .env generation
-- Optional systemd service setup
-- Dependency checking
-
-### Installation
-\`\`\`bash
-chmod +x webspinner-installer.sh
-sudo ./webspinner-installer.sh
-# Or for user installation:
-./webspinner-installer.sh
-\`\`\`
-
-### Requirements
-- Linux/Unix system
-- Deno runtime
-- Bash shell
-
-### Verification
-\`\`\`bash
-sha256sum -c webspinner-installer.sh.sha256
-\`\`\`
-
-For more information, see the [documentation](https://github.com/spintheweb/webspinner)."
-
-        gh release create "$VERSION" \
-            --title "Release $VERSION (Server Installer)" \
-            --notes "$RELEASE_NOTES" \
-            "$INSTALLER_FILE" \
-            "$CHECKSUM_FILE"
-        
-        echo -e "${GREEN}✓ GitHub release created${NC}"
-        echo -e "${BLUE}View at: https://github.com/spintheweb/webspinner/releases/tag/$VERSION${NC}"
+        CREATE_TAG=y
+    else
+        echo "Skipping tag creation and release"
+        CREATE_TAG=n
     fi
 else
-    echo -e "${YELLOW}Step 5: GitHub CLI not available${NC}"
-    echo "To create release manually:"
-    echo "  1. Go to: https://github.com/spintheweb/webspinner/releases/new"
-    echo "  2. Choose tag: $VERSION"
-    echo "  3. Upload: $INSTALLER_FILE"
-    echo "  4. Upload: $CHECKSUM_FILE"
+    CREATE_TAG=y
+fi
+
+# Single decision point
+if [[ "$CREATE_TAG" =~ ^[Yy]$ ]]; then
+    read -p "Create git tag and GitHub release for '$VERSION'? (y/n) [y]: " CREATE_TAG
+    CREATE_TAG=${CREATE_TAG:-y}
+    
+    if [[ "$CREATE_TAG" =~ ^[Yy]$ ]]; then
+        # Create and push tag
+        git tag -a "$VERSION" -m "Release $VERSION (Server Installer) - $(date +'%Y-%m-%d %H:%M:%S')"
+        echo -e "${GREEN}✓ Git tag created: $VERSION${NC}"
+        
+        if [[ "$FORCE_TAG" =~ ^[Yy]$ ]]; then
+            git push origin "$VERSION" --force
+            echo -e "${GREEN}✓ Tag force-pushed to remote${NC}"
+        else
+            git push origin "$VERSION"
+            echo -e "${GREEN}✓ Tag pushed to remote${NC}"
+        fi
+        
+        # Create GitHub release
+        if [ "$GH_AVAILABLE" = true ]; then
+            echo -e "${BLUE}Creating GitHub Release...${NC}"
+            
+            # Delete existing release if force-updating
+            if [[ "$FORCE_TAG" =~ ^[Yy]$ ]]; then
+                gh release delete "$VERSION" --yes 2>/dev/null || true
+                echo -e "${YELLOW}✓ Deleted old GitHub release${NC}"
+            fi
+            
+            RELEASE_NOTES="
+### Overview
+
+Production-ready self-extracting installer for Linux systems. Includes complete runtime, automated dependency installation, and production configuration.
+
+### Components
+
+- Spin the Web framework
+- public directory
+- Deno runtime
+- nginx reverse proxy
+- Let's Encrypt SSL/TLS
+- PostgreSQL database
+- systemd service
+
+### Installation
+
+\`\`\`bash
+sudo ./webspinner-server.sh
+\`\`\`
+
+### Upgrade
+
+Run installer on existing installation to upgrade. Preserves configuration, user data, certificates, and custom webbaselets.
+
+### Requirements
+
+- Linux (Ubuntu, Debian, RHEL, CentOS, Fedora, Arch)
+- Root privileges
+- Ports 80/443 accessible
+- DNS configured
+
+### Verification
+
+\`\`\`bash
+sha256sum -c webspinner-server.sh.sha256
+\`\`\`
+
+### Service Management
+
+\`\`\`bash
+systemctl status webspinner
+systemctl restart webspinner
+journalctl -u webspinner -f
+\`\`\`
+
+For documentation, see the [project wiki](https://github.com/spintheweb/webspinner/wiki)."
+
+            gh release create "$VERSION" \
+                --title "Release $VERSION (Server Installer)" \
+                --notes "$RELEASE_NOTES" \
+                "$INSTALLER_FILE" \
+                "$CHECKSUM_FILE"
+            
+            echo -e "${GREEN}✓ GitHub release created${NC}"
+            echo -e "${BLUE}View at: https://github.com/spintheweb/webspinner/releases/tag/$VERSION${NC}"
+        else
+            echo -e "${YELLOW}GitHub CLI not available${NC}"
+            echo "To create release manually:"
+            echo "  1. Go to: https://github.com/spintheweb/webspinner/releases/new"
+            echo "  2. Choose tag: $VERSION"
+            echo "  3. Upload: $INSTALLER_FILE"
+            echo "  4. Upload: $CHECKSUM_FILE"
+        fi
+    else
+        echo "Tag creation cancelled - skipping GitHub release"
+    fi
 fi
 
 echo ""
