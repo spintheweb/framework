@@ -166,8 +166,3 @@ export abstract class STWElement {
 		return Promise.resolve(secureResponse("Not implemented", { status: 501 }));
 	}
 }
-
-// Helper type guard used by other modules without importing STWContent at runtime
-export function isSTWContent(obj: unknown): obj is STWContent {
-    return !!obj && typeof obj === "object" && "mime" in (obj as any) && "section" in (obj as any);
-}

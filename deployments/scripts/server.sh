@@ -299,56 +299,97 @@ generate_nginx_config() {
     local port=$2
     local max_size=$3
     local output_file=$4
-    
-    cat > "$output_file" << 'NGINXEOF'
+    local cert_dir="/etc/letsencrypt/live/$host"
+
+    # If certs exist, emit dual HTTP->HTTPS + HTTPS server blocks; else emit HTTP only (certbot will amend later)
+    if [ -f "$cert_dir/fullchain.pem" ] && [ -f "$cert_dir/privkey.pem" ]; then
+        cat > "$output_file" << 'NGINXTLS'
 server {
     listen 80;
     server_name $HOST;
-    
-    # Proxy settings (certbot will add HTTPS later)
+    # Allow certbot challenges & redirect everything else to HTTPS
+    location /.well-known/acme-challenge/ { root /var/www/html; }
+    location / { return 301 https://$HOST$request_uri; }
+    server_tokens off;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name $HOST;
+    ssl_certificate $CERTPATH/fullchain.pem;
+    ssl_certificate_key $CERTPATH/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    # Security headers (can be pared down if origin sets them all)
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy no-referrer-when-downgrade always;
+
     location / {
         proxy_pass http://localhost:$WEBSPINNER_PORT;
         proxy_http_version 1.1;
-        
-        # WebSocket support
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        
-        # Reverse proxy headers (preserve client info)
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Preserve backend security headers (do not override)
         proxy_pass_header Server;
         proxy_pass_header X-Content-Type-Options;
         proxy_pass_header X-Frame-Options;
         proxy_pass_header X-XSS-Protection;
         proxy_pass_header Referrer-Policy;
         proxy_pass_header Content-Security-Policy;
-        
-        # Hide technology stack (remove if present)
         proxy_hide_header X-Powered-By;
-        
-        # Timeouts for long-lived connections
         proxy_read_timeout 86400;
         proxy_connect_timeout 60;
         proxy_send_timeout 60;
     }
-    
-    # Increase upload size
     client_max_body_size ${MAX_UPLOADSIZE}M;
-    
-    # Hide nginx version for security
     server_tokens off;
 }
-NGINXEOF
-    
-    # Substitute variables
-    sed -i "s/\$HOST/$host/g" "$output_file"
-    sed -i "s/\$WEBSPINNER_PORT/$port/g" "$output_file"
-    sed -i "s/\${MAX_UPLOADSIZE}/$max_size/g" "$output_file"
+NGINXTLS
+        sed -i "s/\$HOST/$host/g" "$output_file"
+        sed -i "s/\$WEBSPINNER_PORT/$port/g" "$output_file"
+        sed -i "s/\${MAX_UPLOADSIZE}/$max_size/g" "$output_file"
+        sed -i "s#\$CERTPATH#$cert_dir#g" "$output_file"
+    else
+        cat > "$output_file" << 'NGINXHTTP'
+server {
+    listen 80;
+    server_name $HOST;
+    location / {
+        proxy_pass http://localhost:$WEBSPINNER_PORT;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass_header Server;
+        proxy_pass_header X-Content-Type-Options;
+        proxy_pass_header X-Frame-Options;
+        proxy_pass_header X-XSS-Protection;
+        proxy_pass_header Referrer-Policy;
+        proxy_pass_header Content-Security-Policy;
+        proxy_hide_header X-Powered-By;
+        proxy_read_timeout 86400;
+        proxy_connect_timeout 60;
+        proxy_send_timeout 60;
+    }
+    client_max_body_size ${MAX_UPLOADSIZE}M;
+    server_tokens off;
+}
+NGINXHTTP
+        sed -i "s/\$HOST/$host/g" "$output_file"
+        sed -i "s/\$WEBSPINNER_PORT/$port/g" "$output_file"
+        sed -i "s/\${MAX_UPLOADSIZE}/$max_size/g" "$output_file"
+    fi
 }
 
 # Configuration wizard (skip if upgrade)
@@ -375,7 +416,7 @@ ALLOW_DEV="false"
 cat > "$INSTALL_DIR/.env" << EOF
 # Webspinner Environment Configuration
 # Generated during installation
-HOST=localhost
+HOST=$HOST
 PORT=$PORT
 CERTFILE=$CERTFILE
 KEYFILE=$KEYFILE
@@ -450,7 +491,7 @@ if [ "$UPGRADE_MODE" = true ] && [ -f "/etc/nginx/sites-available/webspinner" ];
     # Backup existing config
     cp /etc/nginx/sites-available/webspinner /etc/nginx/sites-available/webspinner.bak.$(date +%Y%m%d-%H%M%S)
     
-    # Generate updated nginx config with existing settings
+    # Generate updated nginx config with existing settings (preserve TLS if certs present)
     generate_nginx_config "$EXISTING_HOST" "$EXISTING_PORT" "$EXISTING_MAX_SIZE" "/etc/nginx/sites-available/webspinner"
     
     # Test and reload nginx
@@ -493,7 +534,7 @@ After=network.target
 Type=simple
 User=$SUDO_USER
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/local/bin/deno run --allow-all stwSpinner.ts
+ExecStart=/usr/local/bin/deno run --allow-net --allow-read --allow-write --allow-env stwSpinner.ts
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -513,7 +554,7 @@ if [ "$SERVICE_INSTALL" = false ]; then
     cat > "$INSTALL_DIR/start.sh" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
-deno run --allow-all stwSpinner.ts
+deno run --allow-net --allow-read --allow-write --allow-env stwSpinner.ts
 EOF
     chmod +x "$INSTALL_DIR/start.sh"
 fi

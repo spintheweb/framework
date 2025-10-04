@@ -4,12 +4,11 @@
   "exports": "./stwSpinner.ts",
 
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env stwSpinner.ts",
-    "dev": "deno run --watch --allow-net --allow-read --allow-env stwSpinner.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env stwSpinner.ts",
+    "dev": "deno run --watch --allow-net --allow-read --allow-write --allow-env stwSpinner.ts",
     "cache": "deno cache stwSpinner.ts",
     "build": "deno run --allow-read --allow-write ./tasks/minify.ts",
     "headers": "deno run --allow-read --allow-write ./tasks/ensure-headers.ts",
-    "integrity": "deno run --allow-read --allow-write ./tasks/integrity.ts",
 
     "docker:build": "docker build -t spintheweb/webspinner:latest .",
     "docker:push": "docker push spintheweb/webspinner:latest"
