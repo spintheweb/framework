@@ -3,8 +3,9 @@
 
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { STWFactory } from "../stwComponents/stwFactory.ts";
-import { STWContent } from "./stwContent.ts";
-import { STWSite } from "./stwSite.ts";
+import type { STWContent } from "./stwContent.ts"; // type-only to avoid circular runtime dependency
+// Removed direct import of STWSite to avoid circular runtime dependency
+import { STWIndex } from "./stwIndex.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export type STWRole = string;
@@ -52,7 +53,7 @@ export abstract class STWElement {
 				element.parent = this;
 				this.children.push(element);
 
-				STWSite.index.set(element._id, element);
+				STWIndex.set(element._id, element);
 			}
 		}
 	}
@@ -164,4 +165,9 @@ export abstract class STWElement {
 	public serve(_req: Request, _session: STWSession, _ref?: STWContent): Promise<Response> {
 		return Promise.resolve(secureResponse("Not implemented", { status: 501 }));
 	}
+}
+
+// Helper type guard used by other modules without importing STWContent at runtime
+export function isSTWContent(obj: unknown): obj is STWContent {
+    return !!obj && typeof obj === "object" && "mime" in (obj as any) && "section" in (obj as any);
 }

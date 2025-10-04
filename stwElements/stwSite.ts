@@ -4,6 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { ISTWArea, STWArea } from "./stwArea.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
+import { STWIndex } from "./stwIndex.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 interface ISTWSite extends ISTWElement {
@@ -16,7 +17,7 @@ interface ISTWSite extends ISTWElement {
 export class STWSite extends STWElement {
 	static #wbdl: ISTWSite;
 	static #instance: STWSite;
-	static index: Map<string, STWElement> = new Map();
+	static index: Map<string, STWElement> = STWIndex as Map<string, STWElement>;
 
 	langs: string[];
 	datasources: Map<string, string>;
@@ -31,7 +32,7 @@ export class STWSite extends STWElement {
 		this.mainpage = site.mainpage;
 		this.version = site.version || `v1.0.0 ${new Date().toISOString()}`
 
-		STWSite.index.set(site._id, this);
+		STWIndex.set(site._id, this);
 	}
 
 	public override toLocalizedJSON(session: STWSession): object {

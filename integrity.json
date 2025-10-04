@@ -1,0 +1,48 @@
+{
+  "generated": "2025-10-04T06:41:09.150Z",
+  "composite": "bb7b1d6aac1c6aa9665689e11f77c1a8fef475a04ea38e58f88f211265154826",
+  "files": [
+    {
+      "file": "stwElements/stwElement.ts",
+      "sha256": "c78dd446c1e30035f125e2fe75c42a7ace36d73ef5fbfeeecfad2812ba3717a2",
+      "size": 6241,
+      "mtime": "2025-10-04T06:33:04.293Z"
+    },
+    {
+      "file": "stwElements/stwContent.ts",
+      "sha256": "d11aceb55f395c80e6cbb46fe3f16ab3112f78fc4c856d451a50ce2bbca26f7f",
+      "size": 8469,
+      "mtime": "2025-10-04T06:23:40.609Z"
+    },
+    {
+      "file": "stwElements/stwSite.ts",
+      "sha256": "02b6d6d0b2f315daaa614f8e2331ebaddf7454653ae82691c61eccf0f60a676f",
+      "size": 7919,
+      "mtime": "2025-10-04T06:33:06.568Z"
+    },
+    {
+      "file": "stwElements/stwPage.ts",
+      "sha256": "0f6a45ad2084c8854c4e71914cf95787a69b41e70b4a2160b5cd5df131354d06",
+      "size": 2366,
+      "mtime": "2025-10-04T05:34:43.498Z"
+    },
+    {
+      "file": "stwSpinner.ts",
+      "sha256": "f32fc7fa194cf6e79845ef5f7d99f44f828ad841baf1866512e1e81c7313da4d",
+      "size": 5666,
+      "mtime": "2025-10-04T06:33:11.195Z"
+    },
+    {
+      "file": "stwComponents/stwFactory.ts",
+      "sha256": "b26d20bc2903ef91d13d461ad086469ff5a1b43648eebe3ceb945dbf1613e8c2",
+      "size": 1184,
+      "mtime": "2025-10-04T04:21:34.294Z"
+    },
+    {
+      "file": "stwComponents/stwResponse.ts",
+      "sha256": "5925fc59b2124be88ad7ab9a88065e001051ed92dd3fca20342f3fadb07d781a",
+      "size": 583,
+      "mtime": "2025-10-04T05:45:04.795Z"
+    }
+  ]
+}

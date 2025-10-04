@@ -4,6 +4,7 @@
 import { serveFile } from "@std/http/file-server";
 import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
+import { STWIndex } from "../stwElements/stwIndex.ts";
 import { STWSession } from "./stwSession.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "./stwDBAdapters/adapter.ts";
@@ -94,7 +95,7 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 				stwAction
 			};
 
-			const origin = STWSite.index.get(records.stwOrigin || "");
+			const origin = STWIndex.get(records.stwOrigin || "");
 			if (origin instanceof STWContent && origin?.isVisible(session, false)) {
 				try {
 					const _result = origin.getLayout(session).handleAction(stwAction); // TODO currently unused

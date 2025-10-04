@@ -8,6 +8,7 @@ import { STWSite } from "./stwElements/stwSite.ts";
 import { handleHttp } from "./stwComponents/stwHttpHandler.ts";
 import { handleWebSocket } from "./stwComponents/stwWebSocket.ts";
 import project from "./deno.json" with { type: "json" };
+import { STWFactory } from "./stwComponents/stwFactory.ts";
 
 // Load environment variables based on context
 const envPath = Deno.env.get("SPINNER_ENV") === "docker" ? ".env.docker" : ".env";
@@ -35,20 +36,37 @@ try {
 }
 
 /**
- * Preload {@linkcode STWFactory} with the Spin the Web elements
- * 
- * @param path The directory containing the elements
+ * Deterministically load element / content modules so that base abstractions
+ * are evaluated before derived implementations. Modules self-register via
+ * registerElement() side-effects. No dummy instantiation needed.
  */
-async function loadSTWElements(path: string) {
-    for (const dirEntry of Deno.readDirSync(path))
-        if (dirEntry.isFile && dirEntry.name.endsWith(".ts")) {
-            const module = await import(`${path}/${dirEntry.name}`);
-            const element = Object.keys(module).find(key => key.startsWith("STW") && key !== "STWLayout");
-            if (element) new module[element]({});
-        }
+async function loadSTWModules(dir: string, priority: string[] = []) {
+    const files: string[] = [];
+    for (const entry of Deno.readDirSync(dir))
+        if (entry.isFile && entry.name.endsWith(".ts")) files.push(entry.name);
+
+    // Priority list first (if present), then the remaining alphabetically.
+    const ordered = [
+        ...priority.filter(p => files.includes(p)),
+        ...files.filter(f => !priority.includes(f)).sort()
+    ];
+
+    for (const f of ordered)
+        await import(`${dir}/${f}`);
 }
-await loadSTWElements("./stwElements");
-await loadSTWElements("./stwContents");
+
+// Load core element hierarchy in a safe order, then all contents.
+await loadSTWModules("./stwElements", [
+    "stwIndex.ts",     // shared registry map (no deps)
+    "stwElement.ts",   // base
+    "stwArea.ts",      // derives from STWElement
+    "stwSite.ts",      // depends on Area for webbaselets
+    "stwPage.ts",      // page-level element
+    "stwContent.ts"    // abstract content base
+]);
+await loadSTWModules("./stwContents");
+
+console.log(`${new Date().toISOString()}: Registered elements: ${Object.keys(STWFactory).length}`);
 
 /**
  * Contains presently active sessions {@linkcode STWSession} 

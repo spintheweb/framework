@@ -4,7 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWSite } from "../stwElements/stwSite.ts";
+import { STWIndex } from "../stwElements/stwIndex.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export interface ISTWShortcut extends ISTWContent {
@@ -20,7 +20,7 @@ export class STWShortcut extends STWContent {
 	}
 	
 	public override serve(_req: Request, _session: STWSession): Promise<Response> {
-		const ref = STWSite.index.get(this.ref);
+		const ref = STWIndex.get(this.ref) as STWContent | undefined;
 
 		if (!(ref instanceof STWContent) || !this.isVisible(_session) || !ref || ref instanceof STWShortcut)
 			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content

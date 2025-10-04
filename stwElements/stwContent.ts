@@ -36,6 +36,7 @@ export interface ISTWContent extends ISTWElement {
 	layout: object;
 	stateful?: boolean;
 	cache?: number; // Cache duration in seconds. -1 for forever, 0 or undefined for no cache.
+	mime?: string; // Optional MIME type override (default text/html)
 }
 export abstract class STWContent extends STWElement {
 	override readonly type: string;
@@ -48,6 +49,7 @@ export abstract class STWContent extends STWElement {
 	protected layout!: Map<string, STWLayout>;
 	readonly stateful: boolean;
 	readonly cache: number;
+	mime: string;
 
 	public constructor(content: ISTWContent, _settings?: { [key: string]: string }) {
 		super(content);
@@ -61,6 +63,7 @@ export abstract class STWContent extends STWElement {
 		this.params = content.params || "";
 		this.stateful = content.stateful || false;
 		this.cache = content.cache || 0;
+		this.mime = content.mime || "text/html; charset=utf-8"; // marker property used for duck-typing
 
 		if (!["Text", "Script", "Shortcut"].includes(this.type) && content.layout) {
 			this.layout = new Map();
@@ -85,7 +88,8 @@ export abstract class STWContent extends STWElement {
 			dsn: this.dsn,
 			query: this.query,
 			params: this.params,
-			layout: this.layout.get(session.lang)?.wbll || ""
+			layout: this.layout.get(session.lang)?.wbll || "",
+			mime: this.mime
 		};
 	}
 
@@ -183,7 +187,7 @@ export abstract class STWContent extends STWElement {
 		};
 		if (layout?.settings.get("visible") === "false")
 			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content
-		return new Promise<Response>(resolve => resolve(secureResponse(JSON.stringify(data))));
+		return new Promise<Response>(resolve => resolve(secureResponse(JSON.stringify(data), { headers: { "Content-Type": this.mime.startsWith("application/json") ? "application/json; charset=utf-8" : "application/json; charset=utf-8" } })));
 
 		function collapsible(): string {
 			return layout?.settings.has("collapsible") ? `<i class="fa-light fa-angle-down" onclick="stwToggleCollapse(event)"></i> ` : "";
@@ -206,6 +210,7 @@ export abstract class STWContent extends STWElement {
 		this.dsn = data.dsn || this.dsn;
 		this.query = data.query || this.query;
 		this.params = data.params || this.params;
+		this.mime = data.mime || this.mime;
 
 		if (data.layout)
 			this.layout.set(session.lang, new STWLayout(data.layout));

@@ -4,7 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
-import { STWSite } from "../stwElements/stwSite.ts";
+import { STWIndex } from "../stwElements/stwIndex.ts";
 import { STWLayout } from "./wbll.ts";
 
 export class STWTabs extends STWContent {
@@ -74,7 +74,7 @@ export class STWTabs extends STWContent {
 			</script>`;
 
 		function closable(session: STWSession, id: string): string {
-			const tab = STWSite.index.get(id);
+			const tab = STWIndex.get(id) as STWContent | undefined;
 			if (tab instanceof STWContent && tab.getLayout(session).settings.get("closable") === "true")
 				return `&emsp;<i class="fa-light fa-xmark"></i>`;
 			return "";
