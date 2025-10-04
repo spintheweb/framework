@@ -293,6 +293,64 @@ fi
 # Clean up temp directory
 rm -rf "$TEMP_EXTRACT"
 
+# Function to generate nginx configuration
+generate_nginx_config() {
+    local host=$1
+    local port=$2
+    local max_size=$3
+    local output_file=$4
+    
+    cat > "$output_file" << 'NGINXEOF'
+server {
+    listen 80;
+    server_name $HOST;
+    
+    # Proxy settings (certbot will add HTTPS later)
+    location / {
+        proxy_pass http://localhost:$WEBSPINNER_PORT;
+        proxy_http_version 1.1;
+        
+        # WebSocket support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Reverse proxy headers (preserve client info)
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Preserve backend security headers (do not override)
+        proxy_pass_header Server;
+        proxy_pass_header X-Content-Type-Options;
+        proxy_pass_header X-Frame-Options;
+        proxy_pass_header X-XSS-Protection;
+        proxy_pass_header Referrer-Policy;
+        proxy_pass_header Content-Security-Policy;
+        
+        # Hide technology stack (remove if present)
+        proxy_hide_header X-Powered-By;
+        
+        # Timeouts for long-lived connections
+        proxy_read_timeout 86400;
+        proxy_connect_timeout 60;
+        proxy_send_timeout 60;
+    }
+    
+    # Increase upload size
+    client_max_body_size ${MAX_UPLOADSIZE}M;
+    
+    # Hide nginx version for security
+    server_tokens off;
+}
+NGINXEOF
+    
+    # Substitute variables
+    sed -i "s/\$HOST/$host/g" "$output_file"
+    sed -i "s/\$WEBSPINNER_PORT/$port/g" "$output_file"
+    sed -i "s/\${MAX_UPLOADSIZE}/$max_size/g" "$output_file"
+}
+
 # Configuration wizard (skip if upgrade)
 if [ "$UPGRADE_MODE" = false ]; then
 echo ""
@@ -357,33 +415,7 @@ EOF
 
 # Setup nginx reverse proxy
 NGINX_CONF="/etc/nginx/sites-available/webspinner"
-cat > "$NGINX_CONF" << 'NGINXEOF'
-server {
-    listen 80;
-    server_name $HOST;
-    
-    # Proxy settings (certbot will add HTTPS later)
-    location / {
-        proxy_pass http://localhost:$WEBSPINNER_PORT;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 86400;
-    }
-    
-    # Increase upload size
-    client_max_body_size ${MAX_UPLOADSIZE}M;
-}
-NGINXEOF
-
-# Substitute variables in nginx config
-sed -i "s/\$HOST/$HOST/g" "$NGINX_CONF"
-sed -i "s/\$WEBSPINNER_PORT/$WEBSPINNER_PORT/g" "$NGINX_CONF"
-sed -i "s/\${MAX_UPLOADSIZE}/$MAX_UPLOADSIZE/g" "$NGINX_CONF"
+generate_nginx_config "$HOST" "$WEBSPINNER_PORT" "$MAX_UPLOADSIZE" "$NGINX_CONF"
 
 # Enable site
 ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/webspinner
@@ -404,6 +436,31 @@ else
 fi
 
 # Close the upgrade mode conditional (configuration wizard was skipped if upgrade)
+fi
+
+# Update nginx configuration during upgrades (if nginx is configured)
+if [ "$UPGRADE_MODE" = true ] && [ -f "/etc/nginx/sites-available/webspinner" ]; then
+    echo "Updating nginx configuration with improved security headers..."
+    
+    # Read existing configuration to extract variables
+    EXISTING_HOST=$(grep -oP 'server_name \K[^;]+' /etc/nginx/sites-available/webspinner | head -1 | tr -d ' ')
+    EXISTING_PORT=$(grep -oP 'proxy_pass http://localhost:\K[0-9]+' /etc/nginx/sites-available/webspinner | head -1)
+    EXISTING_MAX_SIZE=$(grep -oP 'client_max_body_size \K[0-9]+' /etc/nginx/sites-available/webspinner | head -1)
+    
+    # Backup existing config
+    cp /etc/nginx/sites-available/webspinner /etc/nginx/sites-available/webspinner.bak.$(date +%Y%m%d-%H%M%S)
+    
+    # Generate updated nginx config with existing settings
+    generate_nginx_config "$EXISTING_HOST" "$EXISTING_PORT" "$EXISTING_MAX_SIZE" "/etc/nginx/sites-available/webspinner"
+    
+    # Test and reload nginx
+    if nginx -t 2>/dev/null; then
+        systemctl reload nginx
+        echo "Nginx configuration updated successfully"
+    else
+        echo -e "${RED}Error: Nginx configuration test failed, restoring backup${NC}"
+        mv /etc/nginx/sites-available/webspinner.bak.* /etc/nginx/sites-available/webspinner
+    fi
 fi
 
 # Create default data files if they don't exist

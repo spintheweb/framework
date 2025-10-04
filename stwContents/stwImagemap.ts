@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwImagemap.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 
 export class STWImagemap extends STWContent {
@@ -16,4 +17,4 @@ export class STWImagemap extends STWContent {
 	}
 }
 
-STWFactory.Imagemap = STWImagemap;
+registerElement("Imagemap", STWImagemap);

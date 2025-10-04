@@ -2,7 +2,7 @@
 // PostgreSQL database adapter for Spin the Web
 
 import { Client as PostgresClient } from "jsr:@db/postgres";
-import { ISTWAdapter } from "./adapter.ts";
+import { ISTWAdapter, ISTWRecords } from "./adapter.ts";
 
 export class STWPostgresAdapter implements ISTWAdapter {
   private client: PostgresClient;

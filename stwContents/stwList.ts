@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwList.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 import { wbpl } from "../stwComponents/wbpl.ts";
 
 export class STWList extends STWContent {
@@ -45,4 +46,4 @@ export class STWList extends STWContent {
 	}
 }
 
-STWFactory.List = STWList;
+registerElement("List", STWList);

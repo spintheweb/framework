@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwAccordion.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 
 export class STWAccordion extends STWContent {
@@ -59,4 +60,4 @@ export class STWAccordion extends STWContent {
 	}
 }
 
-STWFactory.Accordion = STWAccordion;
+registerElement("Accordion", STWAccordion);

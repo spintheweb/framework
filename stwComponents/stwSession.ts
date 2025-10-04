@@ -79,6 +79,4 @@ export class STWSession {
 		this.timer = setTimeout(() => this.timeout(this.timer), parseInt(Deno.env.get("TIMEOUT") || "15") * 60000); // Session timeout
 	}
 }
-
-// deno-lint-ignore no-explicit-any
-export const STWFactory: { [key: string]: new (element: any) => any } = {};
+// STWFactory has been moved to stwFactory.ts; import from there where needed.

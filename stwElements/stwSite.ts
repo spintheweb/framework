@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web element: stwSite
 
-import { STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
 import { ISTWArea, STWArea } from "./stwArea.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 interface ISTWSite extends ISTWElement {
 	langs: string[];
@@ -142,7 +143,7 @@ export class STWSite extends STWElement {
 
 		return page?.serve(req, session) ||
 			new Promise<Response>(resolve => {
-				const response = new Response(`Site ${this.localize(session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
+				const response = secureResponse(`Site ${this.localize(session, "name")} home page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);
 			});
 	}
@@ -173,7 +174,7 @@ export class STWSite extends STWElement {
 		_url(this);
 
 		return new Promise<Response>(resolve =>
-			resolve(new Response(`<?xml version="1.0" encoding="utf-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${fragment}</urlset>`))
+			resolve(secureResponse(`<?xml version="1.0" encoding="utf-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${fragment}</urlset>`))
 		);
 
 		function _url(element: STWElement) {

@@ -10,10 +10,10 @@ export interface ISTWRecords {
 }
 
 export interface ISTWAdapter {
-  connect(): Promise<void>;
-  close(): Promise<void>;
+	connect(): Promise<void>;
+	close(): Promise<void>;
 
-  execute(batch: string): Promise<ISTWRecords[]>;
-  listObjects(): Promise<ISTWRecords>;
-  getObjectDetails(objectName: string, objectType: string): Promise<ISTWRecords>;
+	execute(batch: string): Promise<ISTWRecords[]>;
+	listObjects(): Promise<ISTWRecords>;
+	getObjectDetails(objectName: string, objectType: string): Promise<ISTWRecords>;
 }

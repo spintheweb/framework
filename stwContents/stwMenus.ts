@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwMenus.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContentWithOptions, ISTWOption } from "../stwElements/stwContent.ts";
 
 export class STWMenus extends STWContent {
@@ -75,4 +76,4 @@ export class STWMenus extends STWContent {
 	}
 }
 
-STWFactory.Menus = STWMenus;
+registerElement("Menus", STWMenus);

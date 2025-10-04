@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web element: stwArea
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { ISTWElement, STWElement } from "./stwElement.ts";
 import { STWSite } from "./stwSite.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export interface ISTWArea extends ISTWElement {
 	mainpage: string;
@@ -40,10 +42,10 @@ export class STWArea extends STWElement {
 
 		return page?.serve(req, session) ||
 			new Promise<Response>(resolve => {
-				const response = new Response(`Area '${this.localize(session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
+				const response = secureResponse(`Area '${this.localize(session, "name")}' main page not found`, { status: 404, statusText: "Not Found" });
 				resolve(response);
 			});
 	}
 }
 
-STWFactory.Area = STWArea;
+registerElement("Area", STWArea);

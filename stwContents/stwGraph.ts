@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwGraph.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWGraph extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -16,4 +17,5 @@ export class STWGraph extends STWContent {
 	}
 }
 
-STWFactory.Tree = STWGraph;
+// NOTE: Fixed previous incorrect registry key (was "Tree" mapping to STWGraph)
+registerElement("Graph", STWGraph);

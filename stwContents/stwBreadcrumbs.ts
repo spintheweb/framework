@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwBreadcrumbs.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { ACTIONS, isTruthy } from "../stwContents/wbll.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWBreadcrumbs extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -33,4 +34,4 @@ export class STWBreadcrumbs extends STWContent {
 	}
 }
 
-STWFactory.Breadcrumbs = STWBreadcrumbs;
+registerElement("Breadcrumbs", STWBreadcrumbs);

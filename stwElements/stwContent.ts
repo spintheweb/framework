@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web element: stwContent
 
-import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
-import { STWSession } from "../stwComponents/stwSession.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
+import { STWDatasources } from "../stwComponents/stwDatasources.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
 import { STWLocalized, ISTWElement, STWElement } from "./stwElement.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
 import { wbpl } from "../stwComponents/wbpl.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 /**
  * The contents that use this interface are: {@linkcode STWMenus} and {@linkcode STWTabs}
@@ -125,7 +127,7 @@ export abstract class STWContent extends STWElement {
 
 	public override async serve(req: Request, session: STWSession, ref: STWContent | undefined): Promise<Response> {
 		if (!ref && !this.isVisible(session))
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content
 
 		if (ref)
 			console.debug(`${new Date().toISOString()}: ${ref._id === this._id ? " ●" : "│└"} ${this.type} (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
@@ -180,8 +182,8 @@ export abstract class STWContent extends STWElement {
 			body: bodyHtml,
 		};
 		if (layout?.settings.get("visible") === "false")
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
-		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
+			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content
+		return new Promise<Response>(resolve => resolve(secureResponse(JSON.stringify(data))));
 
 		function collapsible(): string {
 			return layout?.settings.has("collapsible") ? `<i class="fa-light fa-angle-down" onclick="stwToggleCollapse(event)"></i> ` : "";

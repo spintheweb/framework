@@ -2,8 +2,7 @@
 // MongoDB adapter for Spin the Web
 
 import { MongoClient } from "npm:mongodb";
-import { ISTWRecords } from "../stwDatasources.ts";
-import { ISTWAdapter } from "./adapter.ts";
+import { ISTWAdapter, ISTWRecords } from "./adapter.ts";
 
 export class STWMongoAdapter implements ISTWAdapter {
   private client: MongoClient;

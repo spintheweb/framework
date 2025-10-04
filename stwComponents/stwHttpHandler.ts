@@ -6,13 +6,14 @@ import { getCookies, setCookie } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWSession } from "./stwSession.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "./stwDatasources.ts";
+import { ISTWRecords } from "./stwDBAdapters/adapter.ts";
+import { secureResponse } from "./stwResponse.ts";
 
 export async function handleHttp(request: Request, session: STWSession, sessionId: string): Promise<Response> {
 	const pathname = new URL(request.url).pathname;
 	const element = STWSite.instance.find(session, pathname);
 
-	let response: Response = new Response(null, { status: 204 }); // Default: 204 No content
+	let response: Response = secureResponse(null, { status: 204 }); // Default: 204 No content
 
 	if (request.method === "GET") {
 		if (!element && !pathname.includes("/."))
@@ -32,7 +33,7 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 			const headers = new Headers(request.headers);
 			setCookie(headers, { name: "sessionId", value: sessionId, httpOnly: true, secure: true, sameSite: "Lax" });
 			headers.set("contents", response.headers.get("contents") || "");
-			return new Response(response.body, { headers });
+			return secureResponse(response.body, { headers });
 		}
 		return response;
 
@@ -96,7 +97,7 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 			const origin = STWSite.index.get(records.stwOrigin || "");
 			if (origin instanceof STWContent && origin?.isVisible(session, false)) {
 				try {
-					const result = origin.getLayout(session).handleAction(stwAction); // TODO
+					const _result = origin.getLayout(session).handleAction(stwAction); // TODO currently unused
 					session.socket?.send(JSON.stringify({
 						method: "PUT",
 						section: "stwShowModal",
@@ -111,9 +112,9 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 				}
 			}
 			// Always return a response
-			return new Response(null, { status: 204 });
+			return secureResponse(null, { status: 204 });
 		} catch (_error) {
-			return new Response("Error processing form data", { status: 400 });
+			return secureResponse("Error processing form data", { status: 400 });
 		}
 	}
 

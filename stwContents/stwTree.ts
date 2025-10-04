@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwTree.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 import { wbpl } from "../stwComponents/wbpl.ts";
 
 export class STWTree extends STWContent {
@@ -64,7 +65,9 @@ export class STWTree extends STWContent {
 				}
 			</script>`;
 
-		return body
+		// Ensure async contract maintained with a microtask await (lint requirement)
+		await Promise.resolve();
+		return body;
 	}
 
 	private isHierarchicalData(rows: any[]): boolean {
@@ -129,4 +132,4 @@ export class STWTree extends STWContent {
 	}
 }
 
-STWFactory.Tree = STWTree;
+registerElement("Tree", STWTree);

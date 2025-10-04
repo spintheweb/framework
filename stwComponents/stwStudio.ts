@@ -2,6 +2,7 @@
 // Spin the Web component: stwStudio
 
 import { serveFile } from "@std/http/file-server";
+import { secureResponse } from "./stwResponse.ts";
 
 async function listDirRecursive(dir: string, base = ""): Promise<any[]> {
   const entries: any[] = [];
@@ -28,9 +29,9 @@ async function listDirRecursive(dir: string, base = ""): Promise<any[]> {
 
 export async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
-  let path = decodeURIComponent(url.pathname.replace(/^\/api\/public\/?/, ""));
+  const path = decodeURIComponent(url.pathname.replace(/^\/api\/public\/?/, ""));
   if (path.includes("..")) {
-    return new Response("Forbidden", { status: 403 });
+    return secureResponse("Forbidden", { status: 403 });
   }
   const fsPath = path ? `./public/${path}` : "./public";
   try {
@@ -38,7 +39,7 @@ export async function handler(req: Request): Promise<Response> {
     if (stat.isDirectory) {
       // Recursively list directory contents
       const entries = await listDirRecursive(fsPath, path);
-      return new Response(JSON.stringify(entries), {
+      return secureResponse(JSON.stringify(entries), {
         headers: { "Content-Type": "application/json" }
       });
     } else {
@@ -46,6 +47,6 @@ export async function handler(req: Request): Promise<Response> {
       return await serveFile(req, fsPath);
     }
   } catch {
-    return new Response("Not found", { status: 404 });
+    return secureResponse("Not found", { status: 404 });
   }
 }

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwChart.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWChart extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -36,4 +37,4 @@ export class STWChart extends STWContent {
 	}
 }
 
-STWFactory.Chart = STWChart;
+registerElement("Chart", STWChart);

@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web element: stwElement
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { STWFactory } from "../stwComponents/stwFactory.ts";
 import { STWContent } from "./stwContent.ts";
 import { STWSite } from "./stwSite.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export type STWRole = string;
 export type STWLocalized = Map<string, string>;
@@ -160,6 +162,6 @@ export abstract class STWElement {
 	};
 
 	public serve(_req: Request, _session: STWSession, _ref?: STWContent): Promise<Response> {
-		return Promise.resolve(new Response("Not implemented", { status: 501 }));
+		return Promise.resolve(secureResponse("Not implemented", { status: 501 }));
 	}
 }

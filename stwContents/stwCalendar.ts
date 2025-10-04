@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwCalendar.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
 import { STWLayout } from "../stwContents/wbll.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWCalendar extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -149,4 +150,4 @@ function toLocalDateString(date: Date, session: STWSession): string {
 	return `${year}-${month}-${day}`;
 }
 
-STWFactory.Calendar = STWCalendar;
+registerElement("Calendar", STWCalendar);

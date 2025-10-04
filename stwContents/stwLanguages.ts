@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwLanguages.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export class STWLanguages extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -11,7 +13,7 @@ export class STWLanguages extends STWContent {
 	
 	override serve(_req: Request, session: STWSession): Promise<Response> {
 		if (session.site.langs.length == 1)
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content
 
 		return super.serve(_req, session, undefined);
 	}
@@ -21,5 +23,4 @@ export class STWLanguages extends STWContent {
 		return `<nav>${session.site.langs.reduce((langs, lang) => `${langs}<a href="/stw/language/${lang}">${lang.toUpperCase()}</a> `, "")}</nav>`;
 	}
 }
-
-STWFactory.Languages = STWLanguages;
+registerElement("Languages", STWLanguages);

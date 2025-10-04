@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web element: stwPage
 
-import { serveFile } from "jsr:@std/http/file-server";
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import { serveFile } from "@std/http/file-server";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWElement, ISTWElement } from "./stwElement.ts";
 import { STWContent } from "./stwContent.ts";
 
@@ -65,4 +66,4 @@ export class STWPage extends STWElement {
 	}
 }
 
-STWFactory.Page = STWPage;
+registerElement("Page", STWPage);

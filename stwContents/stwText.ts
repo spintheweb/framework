@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwText.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords, STWDatasources } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
+import { STWDatasources } from "../stwComponents/stwDatasources.ts";
 import { wbpl } from "../stwComponents/wbpl.ts";
+import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export class STWText extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -13,7 +16,7 @@ export class STWText extends STWContent {
 
 	public override async serve(req: Request, session: STWSession, ref: STWContent | undefined): Promise<Response> {
 		if (!ref && !this.isVisible(session))
-			return new Promise<Response>(resolve => resolve(new Response(null, { status: 204 }))); // 204 No content
+			return new Promise<Response>(resolve => resolve(secureResponse(null, { status: 204 }))); // 204 No content
 
 		if (ref)
 			console.debug(`${new Date().toISOString()}: ${ref._id === this._id ? " ●" : "│└"} Text (${this.pathname(session)}) @${this.section}.${this.sequence} [${this._id}]`);
@@ -27,7 +30,7 @@ export class STWText extends STWContent {
 			sequence: (ref || this).sequence,
 			body: await this.render(req, session, await STWDatasources.query(session, this))
 		};
-		return new Promise<Response>(resolve => resolve(new Response(JSON.stringify(data))));
+		return new Promise<Response>(resolve => resolve(secureResponse(JSON.stringify(data))));
 	}
 
 	// deno-lint-ignore require-await
@@ -44,5 +47,4 @@ export class STWText extends STWContent {
 		return wbpl(layoutText, new Map(session.placeholders));
 	}
 }
-
-STWFactory.Text = STWText;
+registerElement("Text", STWText);

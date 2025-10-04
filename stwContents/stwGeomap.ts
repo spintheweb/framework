@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web module: stwContents/stwGeomap.ts
 
-import { STWFactory, STWSession } from "../stwComponents/stwSession.ts";
+import type { STWSession } from "../stwComponents/stwSession.ts";
+import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ISTWRecords } from "../stwComponents/stwDatasources.ts";
+import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWGeomap extends STWContent {
 	public constructor(content: ISTWContent) {
@@ -27,4 +28,4 @@ export class STWGeomap extends STWContent {
 	}
 }
 
-STWFactory.Geomap = STWGeomap;
+registerElement("Geomap", STWGeomap);
