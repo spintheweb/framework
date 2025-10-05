@@ -76,13 +76,6 @@ docker run -d -p 8080:8080 spintheweb/webspinner:latest
 ./deployments/scripts/server.sh
 ```
 
-Creates self-extracting installer with:
-- Complete Webspinner runtime
-- Deno auto-installer
-- nginx + Let's Encrypt + PostgreSQL
-- Systemd service configuration
-- Upgrade detection
-
 **Output:**
 - `webspinner-server.sh` (overwrites previous)
 - `webspinner-server.sh.sha256`
@@ -93,21 +86,6 @@ wget https://github.com/spintheweb/webspinner/releases/latest/download/webspinne
 chmod +x webspinner-server.sh
 sudo ./webspinner-server.sh
 ```
-
-**What Happens:**
-1. Updates system packages
-2. Installs Deno, nginx, certbot, PostgreSQL
-3. Prompts for installation directory and domain
-4. Configures nginx reverse proxy
-5. Obtains Let's Encrypt SSL certificate
-6. Creates PostgreSQL database with random password
-7. Creates and starts systemd service
-
-**Result:**
-- Public: `https://yourdomain.com` (nginx port 443)
-- Internal: Webspinner on `localhost:8080`
-- Database: PostgreSQL on `localhost:5432`
-- Service: `systemctl status webspinner`
 
 **Docs:** [docs/SERVER.md](docs/SERVER.md)
 
