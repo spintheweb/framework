@@ -13,7 +13,7 @@ Spin the Web Studio is a webbaselet designed for building and managing Spin the 
 ### Key Features
 
 - **Webbase Structure Management:**  
-  Visualize the entire webbase (site, areas, pages, contents) as a tree. Edit elements in memory and persist changes to `./public/.data/webapplication.wbdl`.
+  Visualize the entire webbase (site, areas, pages, contents) as a tree. Edit elements in memory and persist changes to `./public/.data/webbase.wbdl`.
 
 - **Search:**  
   Quickly find any element within the webbase structure.

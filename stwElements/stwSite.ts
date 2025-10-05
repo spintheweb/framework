@@ -54,7 +54,7 @@ export class STWSite extends STWElement {
 		if (!STWSite.#instance) {
 			console.log(`${new Date().toISOString()}: Loading webbase '${Deno.env.get("SITE_WEBBASE")}'...`);
 
-			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbdl";
+			const webbase = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbdl";
 			this.#wbdl = JSON.parse(Deno.readTextFileSync(webbase));
 			STWSite.#instance = new STWSite(this.#wbdl);
 			if (!STWSite.#instance)
@@ -194,7 +194,7 @@ export class STWSite extends STWElement {
 		this.#watcherStarted = true;
 
 		const webbasePath = [
-			Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbdl",
+			Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbdl",
 			Deno.env.get("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbdl",
 			Deno.env.get("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbdl"
 		];

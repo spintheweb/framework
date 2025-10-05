@@ -5,17 +5,24 @@
         "roles": "guests"
     },
     {
-        "user": "administrator",
-        "name": "Administrator",
-        "password": "administrator",
+        "user": "root",
+        "name": "Root",
+        "password": "root",
         "roles": "administrators,developers",
+        "email": "security@spintheweb.org"
+    },
+    {
+        "user": "admin",
+        "name": "Administrator",
+        "password": "admin",
+        "roles": "administrators",
         "email": "info@spintheweb.org"
     },
     {
         "user": "user",
-        "name": "Test",
-        "password": "test",
+        "name": "John Doe",
+        "password": "user",
         "roles": "users",
-        "email": "info@spintheweb.org"
+        "email": "user@spintheweb.org"
     }
 ]

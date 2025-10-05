@@ -112,8 +112,9 @@ docker run -d \
 | `MAX_UPLOADSIZE` | `200` | Max upload size (MB) |
 | `ALLOW_DEV` | `false` | Enable dev/studio mode |
 | `SITE_ROOT` | `./public` | Public files directory |
-| `SITE_WEBBASE` | `./public/.data/webapplication.wbdl` | Main webbase file |
-| `SECURITY` | `./public/.data/users.json` | Users file |
+| `SITE_WEBBASE` | `./public/.data/webbase.wbdl` | Main webbase file |
+| `DATASOURCES` | `./public/.data/datasources.json` | Datasources file |
+| `USERS` | `./public/.data/users.json` | Users file |
 
 ### Volume Mounts
 

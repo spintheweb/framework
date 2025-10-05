@@ -28,7 +28,7 @@ const pbkdf2Params = { name: "PBKDF2", iterations: 100000, hash: "SHA-256" };
 
 export const STWSecurity = new class {
     async addUser(user: string, name: string, password: string, roles: string, email: string): Promise<void> {
-        const usersDB = Deno.env.get("SECURITY") || "./public/.data/users.json";
+        const usersDB = Deno.env.get("USERS") || "./public/.data/users.json";
         const users: ISTWUser[] = JSON.parse(Deno.readTextFileSync(usersDB));
 
         if (users.find(p => p.user === user)) {
@@ -47,7 +47,7 @@ export const STWSecurity = new class {
     removeUser(): void { }
 
     async addRoles(user: string, rolesToAdd: string): Promise<void> {
-        const usersDB = Deno.env.get("SECURITY") || "./public/.data/users.json";
+        const usersDB = Deno.env.get("USERS") || "./public/.data/users.json";
         const users: ISTWUser[] = JSON.parse(await Deno.readTextFile(usersDB));
 
         const person = users.find(p => p.user === user);
@@ -65,7 +65,7 @@ export const STWSecurity = new class {
     }
 
     async removeRoles(user: string, rolesToRemove: string): Promise<void> {
-        const usersDB = Deno.env.get("SECURITY") || "./public/.data/users.json";
+        const usersDB = Deno.env.get("USERS") || "./public/.data/users.json";
         const users: ISTWUser[] = JSON.parse(await Deno.readTextFile(usersDB));
 
         const person = users.find(p => p.user === user);
@@ -89,7 +89,7 @@ export const STWSecurity = new class {
             return;
         }
 
-        const usersDB = Deno.env.get("SECURITY") || "./public/.data/users.json";
+        const usersDB = Deno.env.get("USERS") || "./public/.data/users.json";
         const users: ISTWUser[] = JSON.parse(Deno.readTextFileSync(usersDB));
 
         const person = users.find(person => person.user === user);

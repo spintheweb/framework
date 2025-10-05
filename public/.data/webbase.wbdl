@@ -224,6 +224,25 @@
 					]
 				},
 				{
+					"_id": "92a2ced0-be74-11ee-90a9-c195cb5cfc71",
+					"type": "Content",
+					"name": {
+						"en": "Explain"
+					},
+					"slug": {
+						"en": "explain"
+					},
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "Text",
+					"section": "main",
+					"sequence": "9",
+					"layout": {
+						"en": "<h2>Welcome to the Spin the Web Labs</h2><h3>What is WBDL (Webbase Description Language)?</h3><spn>While <b>HTML (HyperText Markup Language)</b> describes the structure and content of a single web page and is interpreted and rendered by <i>client-side browsers</i>, WBDL (Webbase Description Language)</b> describes the architecture, composition and function of an entire web portal and is interpreted and rendered by <i>server-side webspinners</i>.</span>"
+					}
+				},
+				{
 					"_id": "b1e2c3d4-5678-11ee-9abc-def012345678",
 					"type": "Content",
 					"name": {

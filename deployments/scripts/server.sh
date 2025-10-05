@@ -73,10 +73,7 @@ cp .env.example "$PAYLOAD_DIR/.env"
 
 # Remove sensitive/unnecessary files from payload
 find "$PAYLOAD_DIR" -type f \( -name "*.pem" -o -name "*.key" -o -name ".DS_Store" -o -name "Thumbs.db" \) -delete
-# Remove test data files
-rm -f "$PAYLOAD_DIR/public/.data/users.json" 2>/dev/null || true
-rm -f "$PAYLOAD_DIR/public/.data/datasources.json" 2>/dev/null || true
-rm -f "$PAYLOAD_DIR/public/.data/datasources.production.json" 2>/dev/null || true
+# Preserve all public/.data seed files for fresh install; upgrade path excludes overwriting via rsync --exclude='.data'
 
 echo -e "${GREEN}Payload directory prepared${NC}"
 
@@ -423,11 +420,12 @@ KEYFILE=$KEYFILE
 SESSION_TIMEOUT=$SESSION_TIMEOUT
 MAX_USERS=$MAX_USERS
 SITE_ROOT="./public"
-SITE_WEBBASE="./public/.data/webapplication.wbdl"
+SITE_WEBBASE="./public/.data/webbase.wbdl"
 COMMON_WEBBASE="./webbaselets/stwCommon.wbdl"
 STUDIO_WEBBASE="./webbaselets/stwStudio.wbdl"
 MAX_UPLOADSIZE=$MAX_UPLOADSIZE
-SECURITY="./public/.data/users.json"
+DATASOURCES="./public/.data/datasources.json"
+USERS="./public/.data/users.json"
 ALLOW_DEV=$ALLOW_DEV
 EOF
 

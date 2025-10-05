@@ -55,7 +55,7 @@ Deno.test("STWDatasources.query handles errors gracefully", async () => {
 
 
 Deno.test("JSONata queries WBDL", async () => {
-	const wbdlFile: string = Deno.env.get("SITE_WEBBASE") || "./public/.data/webapplication.wbdl";
+	const wbdlFile: string = Deno.env.get("SITE_WEBBASE") || "./public/.data/webbase.wbdl";
 	const wbdlText = await Deno.readTextFile(wbdlFile);
 	const wbdlData = JSON.parse(wbdlText);
 

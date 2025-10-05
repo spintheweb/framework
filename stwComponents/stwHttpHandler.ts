@@ -31,10 +31,13 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 
 		// Set session cookie if not present
 		if (!getCookies(request.headers).sessionId) {
-			const headers = new Headers(request.headers);
+			// IMPORTANT: clone the ORIGINAL RESPONSE headers (not request headers) so we retain Content-Type
+			const headers = new Headers(response.headers);
 			setCookie(headers, { name: "sessionId", value: sessionId, httpOnly: true, secure: true, sameSite: "Lax" });
+			// Preserve any existing custom 'contents' header
 			headers.set("contents", response.headers.get("contents") || "");
-			return secureResponse(response.body, { headers });
+			// Return a new response preserving status and headers so nosniff does not block rendering
+			return secureResponse(response.body, { headers, status: response.status });
 		}
 		return response;
 

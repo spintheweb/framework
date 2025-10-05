@@ -25,7 +25,7 @@ services:
       
       # Site Configuration
       - SITE_ROOT=./public
-      - SITE_WEBBASE=./public/.data/webapplication.wbdl
+      - SITE_WEBBASE=./public/.data/webbase.wbdl
       - COMMON_WEBBASE=./webbaselets/stwCommon.wbdl
       - STUDIO_WEBBASE=./webbaselets/stwStudio.wbdl
       
@@ -33,7 +33,7 @@ services:
       - MAX_UPLOADSIZE=200
       
       # Security
-      - SECURITY=./public/.data/users.json
+      - USERS=./public/.data/users.json
       - ALLOW_DEV=false
       
       # Database Connection (if using external database)

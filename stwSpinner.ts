@@ -18,7 +18,7 @@ const env = await config({ path: envPath });
 try {
     const portalUrl = Deno.env.get("PORTAL_URL") || env["PORTAL_URL"];
     if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
-        const webbasePath = Deno.env.get("SITE_WEBBASE") || env["SITE_WEBBASE"] || "./public/.data/webapplication.wbdl";
+        const webbasePath = Deno.env.get("SITE_WEBBASE") || env["SITE_WEBBASE"] || "./public/.data/webbase.wbdl";
         console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
         const res = await fetch(portalUrl);
         if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
