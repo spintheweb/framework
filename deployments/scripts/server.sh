@@ -225,6 +225,45 @@ if ! command -v psql &> /dev/null; then
     systemctl start postgresql
 fi
 
+# Ensure PostgreSQL cluster is initialized & running (covers edge cases where packaging didn't run initdb)
+echo "Verifying PostgreSQL cluster..."
+if ! su - postgres -c "psql -Atqc 'SELECT 1;'" >/dev/null 2>&1; then
+    echo "PostgreSQL not responding to simple query; attempting cluster initialization..."
+    # Common RedHat/Fedora path if install left empty data dir
+    if [ -d /var/lib/pgsql ] && [ ! -d /var/lib/pgsql/data ]; then
+        echo "Initializing cluster in /var/lib/pgsql/data ..."
+        su - postgres -c "initdb -D /var/lib/pgsql/data" >/dev/null 2>&1 || true
+    fi
+    # Debian/Ubuntu normally auto-initialize; fallback if empty (rare minimal containers)
+    if [ -d /var/lib/postgresql ] && [ -z "$(find /var/lib/postgresql -maxdepth 2 -type d -name main 2>/dev/null)" ]; then
+        # Choose latest installed version directory if present
+        PG_VER_DIR=$(find /usr/lib/postgresql -maxdepth 1 -mindepth 1 -type d 2>/dev/null | sort -V | tail -1)
+        if [ -n "$PG_VER_DIR" ]; then
+            PG_VERSION=${PG_VER_DIR##*/}
+            TARGET_DIR="/var/lib/postgresql/$PG_VERSION/main"
+            if [ ! -d "$TARGET_DIR" ]; then
+                echo "Initializing Debian-style cluster at $TARGET_DIR ..."
+                install -d -o postgres -g postgres "$TARGET_DIR"
+                su - postgres -c "/usr/lib/postgresql/$PG_VERSION/bin/initdb -D '$TARGET_DIR'" >/dev/null 2>&1 || true
+            fi
+        fi
+    fi
+    # Generic helper if available
+    if command -v postgresql-setup &>/dev/null; then
+        echo "Running postgresql-setup --initdb (if not already initialized)..."
+        postgresql-setup --initdb >/dev/null 2>&1 || true
+    fi
+    # Retry start
+    systemctl start postgresql 2>/dev/null || systemctl restart postgresql 2>/dev/null || true
+fi
+
+# Final sanity check
+if su - postgres -c "psql -Atqc 'SELECT 1;'" >/dev/null 2>&1; then
+    echo "PostgreSQL cluster ready."
+else
+    echo "WARNING: PostgreSQL cluster initialization may have failed. Check service logs (journalctl -u postgresql)." >&2
+fi
+
 # Check if this is an upgrade
 UPGRADE_MODE=false
 if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then

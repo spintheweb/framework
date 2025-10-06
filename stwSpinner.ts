@@ -16,23 +16,25 @@ const env = await config({ path: envPath });
 
 // If a PORTAL_URL is provided (env or .env), fetch it and persist to SITE_WEBBASE path before the site loads.
 try {
-    const portalUrl = Deno.env.get("PORTAL_URL") || env["PORTAL_URL"];
-    if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
-        const webbasePath = Deno.env.get("SITE_WEBBASE") || env["SITE_WEBBASE"] || "./public/.data/webbase.wbdl";
-        console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
-        const res = await fetch(portalUrl);
-        if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
-        const json = await res.text(); // keep as text; it's stored and later parsed by STWSite
-    // Ensure folder exists
-    const dir = webbasePath.replace(/\\/g, "/").split("/").slice(0, -1).join("/") || ".";
-    await Deno.mkdir(dir, { recursive: true });
-        await Deno.writeTextFile(webbasePath, json);
-        console.log(`${new Date().toISOString()}: Portal webbase saved to ${webbasePath}.`);
-        // Ensure STWSite reads the same path
-        try { Deno.env.set("SITE_WEBBASE", webbasePath); } catch { /* readonly in some envs */ }
-    }
+	const portalUrl = Deno.env.get("PORTAL_URL") || env["PORTAL_URL"];
+	if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
+		const webbasePath = Deno.env.get("SITE_WEBBASE") || env["SITE_WEBBASE"] || "./public/.data/webbase.wbdl";
+		console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
+		const res = await fetch(portalUrl);
+		if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
+		const json = await res.text(); // keep as text; it's stored and later parsed by STWSite
+		// Ensure folder exists
+		const dir = webbasePath.replace(/\\/g, "/").split("/").slice(0, -1).join("/") || ".";
+		await Deno.mkdir(dir, { recursive: true });
+		await Deno.writeTextFile(webbasePath, json);
+		console.log(`${new Date().toISOString()}: Portal webbase saved to ${webbasePath}.`);
+		// Ensure STWSite reads the same path
+		try {
+			Deno.env.set("SITE_WEBBASE", webbasePath);
+		} catch { /* readonly in some envs */ }
+	}
 } catch (error) {
-    console.error(`PORTAL_URL setup error: ${(error as Error).message}`);
+	console.error(`PORTAL_URL setup error: ${(error as Error).message}`);
 }
 
 /**
@@ -41,35 +43,37 @@ try {
  * registerElement() side-effects. No dummy instantiation needed.
  */
 async function loadSTWModules(dir: string, priority: string[] = []) {
-    const files: string[] = [];
-    for (const entry of Deno.readDirSync(dir))
-        if (entry.isFile && entry.name.endsWith(".ts")) files.push(entry.name);
+	const files: string[] = [];
+	for (const entry of Deno.readDirSync(dir)) {
+		if (entry.isFile && entry.name.endsWith(".ts")) files.push(entry.name);
+	}
 
-    // Priority list first (if present), then the remaining alphabetically.
-    const ordered = [
-        ...priority.filter(p => files.includes(p)),
-        ...files.filter(f => !priority.includes(f)).sort()
-    ];
+	// Priority list first (if present), then the remaining alphabetically.
+	const ordered = [
+		...priority.filter((p) => files.includes(p)),
+		...files.filter((f) => !priority.includes(f)).sort(),
+	];
 
-    for (const f of ordered)
-        await import(`${dir}/${f}`);
+	for (const f of ordered) {
+		await import(`${dir}/${f}`);
+	}
 }
 
 // Load core element hierarchy in a safe order, then all contents.
 await loadSTWModules("./stwElements", [
-    "stwIndex.ts",     // shared registry map (no deps)
-    "stwElement.ts",   // base
-    "stwArea.ts",      // derives from STWElement
-    "stwSite.ts",      // depends on Area for webbaselets
-    "stwPage.ts",      // page-level element
-    "stwContent.ts"    // abstract content base
+	"stwIndex.ts", // shared registry map (no deps)
+	"stwElement.ts", // base
+	"stwArea.ts", // derives from STWElement
+	"stwSite.ts", // depends on Area for webbaselets
+	"stwPage.ts", // page-level element
+	"stwContent.ts", // abstract content base
 ]);
 await loadSTWModules("./stwContents");
 
 console.log(`${new Date().toISOString()}: Registered elements: ${Object.keys(STWFactory).length}`);
 
 /**
- * Contains presently active sessions {@linkcode STWSession} 
+ * Contains presently active sessions {@linkcode STWSession}
  */
 const stwSessions: Map<string, STWSession> = new Map();
 
@@ -84,47 +88,61 @@ let serverOptions: Deno.ServeOptions;
 const hostname: string = Deno.env.get("SPINNER_ENV") === "docker" ? "0.0.0.0" : (env["HOST"] || "127.0.0.1");
 
 if (env["CERTFILE"] && env["KEYFILE"]) {
-    serverOptions = {
-        hostname: hostname,
-        port: parseInt(env["PORT"] || "443"),
-        cert: await Deno.readTextFile(env["CERTFILE"]),
-        key: await Deno.readTextFile(env["KEYFILE"]),
-        onListen: () => {
-            console.log(`${new Date().toISOString()}: Spin the Web v${project.version} listening on https://${env["HOST"] || 'localhost'}:${env["PORT"] || '443'}`);
-        }
-    } as Deno.ServeOptions;
+	serverOptions = {
+		hostname: hostname,
+		port: parseInt(env["PORT"] || "443"),
+		cert: await Deno.readTextFile(env["CERTFILE"]),
+		key: await Deno.readTextFile(env["KEYFILE"]),
+		onListen: () => {
+			console.log(
+				`${new Date().toISOString()}: Spin the Web v${project.version} listening on https://${
+					env["HOST"] || "localhost"
+				}:${env["PORT"] || "443"}`,
+			);
+		},
+	} as Deno.ServeOptions;
 } else {
-    serverOptions = {
-        hostname: hostname,
-        port: parseInt(env["PORT"] || "8000"),
-        onListen: () => {
-            console.log(`${new Date().toISOString()}: Spin the Web v${project.version} listening on http://${env["HOST"] || 'localhost'}:${env["PORT"] || '8000'}`);
-        }
-    } as Deno.ServeOptions;
+	serverOptions = {
+		hostname: hostname,
+		port: parseInt(env["PORT"] || "8000"),
+		onListen: () => {
+			console.log(
+				`${new Date().toISOString()}: Spin the Web v${project.version} listening on http://${
+					env["HOST"] || "localhost"
+				}:${env["PORT"] || "8000"}`,
+			);
+		},
+	} as Deno.ServeOptions;
 }
 
 Deno.serve(serverOptions, async (request: Request, info: Deno.ServeHandlerInfo): Promise<Response> => {
-    let sessionId: string = getCookies(request.headers).sessionId;
-    if (!sessionId)
-        sessionId = crypto.randomUUID();
+	let sessionId: string = getCookies(request.headers).sessionId;
+	if (!sessionId) {
+		sessionId = crypto.randomUUID();
+	}
 
-    let session = stwSessions.get(sessionId);
+	let session = stwSessions.get(sessionId);
 
-    if (
-        !session ||
-        (session.remoteAddr as Deno.NetAddr).hostname !== (info.remoteAddr as Deno.NetAddr).hostname
-    ) {
-        if (session)
-            console.log(`${new Date().toISOString()}: IP address changed for session [${sessionId}]. A new session will be created.`);
-        session = new STWSession(sessionId, info.remoteAddr, STWSite.instance);
-        stwSessions.set(sessionId, session);
-    }
+	if (
+		!session ||
+		(session.remoteAddr as Deno.NetAddr).hostname !== (info.remoteAddr as Deno.NetAddr).hostname
+	) {
+		if (session) {
+			console.log(
+				`${
+					new Date().toISOString()
+				}: IP address changed for session [${sessionId}]. A new session will be created.`,
+			);
+		}
+		session = new STWSession(sessionId, info.remoteAddr, STWSite.instance);
+		stwSessions.set(sessionId, session);
+	}
 
-    session.setPlaceholders(request);
+	session.setPlaceholders(request);
 
-    if (request.headers.get("upgrade") === "websocket") {
-        return handleWebSocket(request, session, stwSessions);
-    } else {
-        return await handleHttp(request, session, sessionId);
-    }
+	if (request.headers.get("upgrade") === "websocket") {
+		return handleWebSocket(request, session, stwSessions);
+	} else {
+		return await handleHttp(request, session, sessionId);
+	}
 });

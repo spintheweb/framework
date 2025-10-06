@@ -26,7 +26,7 @@
 			"section": "stwShowModal",
 			"sequence": "",
 			"dsn": "json",
-			"query": "{\"email\":\"\"}",
+			"command": "{\"email\":\"\"}",
 			"params": "",
 			"layout": {
 				"en": "\\s('caption=\"Password Recovery\"')l('Email')e(';email')\\rb(';stw;pwdreset')t('Send Reset Link')"
@@ -49,7 +49,7 @@
 			"section": "main",
 			"sequence": "",
 			"dsn": "json",
-			"query": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
+			"command": "{\"usr\":\"john\",\"pwd\":\"smith\"}",
 			"params": "",
 			"layout": {
 				"en": "\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;reset')t('Reset')\\rt('Forgot password? ')a('/stwc/forgotpassword')t('click here')"
