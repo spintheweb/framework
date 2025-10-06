@@ -14,7 +14,6 @@ const queryCache = new Map<string, { data: ISTWRecords; timestamp: number }>();
 
 interface ISTWDatasource {
 	type: "stw" | "json" | "api" | "mysql" | "postgres" | "mongodb" | "shell"; // Datasource type
-	// The following properties are optional depending on datasource type
 	host?: string; // Server hostname (api, db)
 	port?: number; // Server port (db)
 	user?: string; // Username (db)
@@ -42,7 +41,6 @@ export class STWDatasources {
 								this.datasources.set(settings.name, settings);
 								break;
 							case "shell":
-								// Store shell datasource settings (name is the executable, e.g. bash, powershell)
 								this.datasources.set(settings.name, { ...settings, name: settings.name });
 								break;
 							case "mysql": {
@@ -138,35 +136,18 @@ export class STWDatasources {
 			} else if ("type" in datasource && (datasource as ISTWDatasource).type === "api") {
 				records = await fetchAPIData(session, content, datasource);
 			} else if ("type" in datasource && (datasource as ISTWDatasource).type === "shell") {
-				// Execute shell command: the datasource name is the executable (e.g., bash, powershell)
-				// content.command holds the actual script/command string. If params provided, split by whitespace for args.
-				// We use wbpl substitution on both command and params.
-				const shellName = (datasource as ISTWDatasource).name || content.dsn; // executable
-				let cmdString = wbpl(content.command, session.placeholders).trim();
-				const paramsString = wbpl(content.params || "", session.placeholders).trim();
-				let args: string[] = [];
-				if (paramsString) {
-					// naive split respecting quoted strings
-					args = paramsString.match(/(?:"[^"]*"|'[^']*'|[^\s"']+)/g)?.map((a) =>
-						a.replace(/^['"]|['"]$/g, "")
-					) || [];
-				}
+				const dsShell = datasource as ISTWDatasource;
 
-				// For shells like bash/powershell we usually pass -c <script>
-				if (["bash", "sh", "zsh"].includes(shellName)) {
-					args = ["-c", cmdString, ...args];
+				const shellName = dsShell.host || dsShell.name || content.dsn; // executable or path
+				const cmdString = wbpl(content.command, session.placeholders).trim();
+				let args: string[] = [];
+
+				if (/(bash|sh|zsh)/i.test(shellName)) {
+					args = ["-c", cmdString];
 				} else if (/powershell/i.test(shellName)) {
-					args = ["-NoProfile", "-Command", cmdString, ...args];
+					args = ["-NoProfile", "-Command", cmdString];
 				} else {
-					// Treat shellName as the actual executable and first token of cmdString as script if space separated
-					const parts = cmdString.split(/\s+/);
-					if (parts.length > 1) {
-						args = [...parts.slice(1), ...args];
-						cmdString = parts[0];
-					} else {
-						// Use command as-is without wrapper flags
-						args = [...args];
-					}
+					throw new Error(`Unsupported shell: ${shellName}`);
 				}
 
 				try {
@@ -174,6 +155,7 @@ export class STWDatasources {
 					const output = await command.output();
 					const stdout = new TextDecoder().decode(output.stdout).trim();
 					const stderr = new TextDecoder().decode(output.stderr).trim();
+
 					// Attempt to parse stdout as JSON for structured rows; fallback to plain text
 					let rows: Record<string, any>[] = [];
 					let fields: { name: string; type?: string }[] = [];

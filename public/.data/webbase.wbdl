@@ -309,14 +309,12 @@
 						"en": "products"
 					},
 					"visibility": {},
-					"subtype": "Table",
-					"cssClass": "stwTable",
+					"subtype": "Text",
 					"sequence": "1",
-					"dsn": "mysqlsample",
-					"command": "select * from products limit 3",
-					"layout": {
-						"en": "\\s('rows=\"10\" ')"
-					}
+					"dsn": "bash",
+					"command": "pwd",
+					"contentType": "application/json",
+					"layout": {}
 				},
 				{
 					"_id": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371",

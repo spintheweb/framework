@@ -47,6 +47,17 @@ export class STWText extends STWContent {
 	public override async render(_req: Request, session: STWSession, records: ISTWRecords): Promise<string> {
 		const layoutValue = this.layout?.get(session.lang);
 		const layoutText = typeof layoutValue === "string" ? layoutValue : (layoutValue?.toString?.() ?? "");
+
+		if (!layoutText) {
+			if (this.contentType === "application/json") {
+				return JSON.stringify(records ?? { rows: [] });
+			} else if (this.contentType.startsWith("text/")) {
+				return records?.rows?.map((row) => row.value).join("\n") ?? "";
+			} else {
+				return "";
+			}
+		}
+
 		if (records?.rows?.length) {
 			return records.rows.map((row) => {
 				const mergedObj = { ...Object.fromEntries(session.placeholders), ...row };

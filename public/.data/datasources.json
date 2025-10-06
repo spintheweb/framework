@@ -16,6 +16,7 @@
 	},
 	{
 		"name": "bash",
-		"type": "shell"
+		"type": "shell",
+		"host": "C:/Program Files/Git/bin/bash.exe"
 	}
 ]
