@@ -142,6 +142,16 @@ export class STWDatasources {
 				const cmdString = wbpl(content.command, session.placeholders).trim();
 				let args: string[] = [];
 
+				// Security: disallow sudo usage explicitly
+				if (/\bsudo\b/i.test(cmdString)) {
+					records = {
+						affectedRows: 1,
+						fields: [{ name: "error" }],
+						rows: [{ error: "Forbidden token 'sudo' in shell command" }],
+					};
+					return records;
+				}
+
 				if (/(bash|sh|zsh)/i.test(shellName)) {
 					args = ["-c", cmdString];
 				} else if (/powershell/i.test(shellName)) {

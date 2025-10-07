@@ -214,7 +214,7 @@
 					"options": [
 						{
 							"name": {
-								"en": "Products"
+								"en": "./public"
 							},
 							"ref": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
 						},
@@ -303,16 +303,16 @@
 					"_id": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371",
 					"type": "Content",
 					"name": {
-						"en": "Products"
+						"en": "Files"
 					},
 					"slug": {
-						"en": "products"
+						"en": "files"
 					},
 					"visibility": {},
-					"subtype": "Text",
+					"subtype": "Table",
 					"sequence": "1",
 					"dsn": "bash",
-					"command": "pwd",
+					"command": "ls -l ./public",
 					"contentType": "application/json",
 					"layout": {}
 				},
