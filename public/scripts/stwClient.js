@@ -212,6 +212,54 @@ window.addEventListener("popstate", function () {
 	stwWS.send(JSON.stringify({ method: "PATCH", resource: location.pathname, options: {} }));
 });
 
+// --- Lazy editor loader utilities ---
+const _stwLoaded = { jquery: false, summernote: false, ace: false };
+const _stwLoading = {};
+
+function stwLoadScript(src) {
+	if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+	if (_stwLoading[src]) return _stwLoading[src];
+	_stwLoading[src] = new Promise((resolve, reject) => {
+		const s = document.createElement("script");
+		s.src = src;
+		s.async = true;
+		s.onload = () => resolve();
+		s.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+		document.head.appendChild(s);
+	});
+	return _stwLoading[src];
+}
+
+function stwLoadStyle(href) {
+	if (document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) return Promise.resolve();
+	if (_stwLoading[href]) return _stwLoading[href];
+	_stwLoading[href] = new Promise((resolve) => {
+		const l = document.createElement("link");
+		l.rel = "stylesheet";
+		l.href = href;
+		l.onload = () => resolve();
+		// stylesheets may not reliably fire onload; resolve after a microtask as a best-effort
+		setTimeout(() => resolve(), 50);
+		document.head.appendChild(l);
+	});
+	return _stwLoading[href];
+}
+
+window.stwLoadSummernote = function stwLoadSummernote() {
+	if (_stwLoaded.summernote) return Promise.resolve();
+	const jqueryCdn = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
+	const snCss = "https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css";
+	const snJs = "https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js";
+	const ensureJq = window.jQuery ? Promise.resolve() : stwLoadScript(jqueryCdn).then(() => { _stwLoaded.jquery = true; });
+	return Promise.all([ensureJq, stwLoadStyle(snCss)]).then(() => stwLoadScript(snJs)).then(() => { _stwLoaded.summernote = true; });
+}
+
+window.stwLoadAce = function stwLoadAce() {
+	if (_stwLoaded.ace) return Promise.resolve();
+	const aceJs = "https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.min.js";
+	return stwLoadScript(aceJs).then(() => { _stwLoaded.ace = true; });
+}
+
 /*
 let isDragging = false;
 let offsetX, offsetY;

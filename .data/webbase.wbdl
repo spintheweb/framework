@@ -224,6 +224,25 @@
 					]
 				},
 				{
+					"_id": "92a2ced0-be64-11ee-90a9-c195db5cfc71",
+					"type": "Content",
+					"name": {
+						"en": "WYSIWYG"
+					},
+					"slug": {
+						"en": "wysiwyg"
+					},
+					"visibility": {
+						"guests": true
+					},
+					"subtype": "Form",
+					"section": "main",
+					"sequence": "11",
+					"layout": {
+						"en": "\\s('caption=\"WYSIWYG\"')m('javascript;note;Hello World!')\\rb(';stw;submit')t('Submit')"
+					}
+				},
+				{
 					"_id": "92a2ced0-be74-11ee-90a9-c195cb5cfc71",
 					"type": "Content",
 					"name": {
