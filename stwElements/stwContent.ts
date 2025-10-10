@@ -5,8 +5,8 @@ import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 import { STWDatasources } from "../stwComponents/stwDatasources.ts";
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { ISTWElement, STWElement, STWLocalized } from "./stwElement.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { STWLayout } from "../stwComponents/stwWBLL.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 /**

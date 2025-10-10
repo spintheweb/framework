@@ -4,7 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
+import { STWLayout } from "../stwComponents/stwWBLL.ts";
 import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWCalendar extends STWContent {

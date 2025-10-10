@@ -4,9 +4,9 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
+import { STWLayout } from "../stwComponents/stwWBLL.ts";
 import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 
 export class STWList extends STWContent {
 	public constructor(content: ISTWContent) {

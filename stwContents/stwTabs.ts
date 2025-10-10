@@ -5,7 +5,7 @@ import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 import { STWIndex } from "../stwElements/stwIndex.ts";
-import { STWLayout } from "./wbll.ts";
+import { STWLayout } from "../stwComponents/stwWBLL.ts";
 
 export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];

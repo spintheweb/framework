@@ -6,7 +6,7 @@ import { registerElement } from "../stwComponents/stwFactory.ts";
 import { ISTWContent, STWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 import { STWDatasources } from "../stwComponents/stwDatasources.ts";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
 
 export class STWText extends STWContent {

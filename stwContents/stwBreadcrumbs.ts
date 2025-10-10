@@ -4,7 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { ACTIONS, isTruthy } from "../stwContents/wbll.ts";
+import { ACTIONS, isTruthy } from "../stwComponents/stwWBLL.ts";
 import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
 
 export class STWBreadcrumbs extends STWContent {

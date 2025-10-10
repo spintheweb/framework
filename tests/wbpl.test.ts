@@ -2,7 +2,7 @@
 // Test suite: wbpl.test
 
 import { assertEquals } from "@std/assert";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 
 const placeholders: Map<string, string> = new Map([
 	["@user", "alice"],

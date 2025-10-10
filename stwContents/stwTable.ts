@@ -4,10 +4,9 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContent } from "../stwElements/stwContent.ts";
-import { STWLayout } from "../stwContents/wbll.ts";
+import { STWLayout, ACTIONS, isTruthy } from "../stwComponents/stwWBLL.ts";
 import { ISTWRecords } from "../stwComponents/stwDBAdapters/adapter.ts";
-import { ACTIONS, isTruthy } from "./wbll.ts";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 
 export class STWTable extends STWContent {
 	public constructor(content: ISTWContent) {

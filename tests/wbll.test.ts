@@ -2,7 +2,7 @@
 // Test suite: wbll.test
 
 import { assertEquals } from "@std/assert";
-import { STWLayout } from "../stwContents/wbll.ts";
+import { STWLayout } from "../stwComponents/stwWBLL.ts";
 
 const Placeholders = new Map<string, string>([
 	["@session", "123"],

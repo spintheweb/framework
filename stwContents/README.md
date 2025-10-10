@@ -115,9 +115,3 @@ Implements the `STWTabs` content type. Organizes content into tabbed interfaces 
 ## stwText.ts
 
 Implements the `STWText` content type. Renders plain or formatted text, supporting localization and dynamic placeholders.
-
----
-
-## wbll.ts
-
-Implements the Webbase Layout Language (WBLL). Defines and parses layout templates, supporting dynamic rendering and localization.

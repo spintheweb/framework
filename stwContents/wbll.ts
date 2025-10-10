@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-// Spin the Web module: stwContents/wbll.ts
+// Spin the Web module: stwWBLL.ts
 
 import { STWSession } from "../stwComponents/stwSession.ts";
-import { wbpl } from "../stwComponents/wbpl.ts";
+import { wbpl } from "../stwComponents/stwWBPL.ts";
 
 const SYNTAX: RegExp = new RegExp(
 	[
