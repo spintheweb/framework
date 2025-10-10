@@ -9,6 +9,7 @@ import { STWSession } from "./stwSession.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
 import { ISTWRecords } from "./stwDBAdapters/adapter.ts";
 import { secureResponse } from "./stwResponse.ts";
+import { envGet } from "./stwConfig.ts";
 
 export async function handleHttp(request: Request, session: STWSession, sessionId: string): Promise<Response> {
 	const pathname = new URL(request.url).pathname;
@@ -43,7 +44,7 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 
 	} else if (request.method === "POST") {
 		try {
-			const maxupload = parseInt(Deno.env.get("MAX_UPLOADSIZE") || "200") * 1024;
+			const maxupload = parseInt(envGet("MAX_UPLOADSIZE") || "200") * 1024;
 			const formData = await request.formData();
 
 			// Collect all values for each key

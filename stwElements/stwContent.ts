@@ -21,11 +21,11 @@ export interface ISTWOption {
 	ref?: string;
 	options?: ISTWOption[];
 }
-export interface ISTWContentWithOptions extends ISTWContent {
+export interface ISTWContentWithOptions extends ISTWContent<any, any, any> {
 	options: ISTWOption[];
 }
 
-export interface ISTWContent extends ISTWElement {
+export interface ISTWContent<TRow = Record<string, unknown>, TState = unknown, TRecords extends ISTWRecords = ISTWRecords> extends ISTWElement<any> { // extra handled by base element
 	subtype: string;
 	cssClass: string;
 	section: string;
@@ -38,7 +38,11 @@ export interface ISTWContent extends ISTWElement {
 	cache?: number; // Cache duration in seconds. -1 for forever, 0 or undefined for no cache.
 	contentType?: string; // Optional MIME type override (default text/html)
 }
-export abstract class STWContent extends STWElement {
+export abstract class STWContent<
+	TRow = Record<string, unknown>,
+	TState = unknown,
+	TRecords extends ISTWRecords = ISTWRecords
+> extends STWElement<any> {
 	override readonly type: string;
 	cssClass: string;
 	section: string;
@@ -51,7 +55,7 @@ export abstract class STWContent extends STWElement {
 	readonly cache: number;
 	contentType: string;
 
-	public constructor(content: ISTWContent, _settings?: { [key: string]: string }) {
+	public constructor(content: ISTWContent<TRow, TState, TRecords>, _settings?: { [key: string]: string }) {
 		super(content);
 
 		this.type = content.subtype;
@@ -121,8 +125,8 @@ export abstract class STWContent extends STWElement {
 	 * @param session The current user session.
 	 * @returns The state object, or undefined if not stateful or no state is set.
 	 */
-	public getState(session: STWSession): any {
-		return this.stateful ? session.states?.get(this._id) : undefined;
+	public getState(session: STWSession): TState | undefined {
+		return this.stateful ? session.states?.get(this._id) as TState : undefined;
 	}
 
 	/**
@@ -131,7 +135,7 @@ export abstract class STWContent extends STWElement {
 	 * @param session The current user session.
 	 * @param state The state object to save.
 	 */
-	public setState(session: STWSession, state: any): void {
+	public setState(session: STWSession, state: TState): void {
 		if (this.stateful) {
 			if (!session.states) session.states = new Map<string, any>();
 			session.states.set(this._id, state);
@@ -159,9 +163,9 @@ export abstract class STWContent extends STWElement {
 
 		const layout = this.layout?.get(session.lang);
 
-		let bodyHtml = "", records;
+		let bodyHtml = "", records: TRecords;
 		try {
-			records = await STWDatasources.command(session, this);
+			records = await STWDatasources.command(session, this) as TRecords;
 
 			const placeholders = new Map(session.placeholders);
 			if (records.rows?.length) {
@@ -246,7 +250,7 @@ export abstract class STWContent extends STWElement {
 		}
 	}
 
-	public async render(_req: Request, _session: STWSession, _record: ISTWRecords): Promise<string> {
+	public async render(_req: Request, _session: STWSession, _record: TRecords): Promise<string> {
 		return await Promise.resolve(`Render ${this.constructor.name}`);
 	}
 

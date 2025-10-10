@@ -3,6 +3,7 @@
 
 import { getCookies } from "@std/http/cookie";
 import { STWSite } from "../stwElements/stwSite.ts";
+import { envGet } from "./stwConfig.ts";
 
 export class STWSession {
 	sessionId: string;
@@ -76,7 +77,7 @@ export class STWSession {
 		clearTimeout(timer);
 		console.log(`${new Date().toISOString()}: Want to keep the session [${this.sessionId}] alive?`);
 
-		this.timer = setTimeout(() => this.timeout(this.timer), parseInt(Deno.env.get("TIMEOUT") || "15") * 60000); // Session timeout
+		this.timer = setTimeout(() => this.timeout(this.timer), parseInt(envGet("TIMEOUT") || "15") * 60000); // Session timeout
 	}
 }
 // STWFactory has been moved to stwFactory.ts; import from there where needed.

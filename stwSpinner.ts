@@ -2,39 +2,33 @@
 // Spin the Web module: stwSpinner.ts
 
 import { getCookies } from "@std/http/cookie";
-import { config } from "https://deno.land/x/dotenv@v3.2.2/mod.ts";
 import { STWSession } from "./stwComponents/stwSession.ts";
 import { STWSite } from "./stwElements/stwSite.ts";
 import { handleHttp } from "./stwComponents/stwHttpHandler.ts";
 import { handleWebSocket } from "./stwComponents/stwWebSocket.ts";
 import project from "./deno.json" with { type: "json" };
 import { STWFactory } from "./stwComponents/stwFactory.ts";
-
-// Load environment variables based on context
-const envPath = Deno.env.get("SPINNER_ENV") === "docker" ? ".env.docker" : ".env";
-const env = await config({ path: envPath });
+import { envGet, envSet, isDocker } from "./stwComponents/stwConfig.ts";
 
 // If a PORTAL_URL is provided (env or .env), fetch it and persist to SITE_WEBBASE path before the site loads.
 try {
-	const portalUrl = Deno.env.get("PORTAL_URL") || env["PORTAL_URL"];
-	if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
-		const webbasePath = Deno.env.get("SITE_WEBBASE") || env["SITE_WEBBASE"] || "./public/.data/webbase.wbdl";
-		console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
-		const res = await fetch(portalUrl);
-		if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
-		const json = await res.text(); // keep as text; it's stored and later parsed by STWSite
-		// Ensure folder exists
-		const dir = webbasePath.replace(/\\/g, "/").split("/").slice(0, -1).join("/") || ".";
-		await Deno.mkdir(dir, { recursive: true });
-		await Deno.writeTextFile(webbasePath, json);
-		console.log(`${new Date().toISOString()}: Portal webbase saved to ${webbasePath}.`);
-		// Ensure STWSite reads the same path
-		try {
-			Deno.env.set("SITE_WEBBASE", webbasePath);
-		} catch { /* readonly in some envs */ }
-	}
+    const portalUrl = envGet("PORTAL_URL");
+    if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
+        const webbasePath = envGet("SITE_WEBBASE") || "./.data/webbase.wbdl";
+        console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
+        const res = await fetch(portalUrl);
+        if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
+        const json = await res.text(); // keep as text; it's stored and later parsed by STWSite
+        // Ensure folder exists
+        const dir = webbasePath.replace(/\\/g, "/").split("/").slice(0, -1).join("/") || ".";
+        await Deno.mkdir(dir, { recursive: true });
+        await Deno.writeTextFile(webbasePath, json);
+        console.log(`${new Date().toISOString()}: Portal webbase saved to ${webbasePath}.`);
+        // Ensure STWSite reads the same path
+        envSet("SITE_WEBBASE", webbasePath);
+    }
 } catch (error) {
-	console.error(`PORTAL_URL setup error: ${(error as Error).message}`);
+    console.error(`PORTAL_URL setup error: ${(error as Error).message}`);
 }
 
 /**
@@ -85,34 +79,30 @@ let serverOptions: Deno.ServeOptions;
 
 // Determine the correct hostname based on the environment.
 // In Docker, always listen on 0.0.0.0. Locally, use the .env setting.
-const hostname: string = Deno.env.get("SPINNER_ENV") === "docker" ? "0.0.0.0" : (env["HOST"] || "127.0.0.1");
+const hostname: string = isDocker ? "0.0.0.0" : (envGet("HOST") || "127.0.0.1");
 
-if (env["CERTFILE"] && env["KEYFILE"]) {
-	serverOptions = {
-		hostname: hostname,
-		port: parseInt(env["PORT"] || "443"),
-		cert: await Deno.readTextFile(env["CERTFILE"]),
-		key: await Deno.readTextFile(env["KEYFILE"]),
-		onListen: () => {
-			console.log(
-				`${new Date().toISOString()}: Spin the Web v${project.version} listening on https://${
-					env["HOST"] || "localhost"
-				}:${env["PORT"] || "443"}`,
-			);
-		},
-	} as Deno.ServeOptions;
+if (envGet("CERTFILE") && envGet("KEYFILE")) {
+    serverOptions = {
+        hostname: hostname,
+        port: parseInt(envGet("PORT") || "443"),
+        cert: await Deno.readTextFile(envGet("CERTFILE")!),
+        key: await Deno.readTextFile(envGet("KEYFILE")!),
+        onListen: () => {
+            console.log(
+                `${new Date().toISOString()}: Spin the Web v${project.version} listening on https://${envGet("HOST") || "localhost"}:${envGet("PORT") || "443"}`,
+            );
+        },
+    } as Deno.ServeOptions;
 } else {
-	serverOptions = {
-		hostname: hostname,
-		port: parseInt(env["PORT"] || "8000"),
-		onListen: () => {
-			console.log(
-				`${new Date().toISOString()}: Spin the Web v${project.version} listening on http://${
-					env["HOST"] || "localhost"
-				}:${env["PORT"] || "8000"}`,
-			);
-		},
-	} as Deno.ServeOptions;
+    serverOptions = {
+        hostname: hostname,
+        port: parseInt(envGet("PORT") || "8000"),
+        onListen: () => {
+            console.log(
+                `${new Date().toISOString()}: Spin the Web v${project.version} listening on http://${envGet("HOST") || "localhost"}:${envGet("PORT") || "8000"}`,
+            );
+        },
+    } as Deno.ServeOptions;
 }
 
 Deno.serve(serverOptions, async (request: Request, info: Deno.ServeHandlerInfo): Promise<Response> => {

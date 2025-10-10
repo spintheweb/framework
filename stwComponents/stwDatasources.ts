@@ -34,7 +34,7 @@ export class STWDatasources {
 				this.datasources.set("stw", session.site); // Webbase
 
 				// TODO: Connection pools
-				for (const settings of JSON.parse(Deno.readTextFileSync("./public/.data/datasources.json"))) {
+				for (const settings of JSON.parse(Deno.readTextFileSync("./.data/datasources.json"))) {
 					try {
 						switch (settings.type) {
 							case "api":

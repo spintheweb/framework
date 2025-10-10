@@ -73,7 +73,7 @@ cp .env.example "$PAYLOAD_DIR/.env"
 
 # Remove sensitive/unnecessary files from payload
 find "$PAYLOAD_DIR" -type f \( -name "*.pem" -o -name "*.key" -o -name ".DS_Store" -o -name "Thumbs.db" \) -delete
-# Preserve all public/.data seed files for fresh install; upgrade path excludes overwriting via rsync --exclude='.data'
+# Preserve all .data seed files for fresh install; upgrade path excludes overwriting via rsync --exclude='.data'
 
 echo -e "${GREEN}Payload directory prepared${NC}"
 
@@ -283,7 +283,7 @@ if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/stwSpinner.ts" ]; then
     
     # Backup critical user data
     [ -f "$INSTALL_DIR/.env" ] && cp "$INSTALL_DIR/.env" "$BACKUP_DIR/"
-    [ -d "$INSTALL_DIR/public/.data" ] && cp -r "$INSTALL_DIR/public/.data" "$BACKUP_DIR/"
+    [ -d "$INSTALL_DIR/.data" ] && cp -r "$INSTALL_DIR/.data" "$BACKUP_DIR/"
     [ -d "$INSTALL_DIR/.cert" ] && cp -r "$INSTALL_DIR/.cert" "$BACKUP_DIR/"
     
     # Stop service if running
@@ -459,12 +459,12 @@ KEYFILE=$KEYFILE
 SESSION_TIMEOUT=$SESSION_TIMEOUT
 MAX_USERS=$MAX_USERS
 SITE_ROOT="./public"
-SITE_WEBBASE="./public/.data/webbase.wbdl"
+SITE_WEBBASE="./.data/webbase.wbdl"
 COMMON_WEBBASE="./webbaselets/stwCommon.wbdl"
 STUDIO_WEBBASE="./webbaselets/stwStudio.wbdl"
 MAX_UPLOADSIZE=$MAX_UPLOADSIZE
-DATASOURCES="./public/.data/datasources.json"
-USERS="./public/.data/users.json"
+DATASOURCES="./.data/datasources.json"
+USERS="./.data/users.json"
 ALLOW_DEV=$ALLOW_DEV
 EOF
 
@@ -542,18 +542,18 @@ if [ "$UPGRADE_MODE" = true ] && [ -f "/etc/nginx/sites-available/webspinner" ];
 fi
 
 # Create default data files if they don't exist
-mkdir -p "$INSTALL_DIR/public/.data"
+mkdir -p "$INSTALL_DIR/.data"
 
-if [ ! -f "$INSTALL_DIR/public/.data/users.json" ]; then
-    cat > "$INSTALL_DIR/public/.data/users.json" << 'EOF'
+if [ ! -f "$INSTALL_DIR/.data/users.json" ]; then
+    cat > "$INSTALL_DIR/.data/users.json" << 'EOF'
 {
   "users": []
 }
 EOF
 fi
 
-if [ ! -f "$INSTALL_DIR/public/.data/datasources.json" ]; then
-    cat > "$INSTALL_DIR/public/.data/datasources.json" << 'EOF'
+if [ ! -f "$INSTALL_DIR/.data/datasources.json" ]; then
+    cat > "$INSTALL_DIR/.data/datasources.json" << 'EOF'
 {
   "datasources": []
 }
@@ -571,7 +571,7 @@ After=network.target
 Type=simple
 User=$SUDO_USER
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/local/bin/deno run --allow-net --allow-read --allow-write --allow-env stwSpinner.ts
+ExecStart=/usr/local/bin/deno run --allow-net --allow-read --allow-write --allow-env --allow-run stwSpinner.ts
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -591,7 +591,7 @@ if [ "$SERVICE_INSTALL" = false ]; then
     cat > "$INSTALL_DIR/start.sh" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
-deno run --allow-net --allow-read --allow-write --allow-env stwSpinner.ts
+deno run --allow-net --allow-read --allow-write --allow-env --allow-run stwSpinner.ts
 EOF
     chmod +x "$INSTALL_DIR/start.sh"
 fi

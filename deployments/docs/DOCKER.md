@@ -2,11 +2,15 @@
 
 ## Overview
 
-Docker releases provide containerized Webspinner deployments with all dependencies included. This is the recommended method for cloud deployments, Kubernetes, and environments that support containers.
+Docker releases provide containerized Webspinner deployments with all dependencies included. This is the recommended
+method for cloud deployments, Kubernetes, and environments that support containers.
 
-All Docker images include the system webbaselets (`stwStudio.wbdl` and `stwCommon.wbdl`) which are centrally managed by the project. Custom webbaselets should be stored in `public/.data/` and mounted as volumes for persistence across container updates.
+All Docker images include the system webbaselets (`stwStudio.wbdl` and `stwCommon.wbdl`) which are centrally managed by
+the project. Custom webbaselets should be stored in `public/.data/` and mounted as volumes for persistence across
+container updates.
 
-**CDN Alternative:** Since system webbaselets are centrally managed, they could be served from a CDN (e.g., `https://cdn.spintheweb.org/webbaselets/`) allowing all portals to load the latest versions without container rebuilds.
+**CDN Alternative:** Since system webbaselets are centrally managed, they could be served from a CDN (e.g.,
+`https://cdn.spintheweb.org/webbaselets/`) allowing all portals to load the latest versions without container rebuilds.
 
 ## Quick Start
 
@@ -51,6 +55,7 @@ Run the Docker release script:
 ```
 
 The script will:
+
 1. Prompt for version (e.g., `v1.0.0`)
 2. Build Docker image with multiple tags
 3. Test the container
@@ -61,6 +66,7 @@ The script will:
 ### Output
 
 The script generates:
+
 - **Docker images**: `spintheweb/webspinner:1.0.0`, `:v1.0.0`, `:latest`
 - **Offline archive**: `deployments/release/webspinner-docker-v1.0.0.tar.gz`
 - **Checksum**: `webspinner-docker-v1.0.0.tar.gz.sha256`
@@ -101,20 +107,20 @@ docker run -d \
 
 ### Available Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `HOST` | `0.0.0.0` | Server hostname |
-| `PORT` | `8080` | Server port |
-| `CERTFILE` | `` | TLS certificate path |
-| `KEYFILE` | `` | TLS key path |
-| `SESSION_TIMEOUT` | `24` | Session timeout (hours) |
-| `MAX_USERS` | `0` | Max users (0=unlimited) |
-| `MAX_UPLOADSIZE` | `200` | Max upload size (MB) |
-| `ALLOW_DEV` | `false` | Enable dev/studio mode |
-| `SITE_ROOT` | `./public` | Public files directory |
-| `SITE_WEBBASE` | `./public/.data/webbase.wbdl` | Main webbase file |
-| `DATASOURCES` | `./public/.data/datasources.json` | Datasources file |
-| `USERS` | `./public/.data/users.json` | Users file |
+| Variable          | Default                    | Description             |
+| ----------------- | -------------------------- | ----------------------- |
+| `HOST`            | `0.0.0.0`                  | Server hostname         |
+| `PORT`            | `8080`                     | Server port             |
+| `CERTFILE`        | ``                         | TLS certificate path    |
+| `KEYFILE`         | ``                         | TLS key path            |
+| `SESSION_TIMEOUT` | `24`                       | Session timeout (hours) |
+| `MAX_USERS`       | `0`                        | Max users (0=unlimited) |
+| `MAX_UPLOADSIZE`  | `200`                      | Max upload size (MB)    |
+| `ALLOW_DEV`       | `false`                    | Enable dev/studio mode  |
+| `SITE_ROOT`       | `./public`                 | Public files directory  |
+| `SITE_WEBBASE`    | `./.data/webbase.wbdl`     | Main webbase file       |
+| `DATASOURCES`     | `./.data/datasources.json` | Datasources file        |
+| `USERS`           | `./.data/users.json`       | Users file              |
 
 ### Volume Mounts
 
@@ -122,14 +128,14 @@ Persist data by mounting volumes:
 
 ```yaml
 volumes:
-  # Persist application data
-  - webspinner-data:/app/public/.data
-  
-  # Custom certificates
-  - ./certs:/app/.cert:ro
-  
-  # Custom webbaselets
-  - ./custom:/app/webbaselets/custom:ro
+    # Persist application data
+    - webspinner-data:/app/public/.data
+
+    # Custom certificates
+    - ./certs:/app/.cert:ro
+
+    # Custom webbaselets
+    - ./custom:/app/webbaselets/custom:ro
 ```
 
 ## Deployment Scenarios
@@ -149,47 +155,47 @@ docker run -d \
 
 ```yaml
 services:
-  webspinner:
-    image: spintheweb/webspinner:latest
-    environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-    depends_on:
-      - mysql
-  
-  mysql:
-    image: mysql:8.0
-    environment:
-      - MYSQL_DATABASE=webspinner
-      - MYSQL_USER=webspinner
-      - MYSQL_PASSWORD=secret
-    volumes:
-      - mysql-data:/var/lib/mysql
+    webspinner:
+        image: spintheweb/webspinner:latest
+        environment:
+            - DB_HOST=mysql
+            - DB_PORT=3306
+        depends_on:
+            - mysql
+
+    mysql:
+        image: mysql:8.0
+        environment:
+            - MYSQL_DATABASE=webspinner
+            - MYSQL_USER=webspinner
+            - MYSQL_PASSWORD=secret
+        volumes:
+            - mysql-data:/var/lib/mysql
 ```
 
 ### 3. Behind Reverse Proxy (Nginx)
 
 ```yaml
 services:
-  webspinner:
-    image: spintheweb/webspinner:latest
-    expose:
-      - "8080"
-    networks:
-      - internal
-  
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certs:/etc/nginx/certs:ro
-    depends_on:
-      - webspinner
-    networks:
-      - internal
+    webspinner:
+        image: spintheweb/webspinner:latest
+        expose:
+            - "8080"
+        networks:
+            - internal
+
+    nginx:
+        image: nginx:alpine
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./certs:/etc/nginx/certs:ro
+        depends_on:
+            - webspinner
+        networks:
+            - internal
 ```
 
 ### 4. Kubernetes Deployment
@@ -198,41 +204,41 @@ services:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webspinner
+    name: webspinner
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: webspinner
-  template:
-    metadata:
-      labels:
-        app: webspinner
-    spec:
-      containers:
-      - name: webspinner
-        image: spintheweb/webspinner:1.0.0
-        ports:
-        - containerPort: 8080
-        env:
-        - name: HOST
-          value: "0.0.0.0"
-        - name: PORT
-          value: "8080"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        volumeMounts:
-        - name: data
-          mountPath: /app/public/.data
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: webspinner-pvc
+    replicas: 3
+    selector:
+        matchLabels:
+            app: webspinner
+    template:
+        metadata:
+            labels:
+                app: webspinner
+        spec:
+            containers:
+                - name: webspinner
+                  image: spintheweb/webspinner:1.0.0
+                  ports:
+                      - containerPort: 8080
+                  env:
+                      - name: HOST
+                        value: "0.0.0.0"
+                      - name: PORT
+                        value: "8080"
+                  resources:
+                      requests:
+                          memory: "256Mi"
+                          cpu: "250m"
+                      limits:
+                          memory: "512Mi"
+                          cpu: "500m"
+                  volumeMounts:
+                      - name: data
+                        mountPath: /app/public/.data
+            volumes:
+                - name: data
+                  persistentVolumeClaim:
+                      claimName: webspinner-pvc
 ```
 
 ## Cloud Deployment
@@ -306,27 +312,27 @@ docker run -d -p 8080:8080 spintheweb/webspinner:1.0.0
 3. **Read-only root filesystem**
    ```yaml
    security_opt:
-     - no-new-privileges:true
+       - no-new-privileges:true
    read_only: true
    tmpfs:
-     - /tmp
+       - /tmp
    ```
 
 4. **Resource limits**
    ```yaml
    deploy:
-     resources:
-       limits:
-         cpus: '0.5'
-         memory: 512M
+       resources:
+           limits:
+               cpus: "0.5"
+               memory: 512M
    ```
 
 5. **Secrets management**
    ```yaml
    secrets:
-     - db_password
+       - db_password
    environment:
-     - DB_PASSWORD_FILE=/run/secrets/db_password
+       - DB_PASSWORD_FILE=/run/secrets/db_password
    ```
 
 ### Scanning Images
