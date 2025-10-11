@@ -32,6 +32,7 @@ const Examples = [
 	{ wbll: `lelele`, html: `<label>nome</label><input name="nome" value="Mario Rossi"><label>altezza</label><input name="altezza" value="1.78"><label>dataDiNascita</label><input name="dataDiNascita" value="1985-04-12">`, isForm: true },
 	{ wbll: `a('http://www.keyvisions.it')ppt('Click here')`, html: ` <a href="http://www.keyvisions.it/?nome=Mario+Rossi&altezza=1.78">Click here</a>`, isForm: false },
 	{ wbll: `t('<b>Bold Text</b>')`, html: `<b>Bold Text</b>`, isForm: false },
+	{ wbll: `m('wysiwyg')`, html: `<b>Bold Text</b>`, isForm: true },
 	{ wbll: `\\s('caption=\"Logon\"')e(';;@usr')\\a('placeholder=\"username\"')t(' ')w(';@pwd')\\a('placeholder=\"password\"')t(' ')b(';stw;logon')t('Logon')t(' ')b(';stw;insert')t('Insert')\\rt('Forgot password?')a('/stw/reset')t('click here')`, html: `<input name="nome" value="Mario Rossi" placeholder="username"> <input type="password" name="altezza" value="1.78" placeholder="password"> <button value="stwlogon" name="stwAction" type="submit">Logon</button> <button value="stwinsert" name="stwAction" type="submit">Insert</button><br>Forgot password? <a href="http://localhost/stw/reset">click here</a>`, isForm: true },
 ];
 

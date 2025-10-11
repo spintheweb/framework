@@ -1,6 +1,6 @@
 {
 	"name": "spintheweb",
-	"version": "1.0.0",
+	"version": "0.3.0",
 	"exports": "./stwSpinner.ts",
 
 	"tasks": {
@@ -8,6 +8,7 @@
 		"dev": "deno run --watch --allow-net --allow-read --allow-write --allow-env --allow-run stwSpinner.ts",
 		"cache": "deno cache stwSpinner.ts",
 		"build": "deno run --allow-read --allow-write ./tasks/minify.ts",
+		"release": "deno run --allow-read --allow-write --allow-run ./tasks/release.ts",
 
 		"docker:build": "docker build -t spintheweb/webspinner:latest .",
 		"docker:push": "docker push spintheweb/webspinner:latest"
@@ -46,7 +47,7 @@
 			"dist",
 			"build",
 			".git",
-			"deployments/release"
+			"deployment/release"
 		]
 	},
 

@@ -3,4 +3,4 @@
 /tests/*.log
 /WIP
 /.env
-/deployments/release
+/deployment/release
