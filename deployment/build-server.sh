@@ -59,20 +59,27 @@ if [ -f "$REPO_ROOT/deno.json" ]; then
   fi
 fi
 
-# Allow CLI override: --version vX.Y.Z
+# Allow CLI override: --version vX.Y.Z, and non-interactive mode
 CLI_VERSION=""
+NON_INTERACTIVE=false
 while [ $# -gt 0 ]; do
   case "$1" in
     --version)
       CLI_VERSION="$2"; shift ;;
+    --non-interactive|--no-prompt|--yes|--ci)
+      NON_INTERACTIVE=true ;;
     *) ;;
   esac
   shift || true
 done
 
 PROMPT_DEFAULT=${CLI_VERSION:-$DEFAULT_VERSION}
-read -p "Release version [${PROMPT_DEFAULT}]: " VERSION
-VERSION=${VERSION:-$PROMPT_DEFAULT}
+if [ "$NON_INTERACTIVE" = true ]; then
+  VERSION="$PROMPT_DEFAULT"
+else
+  read -p "Release version [${PROMPT_DEFAULT}]: " VERSION
+  VERSION=${VERSION:-$PROMPT_DEFAULT}
+fi
 VERSION=$(ensure_v "$VERSION")
 echo -e "${GREEN}Creating server installer for version: $VERSION${NC}"
 echo ""
@@ -114,7 +121,7 @@ echo -e "${GREEN}Payload archive created: $(du -h "$PAYLOAD_TAR" | cut -f1)${NC}
 # Create the installer script
 OUTPUT_DIR="$REPO_ROOT/deployment/release"
 mkdir -p "$OUTPUT_DIR"
-INSTALLER_FILE="$OUTPUT_DIR/webspinner-server.sh"
+INSTALLER_FILE="$OUTPUT_DIR/server.sh"
 
 echo -e "${BLUE}Step 2: Generating self-extracting installer...${NC}"
 
@@ -743,7 +750,7 @@ Production-ready self-extracting installer for Linux systems. Includes complete 
 ### Installation
 
 \`\`\`bash
-sudo ./webspinner-server.sh
+sudo ./server.sh
 \`\`\`
 
 ### Upgrade
@@ -760,7 +767,7 @@ Run installer on existing installation to upgrade. Preserves configuration, user
 ### Verification
 
 \`\`\`bash
-sha256sum -c webspinner-server.sh.sha256
+sha256sum -c server.sh.sha256
 \`\`\`
 
 ### Service Management

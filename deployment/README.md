@@ -29,7 +29,7 @@ sudo bash deployment/server.sh
 ```
 
 Notes:
-- The server installer wrapper runs deployment/release/webspinner-server.sh if present; otherwise it downloads the latest release from GitHub and runs it.
+- The server installer (server.sh) can be bundled in the release under scripts/. If not present, use the wrapper in this repo to fetch the latest.
 - Docker mode binds ./webspinner-data on the host to /app/.data in the container by default and maps localhost:8080.
 
 ## Build the release bundle (maintainers)
@@ -44,7 +44,7 @@ deno task release
 Outputs to: deployment/release/webspinner-stack-<version>.zip (+ .sha256)
 
 Bundle contents:
-- docker.sh, server.sh, webspinner-server.sh (if built)
+- docker.sh, server.sh (self-extracting installer, if built)
 - Dockerfile, docker-compose.yml
 - docs/README.md (this file) and top-level README.md
 

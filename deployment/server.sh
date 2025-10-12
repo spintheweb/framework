@@ -1,6 +1,6 @@
 #!/bin/bash
 # Spin the Web — Server installer wrapper
-# If a self-extracting installer (webspinner-server.sh) is available in deployment/release,
+# If a self-extracting installer (server.sh) is available in deployment/release,
 # run it. Otherwise, fetch the latest release from GitHub and run it.
 
 set -euo pipefail
@@ -15,7 +15,15 @@ echo -e "${BLUE}Spin the Web — Server install${NC}"
 echo "================================"
 
 THIS_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOCAL_INSTALLER="$THIS_DIR/release/webspinner-server.sh"
+# Prefer installer next to this script; fallback to ./release
+LOCAL_INSTALLER=""
+if [ -f "$THIS_DIR/server.sh" ]; then
+  LOCAL_INSTALLER="$THIS_DIR/server.sh"
+elif [ -f "$THIS_DIR/release/server.sh" ]; then
+  LOCAL_INSTALLER="$THIS_DIR/release/server.sh"
+else
+  LOCAL_INSTALLER=""
+fi
 RELEASE_URL_API="https://api.github.com/repos/spintheweb/webspinner/releases/latest"
 
 run_local() {
@@ -31,7 +39,7 @@ download_and_run() {
   fi
 
   TMP_DIR=$(mktemp -d)
-  INSTALLER="$TMP_DIR/webspinner-server.sh"
+  INSTALLER="$TMP_DIR/server.sh"
 
   echo -e "${BLUE}Fetching latest release info...${NC}"
   if command -v curl >/dev/null 2>&1; then
@@ -39,8 +47,8 @@ download_and_run() {
   else
     JSON=$(wget -qO- "$RELEASE_URL_API")
   fi
-  DL_URL=$(printf "%s" "$JSON" | sed -n 's/.*browser_download_url": "\(.*webspinner-server.sh\)".*/\1/p' | head -n1)
-  SHASUM_URL=$(printf "%s" "$JSON" | sed -n 's/.*browser_download_url": "\(.*webspinner-server.sh.sha256\)".*/\1/p' | head -n1)
+  DL_URL=$(printf "%s" "$JSON" | sed -n 's/.*browser_download_url": "\(.*[^/]*server.sh\)".*/\1/p' | head -n1)
+  SHASUM_URL=$(printf "%s" "$JSON" | sed -n 's/.*browser_download_url": "\(.*[^/]*server.sh.sha256\)".*/\1/p' | head -n1)
 
   if [ -z "$DL_URL" ]; then
     echo -e "${RED}Could not determine latest installer URL from GitHub releases.${NC}"
@@ -59,7 +67,7 @@ download_and_run() {
   if [ -s "$INSTALLER.sha256" ] && command -v sha256sum >/dev/null 2>&1; then
     echo -e "${BLUE}Verifying checksum...${NC}"
     (cd "$TMP_DIR" && sha256sum -c "$(basename "$INSTALLER").sha256") || {
-      echo -e "${YELLOW}Checksum verification failed or unavailable. Proceeding anyway...${NC}"
+    echo -e "${YELLOW}Checksum verification failed or unavailable. Proceeding anyway...${NC}"
     }
   fi
 
@@ -68,7 +76,7 @@ download_and_run() {
   exec sudo "$INSTALLER"
 }
 
-if [ -f "$LOCAL_INSTALLER" ]; then
+if [ -n "$LOCAL_INSTALLER" ] && [ -f "$LOCAL_INSTALLER" ]; then
   run_local
 else
   read -rp "No local installer found. Download latest and install? (Y/n): " REPLY
@@ -76,7 +84,7 @@ else
   if [[ "$REPLY" =~ ^[Yy]$ ]]; then
     download_and_run
   else
-    echo "Aborted. Place webspinner-server.sh into deployment/release and re-run."
+  echo "Aborted. Place server.sh into deployment/release and re-run."
     exit 1
   fi
 fi
