@@ -25,7 +25,7 @@ services:
       
       # Site Configuration
       - SITE_ROOT=./public
-      - SITE_WEBBASE=./.data/webbase.wbdl
+      - WEBBASE=./.data/webbase.wbdl
       - COMMON_WEBBASE=./webbaselets/stwCommon.wbdl
       - STUDIO_WEBBASE=./webbaselets/stwStudio.wbdl
       

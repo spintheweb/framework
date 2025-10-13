@@ -98,6 +98,10 @@ cp -r stwElements "$PAYLOAD_DIR/"
 cp -r stwStyles "$PAYLOAD_DIR/"
 cp -r webbaselets "$PAYLOAD_DIR/"
 cp -r public "$PAYLOAD_DIR/"
+# Include seed data for bare-metal installs
+if [ -d ".data" ]; then
+  cp -r .data "$PAYLOAD_DIR/"
+fi
 cp stwSpinner.ts "$PAYLOAD_DIR/"
 cp deno.json "$PAYLOAD_DIR/"
 cp deno.lock "$PAYLOAD_DIR/" 2>/dev/null || true
@@ -109,7 +113,7 @@ cp .env.example "$PAYLOAD_DIR/.env"
 
 # Remove sensitive/unnecessary files from payload
 find "$PAYLOAD_DIR" -type f \( -name "*.pem" -o -name "*.key" -o -name ".DS_Store" -o -name "Thumbs.db" \) -delete
-# Preserve all .data seed files for fresh install; upgrade path excludes overwriting via rsync --exclude='.data'
+# Preserve .data for fresh install. On upgrade, existing .data is left untouched by the installer.
 
 echo -e "${GREEN}Payload directory prepared${NC}"
 
@@ -149,6 +153,21 @@ echo "Webspinner Server Installer"
 
 INSTALL_DIR="/opt/webspinner"
 SERVICE_INSTALL=true
+
+# Optional upgrade behavior flags (default: preserve)
+REPLACE_PUBLIC=false
+REPLACE_DATA=false
+for arg in "$@"; do
+  case "$arg" in
+    --replace-public)
+      REPLACE_PUBLIC=true ;;
+    --replace-data)
+      REPLACE_DATA=true ;;
+    --replace-all)
+      REPLACE_PUBLIC=true; REPLACE_DATA=true ;;
+    *) ;;
+  esac
+done
 
 # Update package lists
 echo "Updating package lists..."
@@ -355,8 +374,25 @@ if [ "$UPGRADE_MODE" = true ]; then
   # Update system webbaselets (preserve custom)
   cp "$TEMP_EXTRACT/webbaselets/stw"*.wbdl "$INSTALL_DIR/webbaselets/" 2>/dev/null || true
     
-  # Update public files BUT preserve .data directory
-  rsync -av --exclude='.data' "$TEMP_EXTRACT/public/" "$INSTALL_DIR/public/" 2>/dev/null || cp -r "$TEMP_EXTRACT/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
+  # Update public files; default preserves .data directory unless --replace-public
+  if [ "$REPLACE_PUBLIC" = true ]; then
+    echo "Replacing public directory contents (requested via --replace-public) ..."
+    rsync -av --delete "$TEMP_EXTRACT/public/" "$INSTALL_DIR/public/" 2>/dev/null || {
+      rm -rf "$INSTALL_DIR/public"/* 2>/dev/null || true
+      cp -r "$TEMP_EXTRACT/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
+    }
+  else
+    rsync -av --exclude='.data' "$TEMP_EXTRACT/public/" "$INSTALL_DIR/public/" 2>/dev/null || cp -r "$TEMP_EXTRACT/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
+  fi
+
+  # Optionally replace root .data directory if requested
+  if [ "$REPLACE_DATA" = true ] && [ -d "$TEMP_EXTRACT/.data" ]; then
+    echo "Replacing .data directory contents (requested via --replace-data) ..."
+    rsync -av --delete "$TEMP_EXTRACT/.data/" "$INSTALL_DIR/.data/" 2>/dev/null || {
+      mkdir -p "$INSTALL_DIR/.data"
+      cp -r "$TEMP_EXTRACT/.data"/* "$INSTALL_DIR/.data/" 2>/dev/null || true
+    }
+  fi
 else
   # Fresh install - copy everything
   cp -r "$TEMP_EXTRACT"/* "$INSTALL_DIR/"
@@ -495,7 +531,7 @@ KEYFILE=$KEYFILE
 SESSION_TIMEOUT=$SESSION_TIMEOUT
 MAX_USERS=$MAX_USERS
 SITE_ROOT="./public"
-SITE_WEBBASE="./.data/webbase.wbdl"
+WEBBASE="./.data/webbase.wbdl"
 COMMON_WEBBASE="./webbaselets/stwCommon.wbdl"
 STUDIO_WEBBASE="./webbaselets/stwStudio.wbdl"
 MAX_UPLOADSIZE=$MAX_UPLOADSIZE
@@ -600,7 +636,7 @@ fi
 if [ "$SERVICE_INSTALL" = true ]; then
   cat > /etc/systemd/system/webspinner.service << EOF
 [Unit]
-Description=Webspinner Web Application Server
+Description=Webspinner (WBDL interpreter)
 After=network.target
 
 [Service]

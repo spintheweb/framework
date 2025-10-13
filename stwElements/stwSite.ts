@@ -53,14 +53,14 @@ export class STWSite extends STWElement {
 	 */
 	static get instance(): STWSite {
 		if (!STWSite.#instance) {
-			console.log(`${new Date().toISOString()}: Loading webbase '${envGet("SITE_WEBBASE")}'...`);
+			console.log(`${new Date().toISOString()}: Loading webbase '${envGet("WEBBASE")}'...`);
 
-			const webbase = envGet("SITE_WEBBASE") || "./.data/webbase.wbdl";
+			const webbase = envGet("WEBBASE") || "./.data/webbase.wbdl";
 			this.#wbdl = JSON.parse(Deno.readTextFileSync(webbase));
 			STWSite.#instance = new STWSite(this.#wbdl);
 			if (!STWSite.#instance) {
 				throw new Error(
-					`Webbase '${webbase}' not found. Set SITE_WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`,
+					`Webbase '${webbase}' not found. Set WEBBASE="<path>" in the .env file or place the webbase in ${webbase}.`,
 				);
 			}
 
@@ -222,7 +222,7 @@ export class STWSite extends STWElement {
 		this.#watcherStarted = true;
 
 		const webbasePath = [
-			envGet("SITE_WEBBASE") || "./.data/webbase.wbdl",
+			envGet("WEBBASE") || "./.data/webbase.wbdl",
 			envGet("COMMON_WEBBASE") || "./webbaselets/stwCommon.wbdl",
 			envGet("STUDIO_WEBBASE") || "./webbaselets/stwStudio.wbdl",
 		];

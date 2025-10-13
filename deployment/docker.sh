@@ -104,7 +104,7 @@ docker run -d \
   -v "${DATA_DIR}:/app/.data" \
   -e PORT=${CONTAINER_PORT} \
   -e SITE_ROOT=./public \
-  -e SITE_WEBBASE=./.data/webbase.wbdl \
+  -e WEBBASE=./.data/webbase.wbdl \
   -e COMMON_WEBBASE=./webbaselets/stwCommon.wbdl \
   -e STUDIO_WEBBASE=./webbaselets/stwStudio.wbdl \
   "${DOCKER_REPO}:${TAG}"

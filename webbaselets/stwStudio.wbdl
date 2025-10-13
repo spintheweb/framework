@@ -138,10 +138,10 @@
 			"_id": "e29cfba0-2952-12ee-8a01-eb5d698979c6",
 			"type": "Content",
 			"name": {
-				"en": "Web application"
+				"en": "Structure"
 			},
 			"slug": {
-				"en": "webapplication"
+				"en": "structure"
 			},
 			"visibility": {},
 			"subtype": "Accordion",
@@ -151,7 +151,7 @@
 			"options": [
 				{
 					"name": {
-						"en": "Web application <span style=\"float:right\"><i class=\"fa-kit fa-light-folder-circle-plus\" aria-label=\"New area\"></i> <i class=\"fa-kit fa-light-file-circle-plus\" aria-label=\"New page\"></i> <i class=\"fa-kit fa-light-rectangle-circle-plus\" aria-label=\"New content\"></i></span>"
+						"en": "Structure <span style=\"float:right\"><i class=\"fa-kit fa-light-folder-circle-plus\" aria-label=\"New area\"></i> <i class=\"fa-kit fa-light-file-circle-plus\" aria-label=\"New page\"></i> <i class=\"fa-kit fa-light-rectangle-circle-plus\" aria-label=\"New content\"></i></span>"
 					},
 					"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
 				},

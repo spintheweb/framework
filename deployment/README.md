@@ -18,7 +18,7 @@ bash deployment/docker.sh
 What the Docker setup includes:
 - App runtime on container port 8080 (host port configurable via --port)
 - Persistent data via host bind: ./webspinner-data -> /app/.data
-- App configuration via environment variables (PORT, SITE_ROOT, SITE_WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE)
+- App configuration via environment variables (PORT, SITE_ROOT, WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE)
 
 Notes:
 - For TLS and reverse proxy, run behind nginx/Traefik/Caddy in your Docker stack.

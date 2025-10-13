@@ -10,11 +10,11 @@ import project from "./deno.json" with { type: "json" };
 import { STWFactory } from "./stwComponents/stwFactory.ts";
 import { envGet, envSet, isDocker } from "./stwComponents/stwConfig.ts";
 
-// If a PORTAL_URL is provided (env or .env), fetch it and persist to SITE_WEBBASE path before the site loads.
+// If a PORTAL_URL is provided (env or .env), fetch it and persist to WEBBASE path before the site loads.
 try {
     const portalUrl = envGet("PORTAL_URL");
     if (portalUrl && /^https?:\/\//i.test(portalUrl)) {
-        const webbasePath = envGet("SITE_WEBBASE") || "./.data/webbase.wbdl";
+        const webbasePath = envGet("WEBBASE") || "./.data/webbase.wbdl";
         console.log(`${new Date().toISOString()}: Fetching portal webbase from ${portalUrl} ...`);
         const res = await fetch(portalUrl);
         if (!res.ok) throw new Error(`Failed to download portal webbase: ${res.status} ${res.statusText}`);
@@ -25,7 +25,7 @@ try {
         await Deno.writeTextFile(webbasePath, json);
         console.log(`${new Date().toISOString()}: Portal webbase saved to ${webbasePath}.`);
         // Ensure STWSite reads the same path
-        envSet("SITE_WEBBASE", webbasePath);
+        envSet("WEBBASE", webbasePath);
     }
 } catch (error) {
     console.error(`PORTAL_URL setup error: ${(error as Error).message}`);

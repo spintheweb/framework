@@ -144,6 +144,11 @@ await Deno.writeTextFile(join(serverRoot, "README-INSTALL.md"),
 		"\n",
 		"sudo bash ./scripts/server.sh\n",
 		"\n",
+		"Upgrade options (defaults preserve data):\n",
+		"- --replace-public  # replace entire public/ (except .data when not used)\n",
+		"- --replace-data    # replace .data/ from bundle\n",
+		"- --replace-all     # replace both\n",
+		"\n",
 		"This will install prerequisites (nginx, certbot, PostgreSQL as needed) and configure Webspinner.\n",
 	].join("")
 );
@@ -176,7 +181,7 @@ await Deno.writeTextFile(join(dockerRoot, "README-RUN-DOCKER.md"),
 		"bash ./scripts/docker.sh\n\n",
 		"- Maps host 8080 -> container 8080\n",
 		"- Persists data: ./webspinner-data -> /app/.data\n",
-		"- Config via env: PORT, SITE_ROOT, SITE_WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE\n",
+		"- Config via env: PORT, SITE_ROOT, WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE\n",
 	].join("")
 );
 
@@ -377,7 +382,7 @@ async function publishGitAndGithub() {
 			`   \`\`\`bash ./scripts/docker.sh\`\`\``,
 			`   - Maps host 8080 -> container 8080`,
 			`   - Persists data: ./webspinner-data -> /app/.data`,
-			`   - Env: PORT, SITE_ROOT, SITE_WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE`,
+			`   - Env: PORT, SITE_ROOT, WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE`,
 			`3) (Optional) Verify checksums: use the .sha256 files next to each zip\n`,
 			dockerNotesSection || null,
 		].filter(Boolean).join("\n");
