@@ -1,12 +1,12 @@
 {
   "name": "spintheweb",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "exports": "./stwSpinner.ts",
   "tasks": {
     "start": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run stwSpinner.ts",
     "dev": "deno run --watch --allow-net --allow-read --allow-write --allow-env --allow-run stwSpinner.ts",
     "cache": "deno cache --lock=deno.lock stwSpinner.ts",
-  "lock:write": "deno cache --lock=deno.lock stwSpinner.ts",
+    "lock:write": "deno cache --lock=deno.lock stwSpinner.ts",
     "lock:verify": "deno cache --lock=deno.lock --frozen stwSpinner.ts",
     "build": "deno run --allow-read --allow-write ./tasks/minify.ts",
     "release": "deno run --allow-read --allow-write --allow-run ./tasks/release.ts",
