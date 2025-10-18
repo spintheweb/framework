@@ -57,6 +57,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENV HOST=0.0.0.0
 ENV PORT=8080
 ENV ALLOW_DEV=false
+ENV SPINNER_ENV=docker
 
 # Entry point
-CMD ["deno", "run", "--allow-all", "stwSpinner.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-env", "stwSpinner.ts"]

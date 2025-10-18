@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Build/development task: minify
 
-import { minify } from "minify";
+import * as esbuild from "https://deno.land/x/esbuild@v0.21.5/mod.js";
 
 const inputJs = await Deno.readTextFile("./public/scripts/stwClient.js");
-const outputJs = await minify("js", inputJs);
-await Deno.writeTextFile("./public/scripts/stwClient.min.js", outputJs);
+const result = await esbuild.transform(inputJs, { minify: true, loader: "js" });
+await Deno.writeTextFile("./public/scripts/stwClient.min.js", result.code);
+esbuild.stop();
 
 console.log("Client-side JS minified successfully!");

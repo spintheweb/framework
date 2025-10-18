@@ -227,10 +227,10 @@
 					"_id": "92a2ced0-be64-11ee-90a9-c195db5cfc71",
 					"type": "Content",
 					"name": {
-						"en": "WYSIWYG"
+						"en": "Code Editor"
 					},
 					"slug": {
-						"en": "wysiwyg"
+						"en": "code-editor"
 					},
 					"visibility": {
 						"guests": true
@@ -239,7 +239,7 @@
 					"section": "main",
 					"sequence": "11",
 					"layout": {
-						"en": "\\s('caption=\"WYSIWYG\"')m('javascript;note;Hello World!')\\rb(';stw;submit')t('Submit')"
+						"en": "\\s('caption=\"Code Editor\"')m('javascript;note;Hello World!')\\rb(';stw;submit')t('Submit')"
 					}
 				},
 				{

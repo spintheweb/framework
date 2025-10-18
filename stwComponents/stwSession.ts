@@ -36,7 +36,7 @@ export class STWSession {
 		this.site = site;
 		this.states = new Map<string, any>();
 
-		console.log(`${new Date().toISOString()}: New session [${this.sessionId}]`);
+		console.log(`${new Date().toISOString()}: New session [${this.sessionId}] ${this.remoteAddr}`);
 	}
 
 	/**

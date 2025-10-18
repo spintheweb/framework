@@ -304,12 +304,13 @@
 						"en": "explorer"
 					},
 					"visibility": {},
-					"subtype": "Tree",
+					"subtype": "Table",
 					"cssClass": null,
 					"section": "",
 					"sequence": "",
-					"dsn": "stw",
-					"command": "($tree:=function($node){{\"_id\":_id,\"slug\":$node.slug.en?$node.slug.en:\"\",\"type\":$node.subtype?$node.subtype:$node.type,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
+					"dsn": "bash",
+					"command": "ls -l ./public",
+					"contentType": "application/json",
 					"params": "",
 					"layout": {
 						"en": ""

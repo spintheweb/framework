@@ -34,7 +34,9 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 		if (!getCookies(request.headers).sessionId) {
 			// IMPORTANT: clone the ORIGINAL RESPONSE headers (not request headers) so we retain Content-Type
 			const headers = new Headers(response.headers);
-			setCookie(headers, { name: "sessionId", value: sessionId, httpOnly: true, secure: true, sameSite: "Lax" });
+			// Only mark cookie Secure when using HTTPS
+			const isSecure = new URL(request.url).protocol === "https:";
+			setCookie(headers, { name: "sessionId", value: sessionId, httpOnly: true, secure: isSecure, sameSite: "Lax" });
 			// Preserve any existing custom 'contents' header
 			headers.set("contents", response.headers.get("contents") || "");
 			// Return a new response preserving status and headers so nosniff does not block rendering
@@ -43,8 +45,9 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 		return response;
 
 	} else if (request.method === "POST") {
-		try {
-			const maxupload = parseInt(envGet("MAX_UPLOADSIZE") || "200") * 1024;
+        try {
+            // Interpret MAX_UPLOADSIZE as MB
+            const maxupload = parseInt(envGet("MAX_UPLOADSIZE") || "2") * 1024 * 1024;
 			const formData = await request.formData();
 
 			// Collect all values for each key
