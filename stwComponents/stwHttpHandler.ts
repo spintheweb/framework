@@ -22,13 +22,15 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 			response = await serveFile(request, `./public${pathname}`);
 		else if (element?.type === "Page" || element?.type === "Area" || element?.type === "Site")
 			response = await element.serve(request, session);
-		else if (session.socket && element?.type) {
-			const res = await element.serve(request, session);
-			if (res.status === 200) {
-				const text = await res.text();
-				session.socket.send(text);
-			}
-		}
+		else if (element?.type && session.sockets.size > 0) {
+            const res = await element.serve(request, session);
+            if (res.status === 200) {
+                const text = await res.text();
+                for (const ws of session.sockets.values()) {
+                    try { ws.send(text); } catch {}
+                }
+            }
+        }
 
 		// Set session cookie if not present
 		if (!getCookies(request.headers).sessionId) {
@@ -104,21 +106,17 @@ export async function handleHttp(request: Request, session: STWSession, sessionI
 
 			const origin = STWIndex.get(records.stwOrigin || "");
 			if (origin instanceof STWContent && origin?.isVisible(session, false)) {
-				try {
-					const _result = origin.getLayout(session).handleAction(stwAction); // TODO currently unused
-					session.socket?.send(JSON.stringify({
-						method: "PUT",
-						section: "stwShowModal",
-						body: `<label>Form data ${stwAction}</label><pre>${JSON.stringify(records, null, 4)}</pre>`
-					}));
-				} catch (error: any) {
-					session.socket?.send(JSON.stringify({
-						method: "PUT",
-						section: "stwShowModal",
-						body: `<label>Error</label><pre>${error.message}</pre>`
-					}));
-				}
-			}
+                try {
+                    const _result = origin.getLayout(session).handleAction(stwAction);
+                    const msg = JSON.stringify({ method: "PUT", section: "stwShowModal", body: `<label>Form data ${stwAction}</label><pre>${JSON.stringify(records, null, 4)}</pre>` });
+                    const targets = Array.from(session.sockets.values());
+                    for (const s of targets) { try { s.send(msg); } catch {} }
+                } catch (error: any) {
+                    const msg = JSON.stringify({ method: "PUT", section: "stwShowModal", body: `<label>Error</label><pre>${error.message}</pre>` });
+                    const targets = Array.from(session.sockets.values());
+                    for (const s of targets) { try { s.send(msg); } catch {} }
+                }
+            }
 			// Always return a response
 			return secureResponse(null, { status: 204 });
 		} catch (_error) {

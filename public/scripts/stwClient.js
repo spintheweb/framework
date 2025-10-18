@@ -12,112 +12,128 @@
 self.addEventListener("load", stwStartWebsocket);
 
 let stwWS;
+let stwReconnectTimer = null;
+const stwTabId = sessionStorage.getItem("stwTabId") || (() => {
+  const id = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+  sessionStorage.setItem("stwTabId", id);
+  return id;
+})();
+
 function stwStartWebsocket() {
-	const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-	const wsUrl = `${protocol}//${window.location.host}/`;
+  if (stwWS && (stwWS.readyState === WebSocket.OPEN || stwWS.readyState === WebSocket.CONNECTING)) return;
 
-	stwWS = new WebSocket(wsUrl);
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${window.location.host}/?tab=${encodeURIComponent(stwTabId)}`;
+  stwWS = new WebSocket(wsUrl);
 
-	stwWS.onopen = _event => {
-		stwWS.send(JSON.stringify({
-			method: "HEAD",
-			resource: document.location.pathname,
-			options: {
-				lang: navigator.language,
-				langs: navigator.languages,
-				tz: Intl.DateTimeFormat().resolvedOptions().timeZone
-			}
-		}));
+  if (stwReconnectTimer) { clearTimeout(stwReconnectTimer); stwReconnectTimer = null; }
 
-		// TODO: Update lang to reflect the session language, should each <article> have a lang attribute that reflects its language?
-		document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
-	};
+  stwWS.onopen = () => {
+    stwWS.send(JSON.stringify({
+      method: "HEAD",
+      resource: document.location.pathname,
+      options: {
+        lang: navigator.language,
+        langs: navigator.languages,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        placeholder: "" // optional, server may echo this back
+      }
+    }));
 
-	stwWS.onmessage = event => {
-		// event.data = { method: "GET" | "PUT" | "PATCH" | "DELETE", id: string, section: string, sequence: number, body: string }
-		const data = JSON.parse(event.data);
+    // TODO: Update lang to reflect the session language, should each <article> have a lang attribute that reflects its language?
+    document.querySelectorAll("[lang]").forEach(element => element.setAttribute("lang", "en-US"));
+  };
 
-		if (data.method === "PATCH") {
-			stwWS.send(JSON.stringify({ method: "PATCH", resource: data.id, options: { placeholder: data.placeholder } }));
-			return;
-		}
+  stwWS.onmessage = event => {
+    // event.data = { method: "GET" | "PUT" | "PATCH" | "DELETE", id: string, section: string, sequence: number, body: string }
+    const data = JSON.parse(event.data);
 
-		if (data.placeholder) {
-			const placeholder = document.getElementById(data.placeholder);
-			placeholder?.insertAdjacentHTML("afterend", data.body);
-			placeholder?.remove();
+    if (data.method === "PATCH") {
+      stwWS.send(JSON.stringify({ method: "PATCH", resource: data.id, options: { placeholder: data.placeholder } }));
+      return;
+    }
 
-		} else {
-			if (data.method === "PUT" || data.method === "DELETE") {
-				const element = document.getElementById(data.id);
-				if (element && data.section === "")
-					element.insertAdjacentHTML("afterend", data.body);
-				element?.remove();
-				if (data.method === "DELETE")
-					return;
-			}
+    if (data.placeholder) {
+      const placeholder = document.getElementById(data.placeholder);
+      placeholder?.insertAdjacentHTML("afterend", data.body);
+      placeholder?.remove();
 
-			if (data.section === "stwShowModal" || data.section === "stwShow") {
-				// document.querySelector("dialog")?.remove();
-				document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
-				if (data.section === "stwShowModal")
-					document.querySelector("dialog")?.showModal();
-				else
-					document.querySelector("dialog")?.show();
-			} else {
-				let insertion = document.getElementById(data.section);
-				insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
-					if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
-						insertion = article;
-				});
-				insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
-			}
-		}
+    } else {
+      // Replace or delete existing element by id first
+      if (data.method === "DELETE") {
+        document.getElementById(data.id)?.remove();
+        return;
+      }
+      if (data.method === "PUT") {
+        const element = document.getElementById(data.id);
+        if (element) {
+          element.insertAdjacentHTML("afterend", data.body);
+          element.remove();
+          return; // done
+        }
+      }
 
-		// Load articles
-		document.body.querySelectorAll("article[href]").forEach(article => {
-			stwWS.send(JSON.stringify({ method: "PATCH", resource: article.getAttribute("href"), options: { placeholder: article.id } }));
-			article.removeAttribute("href");
-		});
+      if (data.section === "stwShowModal" || data.section === "stwShow") {
+        // document.querySelector("dialog")?.remove();
+        document.body.insertAdjacentHTML("afterbegin", `<dialog onclose="this.remove()">${data.body}</dialog>`);
+        if (data.section === "stwShowModal")
+          document.querySelector("dialog")?.showModal();
+        else
+          document.querySelector("dialog")?.show();
+      } else {
+        let insertion = document.getElementById(data.section);
+        insertion?.querySelectorAll("article[data-sequence]").forEach(article => {
+          if (parseFloat(article.getAttribute("data-sequence")) < data.sequence)
+            insertion = article;
+        });
+        insertion?.insertAdjacentHTML(insertion.id === data.section ? "afterbegin" : "afterend", data.body);
+      }
+    }
 
-		// Load content script
-		document.body.querySelectorAll("script").forEach(script => {
-			if (document.head.querySelector(`script[name="${script.getAttribute("name")}"]`))
-				return;
+    // Load articles
+    document.body.querySelectorAll("article[href]").forEach(article => {
+      stwWS.send(JSON.stringify({ method: "PATCH", resource: article.getAttribute("href"), options: { placeholder: article.id } }));
+      article.removeAttribute("href");
+    });
 
-			const loadScript = document.createElement("script");
-			loadScript.setAttribute("name", script.getAttribute("name") || "");
-			if (script.src)
-				loadScript.src = script.src;
-			else
-				loadScript.textContent = script.textContent;
-			document.head.appendChild(loadScript);
-			if (typeof script.onload === "function")
-				script.onload();
-			script.remove();
-		});
+    // Load content script
+    document.body.querySelectorAll("script").forEach(script => {
+      if (document.head.querySelector(`script[name="${script.getAttribute("name")}"]`))
+        return;
 
-		const script = document.getElementById(data.id)?.querySelector("script[onload]");
-		if (script) {
-			if (typeof window[`fn${script.getAttribute("name")}`] !== "function") {
-				const element = document.createElement("script");
-				element.insertAdjacentText("afterbegin", script.innerText);
-				document.head.append(element);
-			}
-			script.onload();
-			script.remove();
-		}
-	};
+      const loadScript = document.createElement("script");
+      loadScript.setAttribute("name", script.getAttribute("name") || "");
+      if (script.src)
+        loadScript.src = script.src;
+      else
+        loadScript.textContent = script.textContent;
+      document.head.appendChild(loadScript);
+      if (typeof script.onload === "function")
+        script.onload();
+      script.remove();
+    });
 
-	stwWS.onclose = () => {
-		setTimeout(stwStartWebsocket, 2000);
-	};
+    const script = document.getElementById(data.id)?.querySelector("script[onload]");
+    if (script) {
+      if (typeof window[`fn${script.getAttribute("name")}`] !== "function") {
+        const element = document.createElement("script");
+        element.insertAdjacentText("afterbegin", script.innerText);
+        document.head.append(element);
+      }
+      script.onload();
+      script.remove();
+    }
+  };
 
-	stwWS.onerror = err => {
-		console.error(err);
-		stwWS = null;
-		setTimeout(stwStartWebsocket, 5000);
-	};
+  stwWS.onclose = () => {
+    setTimeout(stwStartWebsocket, 2000);
+  };
+
+  stwWS.onerror = err => {
+    console.error(err);
+    stwWS = null;
+    setTimeout(stwStartWebsocket, 5000);
+  };
 }
 function stwToggleCollapse(event) {
 	event.preventDefault();

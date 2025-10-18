@@ -32,7 +32,7 @@ const pbkdf2Params = { name: "PBKDF2", iterations: 100000, hash: "SHA-256" };
 export const STWSecurity = new class {
 	async addUser(user: string, name: string, password: string, roles: string, email: string): Promise<void> {
 		const usersDB = envGet("USERS") || "./.data/users.json";
-		const users: ISTWUser[] = JSON.parse(Deno.readTextFileSync(usersDB));
+		const users: ISTWUser[] = JSON.parse(Deno.readTextFileSync(usersDB)) || [];
 
 		if (users.find((p) => p.user === user)) {
 			throw new Error("User already exists");

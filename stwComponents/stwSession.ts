@@ -19,7 +19,7 @@ export class STWSession {
 	private timer: number = 0;
 	dev: boolean; // If true STW Studio  enabled
 	site: STWSite;
-	socket!: WebSocket | undefined; // WebSocket connection, if any
+	public sockets: Map<string, WebSocket> = new Map(); // per-tab sockets
 	public states: Map<string, any>;
 
 	public constructor(sessionId: string, remoteAddr: Deno.Addr, site: STWSite) {
@@ -35,6 +35,7 @@ export class STWSession {
 		this.dev = true;
 		this.site = site;
 		this.states = new Map<string, any>();
+		this.sockets = new Map();
 
 		console.log(`${new Date().toISOString()}: New session ${JSON.stringify(this.remoteAddr)} [${this.sessionId}]`);
 	}

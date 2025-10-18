@@ -22,11 +22,7 @@ function basename(p: string): string {
 	return idx >= 0 ? n.slice(idx + 1) : n;
 }
 
-function dirname(p: string): string {
-	const n = norm(p);
-	const idx = n.lastIndexOf("/");
-	return idx > 0 ? n.slice(0, idx) : ".";
-}
+// dirname helper no longer needed in current flow
 
 function getArg(name: string, def?: string): string | undefined {
 	const idx = Deno.args.findIndex((a) => a === `--${name}`);
@@ -79,18 +75,7 @@ async function exists(path: string) {
 	}
 }
 
-// Helper: zip a directory tree and write sha256
-async function zipDir(sourceDir: string, outZip: string) {
-	try { await Deno.remove(outZip); } catch { /* ignore missing */ }
-	const parent = dirname(sourceDir);
-	const folder = basename(sourceDir);
-	const proc = new Deno.Command("zip", { args: ["-r", outZip, folder], cwd: parent, stdout: "inherit", stderr: "inherit" });
-	const res = await proc.output();
-	if (res.code !== 0) {
-		console.error("zip failed. Ensure 'zip' is installed.");
-		Deno.exit(res.code);
-	}
-}
+// (zip packaging removed; release attaches standalone scripts + checksums)
 
 async function sha256File(file: string): Promise<string | null> {
 	const c = new Deno.Command("sha256sum", { args: [file] });
@@ -106,89 +91,35 @@ async function sha256File(file: string): Promise<string | null> {
 	}
 }
 
-// Ensure server installer is present for a complete release; build it if missing
+// Always (re)build the server installer for each release
 const serverInstallerOut = join(outDir, "server.sh");
-if (!(await exists(serverInstallerOut))) {
-	console.log("server.sh not found; generating server installer (non-interactive)...");
-	try {
-		const gen = new Deno.Command("bash", { args: ["-lc", "./deployment/build-server.sh --non-interactive"], cwd });
-		const res = await gen.output();
-		if (res.code !== 0) {
-			console.warn("Server installer generation failed; continuing without embedding installer.");
-		}
-	} catch (_e) {
-		console.warn("Failed to invoke server installer generator; continuing without embedding installer.");
+console.log("Generating server installer (non-interactive)...");
+try {
+	try { await Deno.remove(serverInstallerOut); } catch { /* ignore */ }
+	const gen = new Deno.Command("bash", { args: ["-lc", "./deployment/build-server.sh --non-interactive"], cwd });
+	const res = await gen.output();
+	if (res.code !== 0) {
+		console.warn("Server installer generation failed; continuing without server.sh asset.");
 	}
+} catch (_e) {
+	console.warn("Failed to invoke server installer generator; continuing without server.sh asset.");
 }
 
-// Proceed to build the two artifacts
+// Prepare standalone installer scripts as release assets
+// 1) server.sh (already generated above) -> ensure checksum
+await sha256File(serverInstallerOut);
 
-// Create a temp staging dir for nicer layout inside the zip
-const stagingRoot = await Deno.makeTempDir();
-
-// SERVER ZIP layout
-const serverRoot = join(stagingRoot, `server-${version}`);
-await Deno.mkdir(serverRoot, { recursive: true });
-const serverScriptsDir = join(serverRoot, "scripts");
-await Deno.mkdir(serverScriptsDir, { recursive: true });
-await Deno.copyFile(serverInstallerOut, join(serverScriptsDir, "server.sh"));
-// docs
-for (const f of [join(cwd, "deployment", "README.md"), join(cwd, "README.md")]) {
-	if (await exists(f)) await Deno.copyFile(f, join(serverRoot, basename(f)));
+// 2) docker.sh -> copy into release dir and checksum
+const dockerScriptSrc = join(cwd, "deployment", "docker.sh");
+const dockerScriptOut = join(outDir, "docker.sh");
+if (await exists(dockerScriptSrc)) {
+	await Deno.copyFile(dockerScriptSrc, dockerScriptOut);
+	await sha256File(dockerScriptOut);
+	console.log("Docker script prepared:", dockerScriptOut);
+} else {
+	console.warn("deployment/docker.sh not found; Docker script will not be attached to the release.");
 }
-await Deno.writeTextFile(join(serverRoot, "README-INSTALL.md"),
-	[
-		"# Server install\n",
-		"\n",
-		"Run on the target machine:\n",
-		"\n",
-		"sudo bash ./scripts/server.sh\n",
-		"\n",
-		"Upgrade options (defaults preserve data):\n",
-		"- --replace-public  # replace entire public/ (except .data when not used)\n",
-		"- --replace-data    # replace .data/ from bundle\n",
-		"- --replace-all     # replace both\n",
-		"\n",
-		"This will install prerequisites (nginx, certbot, PostgreSQL as needed) and configure Webspinner.\n",
-	].join("")
-);
 
-const serverZip = join(outDir, `server-${version}.zip`);
-await zipDir(serverRoot, serverZip);
-await sha256File(serverZip);
-console.log("Server package created:", serverZip);
-
-// DOCKER ZIP layout
-const dockerRoot = join(stagingRoot, `docker-${version}`);
-await Deno.mkdir(dockerRoot, { recursive: true });
-const dockerScriptsDir = join(dockerRoot, "scripts");
-await Deno.mkdir(dockerScriptsDir, { recursive: true });
-// include docker.sh
-if (await exists(join(cwd, "deployment", "docker.sh"))) {
-	await Deno.copyFile(join(cwd, "deployment", "docker.sh"), join(dockerScriptsDir, "docker.sh"));
-}
-// docker files
-if (await exists(join(cwd, "Dockerfile"))) await Deno.copyFile(join(cwd, "Dockerfile"), join(dockerRoot, "Dockerfile"));
-if (await exists(join(cwd, "docker-compose.yml"))) await Deno.copyFile(join(cwd, "docker-compose.yml"), join(dockerRoot, "docker-compose.yml"));
-// docs
-for (const f of [join(cwd, "deployment", "README.md"), join(cwd, "README.md")]) {
-	if (await exists(f)) await Deno.copyFile(f, join(dockerRoot, basename(f)));
-}
-await Deno.writeTextFile(join(dockerRoot, "README-RUN-DOCKER.md"),
-	[
-		"# Docker setup\n\n",
-		"Quick start:\n\n",
-		"bash ./scripts/docker.sh\n\n",
-		"- Maps host 8080 -> container 8080\n",
-		"- Persists data: ./webspinner-data -> /app/.data\n",
-		"- Config via env: PORT, SITE_ROOT, WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE\n",
-	].join("")
-);
-
-const dockerZip = join(outDir, `docker-${version}.zip`);
-await zipDir(dockerRoot, dockerZip);
-await sha256File(dockerZip);
-console.log("Docker package created:", dockerZip);
 // ready for gh assets
 
 // Auto-bump patch in deno.json unless overridden with --version or disabled with --no-bump
@@ -356,34 +287,36 @@ async function publishGitAndGithub() {
 			console.warn("GitHub CLI (gh) not found; skipping GitHub release");
 			return;
 		}
-		// Build asset list (server and docker packages)
+		// Build asset list: standalone scripts (server.sh, docker.sh) and their checksums
 		const assets: string[] = [];
-		const serverZipPath = join(outDir, `server-${tag}.zip`);
-		const serverZipShaPath = `${serverZipPath}.sha256`;
-		const dockerZipPath = join(outDir, `docker-${tag}.zip`);
-		const dockerZipShaPath = `${dockerZipPath}.sha256`;
-		if (await exists(serverZipPath)) assets.push(serverZipPath);
-		if (await exists(serverZipShaPath)) assets.push(serverZipShaPath);
-		if (await exists(dockerZipPath)) assets.push(dockerZipPath);
-		if (await exists(dockerZipShaPath)) assets.push(dockerZipShaPath);
-		// add server/docker assets only; Source code will be attached automatically by the tag
+		const serverShPath = join(outDir, "server.sh");
+		const serverShShaPath = `${serverShPath}.sha256`;
+		const dockerShPath = join(outDir, "docker.sh");
+		const dockerShShaPath = `${dockerShPath}.sha256`;
+		if (await exists(serverShPath)) assets.push(serverShPath);
+		if (await exists(serverShShaPath)) assets.push(serverShShaPath);
+		if (await exists(dockerShPath)) assets.push(dockerShPath);
+		if (await exists(dockerShShaPath)) assets.push(dockerShShaPath);
+		// Source code archives are attached automatically by GitHub for the tag
 
 		const title = `Webspinner ${tag}`;
 		const notes = [
 			`Release ${tag}`,
 			`\nIncluded assets:`,
-			(await exists(serverZipPath) ? `- ${basename(serverZipPath)} (+ .sha256)` : null),
-			(await exists(dockerZipPath) ? `- ${basename(dockerZipPath)} (+ .sha256)` : null),
+			(await exists(serverShPath) ? `- ${basename(serverShPath)} (+ .sha256)` : null),
+			(await exists(dockerShPath) ? `- ${basename(dockerShPath)} (+ .sha256)` : null),
 			`\nHow to use on the destination server:`,
-			`1) For Linux server: unzip ${basename(serverZipPath)} and run`,
-			`   \`\`\`sudo bash ./scripts/server.sh\`\`\``,
-			`   - This is the self-extracting installer. (sudo required to install packages/services)`,
-			`2) For Docker: unzip ${basename(dockerZipPath)} and run`,
-			`   \`\`\`bash ./scripts/docker.sh\`\`\``,
+			`1) Linux server install:`,
+			`   Download ${basename(serverShPath)} and run:`,
+			`   \`\`\`sudo bash ${basename(serverShPath)}\`\`\``,
+			`   (sudo is required to install packages/services)`,
+			`2) Docker setup:`,
+			`   Download ${basename(dockerShPath)} and run:`,
+			`   \`\`\`bash ${basename(dockerShPath)}\`\`\``,
 			`   - Maps host 8080 -> container 8080`,
 			`   - Persists data: ./webspinner-data -> /app/.data`,
 			`   - Env: PORT, SITE_ROOT, WEBBASE, COMMON_WEBBASE, STUDIO_WEBBASE`,
-			`3) (Optional) Verify checksums: use the .sha256 files next to each zip\n`,
+			`3) (Optional) Verify checksums: use the .sha256 files next to each script\n`,
 			dockerNotesSection || null,
 		].filter(Boolean).join("\n");
 
@@ -415,4 +348,17 @@ if (doPublish) {
 		await publishDockerImage();
 	}
 	await publishGitAndGithub();
+
+	// Cleanup: remove local release artifacts after publishing
+	if (!dryRun) {
+		try {
+			await Deno.remove(outDir, { recursive: true });
+			console.log("Cleaned release artifacts:", outDir);
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : String(e);
+			console.warn("Cleanup failed for", outDir, "-", msg);
+		}
+	} else {
+		console.log("[dry-run] Skipping cleanup of", outDir);
+	}
 }

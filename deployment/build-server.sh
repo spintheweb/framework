@@ -618,17 +618,26 @@ mkdir -p "$INSTALL_DIR/.data"
 
 if [ ! -f "$INSTALL_DIR/.data/users.json" ]; then
   cat > "$INSTALL_DIR/.data/users.json" << 'EOF'
-{
-  "users": []
-}
+[
+    {
+        "user": "guest",
+        "name": "Guest",
+        "roles": "guests"
+    },
+    {
+        "user": "root",
+        "name": "Root",
+        "password": "root",
+        "roles": "administrators,developers",
+        "email": "security@spintheweb.org"
+    }
+]
 EOF
 fi
 
 if [ ! -f "$INSTALL_DIR/.data/datasources.json" ]; then
   cat > "$INSTALL_DIR/.data/datasources.json" << 'EOF'
-{
-  "datasources": []
-}
+[]
 EOF
 fi
 
