@@ -10,11 +10,13 @@ WORKDIR /app
 # Stage 2: Dependencies
 FROM base AS deps
 
-# Copy dependency files
+# Copy only files needed to resolve and cache dependencies
 COPY deno.json deno.lock ./
+COPY stwSpinner.ts ./
 
-# Cache dependencies
-RUN deno cache --lock=deno.lock stwSpinner.ts || true
+# Cache and verify dependencies using the lockfile (Deno v2: --lock writes/updates)
+RUN deno cache --lock=deno.lock stwSpinner.ts \
+  && deno cache --lock=deno.lock --frozen stwSpinner.ts
 
 # Stage 3: Application
 FROM base AS app

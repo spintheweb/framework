@@ -7,7 +7,7 @@ import { STWContent } from "../stwElements/stwContent.ts";
 import { wbpl } from "./stwWBPL.ts";
 import { ISTWRecords } from "./stwDBAdapters/adapter.ts";
 import { Client as MySQLClient } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
-import jsonata from "https://esm.sh/jsonata@latest";
+import jsonata from "https://esm.sh/jsonata@1.8.7";
 
 // Global cache for query results
 const queryCache = new Map<string, { data: ISTWRecords; timestamp: number }>();

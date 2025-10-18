@@ -1,7 +1,7 @@
-import { config as loadDotEnv } from "https://deno.land/x/dotenv@v3.2.2/mod.ts";
+import { load as loadDotEnv } from "@std/dotenv";
 
 const envPath = Deno.env.get("SPINNER_ENV") === "docker" ? ".env.docker" : ".env";
-const fileEnv = await loadDotEnv({ path: envPath });
+const fileEnv = await loadDotEnv({ envPath });
 
 // Cache .env values so we don’t lose them if Deno.env is readonly
 const cache = new Map<string, string>(Object.entries(fileEnv));
