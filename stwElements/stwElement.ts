@@ -6,6 +6,7 @@ import { STWFactory } from "../stwComponents/stwFactory.ts";
 import type { STWContent } from "./stwContent.ts";
 import { STWIndex } from "./stwIndex.ts";
 import { secureResponse } from "../stwComponents/stwResponse.ts";
+import { newId } from "../stwComponents/stwIds.ts";
 
 export type STWRole = string;
 export type STWLocalized = Map<string, string>;
@@ -38,7 +39,7 @@ export abstract class STWElement<TExtra = unknown> {
 	protected extra?: TExtra;
 
 	public constructor(element: ISTWElement<TExtra>) {
-		this._id = element._id ? element._id : crypto.randomUUID();
+		this._id = element._id ? element._id : newId();
 		this.type = element.type || this.constructor.name.replace("STW", "");
 		this.name = new Map(Object.entries(element.name || { "en": `New ${this.type}` }));
 		this.slug = new Map(

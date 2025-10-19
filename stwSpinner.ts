@@ -9,6 +9,7 @@ import { handleWebSocket } from "./stwComponents/stwWebSocket.ts";
 import project from "./deno.json" with { type: "json" };
 import { STWFactory } from "./stwComponents/stwFactory.ts";
 import { envGet, envSet, isDocker } from "./stwComponents/stwConfig.ts";
+import { newId } from "./stwComponents/stwIds.ts";
 
 // If a PORTAL_URL is provided (env or .env), fetch it and persist to WEBBASE path before the site loads.
 try {
@@ -108,7 +109,7 @@ if (envGet("CERTFILE") && envGet("KEYFILE")) {
 Deno.serve(serverOptions, async (request: Request, info: Deno.ServeHandlerInfo): Promise<Response> => {
 	let sessionId: string = getCookies(request.headers).sessionId;
 	if (!sessionId) {
-		sessionId = crypto.randomUUID();
+		sessionId = newId();
 	}
 
 	let session = stwSessions.get(sessionId);

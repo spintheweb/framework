@@ -11,7 +11,7 @@
 // deno-lint-ignore-file
 self.addEventListener("load", stwStartWebsocket);
 
-function _uuidToBase62(uuid) {
+function newId(uuid) {
 	const alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	const hex = uuid.replace(/-/g, "");
 
@@ -33,7 +33,7 @@ const stwTabId = sessionStorage.getItem("stwTabId") || (() => {
 	const raw = crypto.randomUUID
 		? crypto.randomUUID()
 		: (Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2));
-	const id = _uuidToBase62(raw);
+	const id = newId(raw);
 	sessionStorage.setItem("stwTabId", id);
 	return id;
 })();

@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Spin the Web component: stwWebSocket
 
+// deno-lint-ignore-file no-empty
+
 import { STWSite } from "../stwElements/stwSite.ts";
 import { STWPage } from "../stwElements/stwPage.ts";
 import { STWContent } from "../stwElements/stwContent.ts";
 import { STWSession } from "./stwSession.ts";
+import { newId } from "./stwIds.ts";
 
 const SESSION_CLEANUP_GRACE_PERIOD_MS = 30000; // 30 seconds
 
@@ -12,7 +15,7 @@ export function handleWebSocket(request: Request, session: STWSession, stwSessio
     const { socket, response } = Deno.upgradeWebSocket(request);
 
     const url = new URL(request.url);
-    const tabId = url.searchParams.get("tab") || crypto.randomUUID();
+    const tabId = url.searchParams.get("tab") || newId();
 
     // One socket per tab; replace previous if any
     const prev = session.sockets.get(tabId);

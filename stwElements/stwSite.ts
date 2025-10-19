@@ -126,7 +126,7 @@ export class STWSite extends STWElement {
 
 	// Find the element given an _id or permalink
 	public find(session: STWSession, ref: string): STWElement | null {
-		if (ref.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)) {
+		if (ref.match(/^x[0-9a-zA-Z]{21,22}/i)) {
 			return STWSite.index.get(ref) || null;
 		}
 		if (ref === "/") {
