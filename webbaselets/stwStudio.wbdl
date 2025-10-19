@@ -1,373 +1,373 @@
 {
-	"_id": "e258daa0-293a-11ee-9729-21da0b1a268c",
-	"type": "Area",
-	"name": {
-		"en": "STW Studio"
-	},
-	"description": {
-		"en": "Spin the Web studio webbaselet v1.0.0\nMIT License. Copyright (c) 2025 Giancarlo Trevisan"
-	},
-	"slug": {
-		"en": "stws"
-	},
-	"children": [
-		{
-			"_id": "e29cfba0-2952-11ee-8a01-eb5d698379c5",
-			"type": "Page",
-			"name": {
-				"en": "Edit"
-			},
-			"slug": {
-				"en": "edit"
-			},
-			"visibility": {},
-			"children": [
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Edit Site"
-					},
-					"slug": {
-						"en": "site"
-					},
-					"visibility": {},
-					"subtype": "Form",
-					"section": "stwShow",
-					"dsn": "stw",
-					"command": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"mainpage\"]",
-					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-globe\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
-					}
-				},
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Edit Area"
-					},
-					"slug": {
-						"en": "area"
-					},
-					"visibility": {},
-					"subtype": "Form",
-					"section": "stwShow",
-					"dsn": "stw",
-					"command": "[\"_id\", \"name\", \"slug\", \"mainpage\"]",
-					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-folder\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Mainpage')e\\rb(';stw;update')t('Save')"
-					}
-				},
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Edit Page"
-					},
-					"slug": {
-						"en": "page"
-					},
-					"visibility": {},
-					"subtype": "Form",
-					"section": "stwShow",
-					"dsn": "stw",
-					"command": "[\"_id\", \"name\", \"slug\", \"template\"]",
-					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-page\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
-					}
-				},
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Edit content"
-					},
-					"slug": {
-						"en": "content"
-					},
-					"visibility": {},
-					"subtype": "Form",
-					"section": "stwShow",
-					"dsn": "stw",
-					"command": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"command\", \"params\", \"layout\"]",
-					"layout": {
-						"en": "\\s('caption='<i class=\"fa-light fa-rectangle\"></i> @@name' key=\"_id\"')hl('Name')e\\rl('Slug')e\\rl('Type')\\rD(';;1;Text;Table;Tree;List;Form;Calendar;Graph;Map;Plot')\\rl('Section')el('Sequence')e\\rl('DSN')e\\rl('Command')m\\rl('Parameters')e\\rl('Layout')m\\rb(';stw;update')t('Save')"
-					}
-				},
-				{
-					"_id": "e20cfba0-2952-11ee-8a01-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Edit datasource"
-					},
-					"slug": {
-						"en": "datasource"
-					},
-					"visibility": {},
-					"subtype": "Table",
-					"cssClass": "stwFormCompact",
-					"section": "",
-					"sequence": "",
-					"dsn": "stw",
-					"command": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
-					"params": "",
-					"layout": {
-						"en": "\\s('key=\"name\"')l('Name')el('Type')d(';;2;mysql;mySQL;api;API')l('Host')el('Port')e\\a('type=\"number\"')l('User')el('Password')wl('Database')el('Content-Type')d(';;1;application/json')b(';stw;update')t('Save')"
-					}
-				},
-				{
-					"_id": "e20cfba0-2952-11ee-8a11-eb5d698979c6",
-					"type": "Content",
-					"name": {
-						"en": "Role Visibility"
-					},
-					"slug": {
-						"en": "role-visibility"
-					},
-					"visibility": {},
-					"subtype": "Table",
-					"dsn": "stw",
-					"command": "$keys(visibility)\\@$v.{\"name\": $v,\"value\": $lookup(visibility, $v)}",
-					"layout": {
-						"en": "\\s('key=\"name\"')l('Name')fl('Visible')d(';;2;1;True;0;False')b(';stw;update')t('Save')"
-					}
-				}
-			]
-		},
-		{
-			"_id": "e29cfba0-2952-12ee-8a01-eb5d698979c6",
-			"type": "Content",
-			"name": {
-				"en": "Structure"
-			},
-			"slug": {
-				"en": "structure"
-			},
-			"visibility": {},
-			"subtype": "Accordion",
-			"layout": {
-				"en": "\\s('header=\"&emsp;WEBBASE\"')"
-			},
-			"options": [
-				{
-					"name": {
-						"en": "Structure <span style=\"float:right\"><i class=\"fa-kit fa-light-folder-circle-plus\" aria-label=\"New area\"></i> <i class=\"fa-kit fa-light-file-circle-plus\" aria-label=\"New page\"></i> <i class=\"fa-kit fa-light-rectangle-circle-plus\" aria-label=\"New content\"></i></span>"
-					},
-					"ref": "e29cfba0-2952-11ee-8a01-eb5d698379c5"
-				},
-				{
-					"name": {
-						"en": "Data sources <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New data source\"></i></span>"
-					},
-					"ref": "e20cfba0-2952-11ee-8a01-eb5d698979c6"
-				},
-				{
-					"name": {
-						"en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New role\"></i></span>"
-					},
-					"ref": "e20cfba0-2952-11ee-8a11-eb5d698979c6"
-				}
-			]
-		},
-		{
-			"_id": "c7a1e2b0-16b2-4e6a-9f2a-8d2e4c9b7f3a",
-			"type": "Content",
-			"name": {
-				"en": "Search"
-			},
-			"slug": {
-				"en": "search"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwFormCompact",
-			"section": "stwShowModal",
-			"sequence": "",
-			"dsn": "",
-			"command": "",
-			"params": "",
-			"layout": {
-				"en": "\\s('header=\"&emsp;SEARCH\"')e\\a('placeholder=\"Search\"')e\\a('placeholder=\"Replace\"')b(';stw;search')t('Search')\\nt('search results')"
-			}
-		},
-		{
-			"_id": "e29cfba0-2952-11fe-8a01-eb5e698379c5",
-			"type": "Content",
-			"name": {
-				"en": "Settings"
-			},
-			"slug": {
-				"en": "settings"
-			},
-			"visibility": {},
-			"subtype": "Form",
-			"cssClass": "stwFormCompact",
-			"section": "stwShowModal",
-			"sequence": "",
-			"dsn": "",
-			"command": "",
-			"params": "",
-			"layout": {
-				"en": "l('Color')d('tint;;1;Blue;Green;Red;Yellow;Purple;Gray')\\rb('stws;save')t('Save')"
-			}
-		},
-		{
-			"_id": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef",
-			"type": "Page",
-			"name": {
-				"en": "Interface"
-			},
-			"slug": {
-				"en": "interface"
-			},
-			"children": [
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c5",
-					"type": "Content",
-					"name": {
-						"en": "activities"
-					},
-					"slug": {
-						"en": "activities"
-					},
-					"visibility": {},
-					"subtype": "Tabs",
-					"cssClass": null,
-					"section": "stwSidebar",
-					"sequence": "2",
-					"dsn": "",
-					"command": "",
-					"params": "",
-					"layout": {
-						"en": "\\s('mode=\"vertical\"')"
-					},
-					"options": [
-						{
-							"name": {
-								"en": "<i class=\"fa-light fa-2x fa-sitemap\" aria-label=\"Webbase\"></i>"
-							},
-							"ref": "e29cfba0-2952-12ee-8a01-eb5d698979c6"
-						},
-						{
-							"name": {
-								"en": "<i class=\"fa-light fa-2x fa-search\" aria-label=\"Search\"></i>"
-							},
-							"ref": "c7a1e2b0-16b2-4e6a-9f2a-8d2e4c9b7f3a"
-						},
-						{
-							"name": {
-								"en": "<i class=\"fa-light fa-2x fa-copy\" aria-label=\"Explorer\"></i>"
-							},
-							"ref": "e29cfba0-2952-11fe-8a01-eb5d698379c5"
-						},
-						{
-							"name": {
-								"en": "-"
-							}
-						},
-						{
-							"name": {
-								"en": "<i class=\"fa-light fa-2x fa-gear\" aria-label=\"Settings\"></i>"
-							},
-							"ref": "e29cfba0-2952-11fe-8a01-eb5e698379c5"
-						}
-					]
-				},
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698379c5",
-					"type": "Content",
-					"name": {
-						"en": "Webbase"
-					},
-					"slug": {
-						"en": "webbase"
-					},
-					"visibility": {},
-					"subtype": "Tree",
-					"cssClass": null,
-					"section": "",
-					"sequence": "",
-					"dsn": "stw",
-					"command": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit/\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
-					"params": "",
-					"layout": {
-						"en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-folder\"></i>;Page*;<i class=\"fa-light fa-file\"></i>;Content*;<i class=\"fa-light fa-cloud\"></i>;;<i class=\"fa-light fa-rectangle\"></i>')apf"
-					}
-				},
-				{
-					"_id": "e29cfba0-2952-11fe-8a01-eb5d698379c5",
-					"type": "Content",
-					"name": {
-						"en": "Explorer"
-					},
-					"slug": {
-						"en": "explorer"
-					},
-					"visibility": {},
-					"subtype": "Table",
-					"cssClass": null,
-					"section": "",
-					"sequence": "",
-					"dsn": "bash",
-					"command": "ls -l ./public",
-					"contentType": "application/json",
-					"params": "",
-					"layout": {
-						"en": ""
-					}
-				},
-				{
-					"_id": "e29cfba0-2952-11ee-8a01-eb5d698979c7",
-					"type": "Content",
-					"name": {
-						"en": "Logon"
-					},
-					"slug": {
-						"en": "logon"
-					},
-					"visibility": {
-						"guests": true,
-						"everyone": false
-					},
-					"subtype": "Form",
-					"cssClass": null,
-					"section": "",
-					"sequence": "",
-					"dsn": "",
-					"command": "",
-					"params": "",
-					"layout": {
-						"en": "\\s('caption=\"Logon\"')l('Username')e(';usr')t(' ')l('Password')w('pwd')b(';Logon;;stw;logon;@@usr;@@pwd')"
-					}
-				},
-				{
-					"_id": "f789bbc0-2952-11ee-a56c-e7d2b4a9289e",
-					"type": "Content",
-					"name": {
-						"en": "statusbar"
-					},
-					"slug": {
-						"en": "statusbar"
-					},
-					"visibility": {},
-					"subtype": "Text",
-					"cssClass": null,
-					"section": "stwStatusbar",
-					"sequence": "1",
-					"dsn": null,
-					"command": null,
-					"params": "",
-					"layout": {
-						"en": "Alt+F12 Toggles Spin the Web Studio"
-					}
-				}
-			],
-			"visibility": {}
-		}
-	],
-	"visibility": {
-		"everyone": false,
-		"developers": true
-	},
-	"mainpage": "f6f530d0-293a-11ee-aec6-29bdf5c4dfef"
+  "_id": "x6T6S55WbZjerGVamxGi8kA",
+  "type": "Area",
+  "name": {
+    "en": "STW Studio"
+  },
+  "description": {
+    "en": "Spin the Web studio webbaselet v1.0.0\nMIT License. Copyright (c) 2025 Giancarlo Trevisan"
+  },
+  "slug": {
+    "en": "stws"
+  },
+  "children": [
+    {
+      "_id": "x6TC0s1xSa5NgDIgMyCbIhL",
+      "type": "Page",
+      "name": {
+        "en": "Edit"
+      },
+      "slug": {
+        "en": "edit"
+      },
+      "visibility": {},
+      "children": [
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzY",
+          "type": "Content",
+          "name": {
+            "en": "Edit Site"
+          },
+          "slug": {
+            "en": "site"
+          },
+          "visibility": {},
+          "subtype": "Form",
+          "section": "stwShow",
+          "dsn": "stw",
+          "command": "[\"_id\", \"name\", \"slug\", \"URL\", \"lang\", \"mainpage\"]",
+          "layout": {
+            "en": "\\s('caption='<i class=\"fa-light fa-globe\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('URL')el('Language')el('Homepage')e\\rb(';stw;update')t('Save')"
+          }
+        },
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzY",
+          "type": "Content",
+          "name": {
+            "en": "Edit Area"
+          },
+          "slug": {
+            "en": "area"
+          },
+          "visibility": {},
+          "subtype": "Form",
+          "section": "stwShow",
+          "dsn": "stw",
+          "command": "[\"_id\", \"name\", \"slug\", \"mainpage\"]",
+          "layout": {
+            "en": "\\s('caption='<i class=\"fa-light fa-folder\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Mainpage')e\\rb(';stw;update')t('Save')"
+          }
+        },
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzY",
+          "type": "Content",
+          "name": {
+            "en": "Edit Page"
+          },
+          "slug": {
+            "en": "page"
+          },
+          "visibility": {},
+          "subtype": "Form",
+          "section": "stwShow",
+          "dsn": "stw",
+          "command": "[\"_id\", \"name\", \"slug\", \"template\"]",
+          "layout": {
+            "en": "\\s('caption='<i class=\"fa-light fa-page\"></i> @@name' key=\"_id\"')hl('Name')el('Slug')el('Template')e\\rb(';stw;update')t('Save')"
+          }
+        },
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzY",
+          "type": "Content",
+          "name": {
+            "en": "Edit content"
+          },
+          "slug": {
+            "en": "content"
+          },
+          "visibility": {},
+          "subtype": "Form",
+          "section": "stwShow",
+          "dsn": "stw",
+          "command": "[\"_id\", \"name\", \"slug\", \"subtype\", \"section\", \"sequence\", \"dsn\", \"command\", \"params\", \"layout\"]",
+          "layout": {
+            "en": "\\s('caption='<i class=\"fa-light fa-rectangle\"></i> @@name' key=\"_id\"')hl('Name')e\\rl('Slug')e\\rl('Type')\\rD(';;1;Text;Table;Tree;List;Form;Calendar;Graph;Map;Plot')\\rl('Section')el('Sequence')e\\rl('DSN')e\\rl('Command')m\\rl('Parameters')e\\rl('Layout')m\\rb(';stw;update')t('Save')"
+          }
+        },
+        {
+          "_id": "x6SyclmGzAM2uOpnred9ceG",
+          "type": "Content",
+          "name": {
+            "en": "Edit datasource"
+          },
+          "slug": {
+            "en": "datasource"
+          },
+          "visibility": {},
+          "subtype": "Table",
+          "cssClass": "stwFormCompact",
+          "section": "",
+          "sequence": "",
+          "dsn": "stw",
+          "command": "[\"name\", \"type\", \"host\", \"port\", \"user\", \"password\", \"database\", \"contentType\"]",
+          "params": "",
+          "layout": {
+            "en": "\\s('key=\"name\"')l('Name')el('Type')d(';;2;mysql;mySQL;api;API')l('Host')el('Port')e\\a('type=\"number\"')l('User')el('Password')wl('Database')el('Content-Type')d(';;1;application/json')b(';stw;update')t('Save')"
+          }
+        },
+        {
+          "_id": "x6SyclmGzAM2uOK0hCP7VyK",
+          "type": "Content",
+          "name": {
+            "en": "Role Visibility"
+          },
+          "slug": {
+            "en": "role-visibility"
+          },
+          "visibility": {},
+          "subtype": "Table",
+          "dsn": "stw",
+          "command": "$keys(visibility)\\@$v.{\"name\": $v,\"value\": $lookup(visibility, $v)}",
+          "layout": {
+            "en": "\\s('key=\"name\"')l('Name')fl('Visible')d(';;2;1;True;0;False')b(';stw;update')t('Save')"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "x6TC0s1xSa7g1ciRv64FQ22",
+      "type": "Content",
+      "name": {
+        "en": "Structure"
+      },
+      "slug": {
+        "en": "structure"
+      },
+      "visibility": {},
+      "subtype": "Accordion",
+      "layout": {
+        "en": "\\s('header=\"&emsp;WEBBASE\"')"
+      },
+      "options": [
+        {
+          "name": {
+            "en": "Structure <span style=\"float:right\"><i class=\"fa-kit fa-light-folder-circle-plus\" aria-label=\"New area\"></i> <i class=\"fa-kit fa-light-file-circle-plus\" aria-label=\"New page\"></i> <i class=\"fa-kit fa-light-rectangle-circle-plus\" aria-label=\"New content\"></i></span>"
+          },
+          "ref": "x6TC0s1xSa5NgDIgMyCbIhL"
+        },
+        {
+          "name": {
+            "en": "Data sources <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New data source\"></i></span>"
+          },
+          "ref": "x6SyclmGzAM2uOpnred9ceG"
+        },
+        {
+          "name": {
+            "en": "Roles <span style=\"float:right\"><i class=\"fa-thin fa-plus\" aria-label=\"New role\"></i></span>"
+          },
+          "ref": "x6SyclmGzAM2uOK0hCP7VyK"
+        }
+      ]
+    },
+    {
+      "_id": "x64HscPpcM9pByUEWIVTocq",
+      "type": "Content",
+      "name": {
+        "en": "Search"
+      },
+      "slug": {
+        "en": "search"
+      },
+      "visibility": {},
+      "subtype": "Form",
+      "cssClass": "stwFormCompact",
+      "section": "stwShowModal",
+      "sequence": "",
+      "dsn": "",
+      "command": "",
+      "params": "",
+      "layout": {
+        "en": "\\s('header=\"&emsp;SEARCH\"')e\\a('placeholder=\"Search\"')e\\a('placeholder=\"Replace\"')b(';stw;search')t('Search')\\nt('search results')"
+      }
+    },
+    {
+      "_id": "x6TC0s1xSa5SWiCO4UTvujX",
+      "type": "Content",
+      "name": {
+        "en": "Settings"
+      },
+      "slug": {
+        "en": "settings"
+      },
+      "visibility": {},
+      "subtype": "Form",
+      "cssClass": "stwFormCompact",
+      "section": "stwShowModal",
+      "sequence": "",
+      "dsn": "",
+      "command": "",
+      "params": "",
+      "layout": {
+        "en": "l('Color')d('tint;;1;Blue;Green;Red;Yellow;Purple;Gray')\\rb('stws;save')t('Save')"
+      }
+    },
+    {
+      "_id": "x7w0adQ8hdI0CUWkSHoOhYj",
+      "type": "Page",
+      "name": {
+        "en": "Interface"
+      },
+      "slug": {
+        "en": "interface"
+      },
+      "children": [
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzX",
+          "type": "Content",
+          "name": {
+            "en": "activities"
+          },
+          "slug": {
+            "en": "activities"
+          },
+          "visibility": {},
+          "subtype": "Tabs",
+          "cssClass": null,
+          "section": "stwSidebar",
+          "sequence": "2",
+          "dsn": "",
+          "command": "",
+          "params": "",
+          "layout": {
+            "en": "\\s('mode=\"vertical\"')"
+          },
+          "options": [
+            {
+              "name": {
+                "en": "<i class=\"fa-light fa-2x fa-sitemap\" aria-label=\"Webbase\"></i>"
+              },
+              "ref": "x6TC0s1xSa7g1ciRv64FQ22"
+            },
+            {
+              "name": {
+                "en": "<i class=\"fa-light fa-2x fa-search\" aria-label=\"Search\"></i>"
+              },
+              "ref": "x64HscPpcM9pByUEWIVTocq"
+            },
+            {
+              "name": {
+                "en": "<i class=\"fa-light fa-2x fa-copy\" aria-label=\"Explorer\"></i>"
+              },
+              "ref": "x6TC0s1xSa5SWiCO4QcQf7T"
+            },
+            {
+              "name": {
+                "en": "-"
+              }
+            },
+            {
+              "name": {
+                "en": "<i class=\"fa-light fa-2x fa-gear\" aria-label=\"Settings\"></i>"
+              },
+              "ref": "x6TC0s1xSa5SWiCO4UTvujX"
+            }
+          ]
+        },
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCbIhL",
+          "type": "Content",
+          "name": {
+            "en": "Webbase"
+          },
+          "slug": {
+            "en": "webbase"
+          },
+          "visibility": {},
+          "subtype": "Tree",
+          "cssClass": null,
+          "section": "",
+          "sequence": "",
+          "dsn": "stw",
+          "command": "($tree:=function($node){{\"icon\":$node.type & ($node.section ? \"\" : \"*\"),\"url\":\"/stws/edit/\" & $lowercase($node.type),\"_id\":$node._id,\"name\":$node.name.en,\"children\":$node.children?$map($node.children,$tree):[]}};$tree($))",
+          "params": "",
+          "layout": {
+            "en": "n('2;Site*;<i class=\"fa-light fa-globe\"></i>;Area*;<i class=\"fa-light fa-folder\"></i>;Page*;<i class=\"fa-light fa-file\"></i>;Content*;<i class=\"fa-light fa-cloud\"></i>;;<i class=\"fa-light fa-rectangle\"></i>')apf"
+          }
+        },
+        {
+          "_id": "x6TC0s1xSa5SWiCO4QcQf7T",
+          "type": "Content",
+          "name": {
+            "en": "Explorer"
+          },
+          "slug": {
+            "en": "explorer"
+          },
+          "visibility": {},
+          "subtype": "Table",
+          "cssClass": null,
+          "section": "",
+          "sequence": "",
+          "dsn": "bash",
+          "command": "ls -l ./public",
+          "contentType": "application/json",
+          "params": "",
+          "layout": {
+            "en": ""
+          }
+        },
+        {
+          "_id": "x6TC0s1xSa5NgDIgMyCdmzZ",
+          "type": "Content",
+          "name": {
+            "en": "Logon"
+          },
+          "slug": {
+            "en": "logon"
+          },
+          "visibility": {
+            "guests": true,
+            "everyone": false
+          },
+          "subtype": "Form",
+          "cssClass": null,
+          "section": "",
+          "sequence": "",
+          "dsn": "",
+          "command": "",
+          "params": "",
+          "layout": {
+            "en": "\\s('caption=\"Logon\"')l('Username')e(';usr')t(' ')l('Password')w('pwd')b(';Logon;;stw;logon;@@usr;@@pwd')"
+          }
+        },
+        {
+          "_id": "x7x632LisDuQKDzazMvGb8y",
+          "type": "Content",
+          "name": {
+            "en": "statusbar"
+          },
+          "slug": {
+            "en": "statusbar"
+          },
+          "visibility": {},
+          "subtype": "Text",
+          "cssClass": null,
+          "section": "stwStatusbar",
+          "sequence": "1",
+          "dsn": null,
+          "command": null,
+          "params": "",
+          "layout": {
+            "en": "Alt+F12 Toggles Spin the Web Studio"
+          }
+        }
+      ],
+      "visibility": {}
+    }
+  ],
+  "visibility": {
+    "everyone": false,
+    "developers": true
+  },
+  "mainpage": "x7w0adQ8hdI0CUWkSHoOhYj"
 }

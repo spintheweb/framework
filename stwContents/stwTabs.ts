@@ -6,6 +6,7 @@ import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
 import { STWIndex } from "../stwElements/stwIndex.ts";
 import { STWLayout } from "../stwComponents/stwWBLL.ts";
+import { newId } from "../stwComponents/stwIds.ts";
 
 export class STWTabs extends STWContent {
 	options: ISTWOption[] = [];
@@ -40,7 +41,7 @@ export class STWTabs extends STWContent {
 		if (!id)
 			return "";
 
-		body += `</div><dd><article id="${crypto.randomUUID()}" href="${id}${(new URL(_req.url)).search}"><i class="fa-light fa-loader fa-spin"></i></article></dd>`;
+		body += `</div><dd><article id="${newId()}" href="${id}${(new URL(_req.url)).search}"><i class="fa-light fa-loader fa-spin"></i></article></dd>`;
 
 		// The STWTabs script selects the clicked tab and requests from the spinner the tab content
 		const mode = layout.settings.get("mode") || "horizontal";

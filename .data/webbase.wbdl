@@ -1,522 +1,522 @@
 {
-	"_id": "169ecfb0-2916-11ee-ad92-6bd31f953e80",
-	"type": "Site",
-	"name": {
-		"en": "Spin the Web"
-	},
-	"children": [
-		{
-			"_id": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
-			"type": "Page",
-			"name": {
-				"en": "Home"
-			},
-			"slug": {
-				"en": "home"
-			},
-			"children": [
-				{
-					"_id": "169ecfb2-2916-11ee-ad92-6bd31f953e80",
-					"type": "Content",
-					"name": {
-						"en": "Customers"
-					},
-					"slug": {
-						"en": "customers"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Table",
-					"cssClass": "stwTable",
-					"section": "main",
-					"sequence": "1",
-					"dsn": "mysqlsample",
-					"command": "SELECT * FROM customers LIMIT 3",
-					"params": "",
-					"layout": {
-						"en": "\\s('caption=\"Customers\"')"
-					}
-				},
-				{
-					"_id": "0c6511f0-aff6-11ee-86f2-1733f9fc2f8d",
-					"type": "Content",
-					"name": {
-						"en": "DB Schema"
-					},
-					"slug": {
-						"en": "dbschema"
-					},
-					"visibility": {
-						"guests": false
-					},
-					"subtype": "Tree",
-					"cssClass": "stwTree",
-					"section": "main",
-					"sequence": "10",
-					"dsn": "mysqlsample",
-					"command": "SELECT 'TABLES' as TYPE, 'TABLES' as NAME, null as rows, '' as DATA_TYPE, '' as COLUMN_TYPE, '' as COLUMN_KEY, 'TABLE' as PATH\nUNION\nSELECT 'TABLE', T.TABLE_NAME, T.TABLE_ROWS, '', '', '', concat_ws('/', 'TABLE', T.TABLE_NAME)\n    FROM information_schema.tables T \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'TABLE', T.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.tables T inner join information_schema.columns C on T.TABLE_SCHEMA = C.TABLE_SCHEMA and T.TABLE_NAME = C.TABLE_NAME \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'VIEWS', 'VIEWS', null, '', '', '', 'VIEW'\nUNION\nSELECT 'VIEW', V.TABLE_NAME, null, '', '', '', concat_ws('/', 'VIEW', V.TABLE_NAME)\n    FROM information_schema.views V\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'VIEW', V.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.views V inner join information_schema.columns C on V.TABLE_SCHEMA = C.TABLE_SCHEMA and V.TABLE_NAME = C.TABLE_NAME\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'ROUTINES', 'ROUTINES', null, '', '', '', 'ROUTINE'\nUNION\nSELECT distinct concat(R.ROUTINE_TYPE, 'S'), concat(R.ROUTINE_TYPE, 'S'), null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT R.ROUTINE_TYPE, R.ROUTINE_NAME, null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'PARAMETER', ifnull(P.PARAMETER_NAME, 'RETURN'), null, P.DATA_TYPE, P.DTD_IDENTIFIER, ifnull(P.PARAMETER_MODE, ''), concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME, ifnull(P.PARAMETER_NAME, 'RETURN'))\n    FROM information_schema.ROUTINES R left join information_schema.PARAMETERS P ON R.ROUTINE_SCHEMA = P.SPECIFIC_SCHEMA and R.ROUTINE_NAME = P.SPECIFIC_NAME\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'",
-					"params": "",
-					"layout": {
-						"en": "\\s('caption=\"DB Schema\" key=\"PATH\"')"
-					}
-				},
-				{
-					"_id": "6b70fab0-2aa9-11ee-956d-479821047fbc",
-					"type": "Content",
-					"name": {
-						"en": "Logoff"
-					},
-					"slug": {
-						"en": "logoff"
-					},
-					"visibility": {
-						"guests": false
-					},
-					"subtype": "Form",
-					"cssClass": "stwForm",
-					"section": "main",
-					"sequence": "2",
-					"dsn": "",
-					"command": "",
-					"params": "",
-					"layout": {
-						"en": "t('\n<form action=\"/stw/logoff\" method=\"post\">\n<button type=\"submit\">Logoff</button>\n</form>')"
-					}
-				},
-				{
-					"_id": "92a2ced0-ae64-11ee-90a9-c195cb5cfc71",
-					"type": "Content",
-					"name": {
-						"en": "Menus"
-					},
-					"slug": {
-						"en": "menus"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Menus",
-					"cssClass": null,
-					"section": "header",
-					"sequence": "1",
-					"layout": {
-						"en": "\\s('short')"
-					},
-					"options": [
-						{
-							"name": {
-								"en": "Animals"
-							},
-							"options": [
-								{
-									"name": {
-										"en": "Dogs"
-									},
-									"ref": "/home"
-								},
-								{
-									"name": {
-										"en": "Cats"
-									},
-									"ref": "/home"
-								},
-								{
-									"name": {
-										"en": "Bears"
-									},
-									"options": [
-										{
-											"name": {
-												"en": "Dogs"
-											},
-											"ref": "/home"
-										},
-										{
-											"name": {
-												"en": "Cats"
-											},
-											"ref": "/home"
-										},
-										{
-											"name": {
-												"en": "Bears"
-											},
-											"ref": "/home"
-										},
-										{
-											"name": {
-												"en": "-"
-											}
-										},
-										{
-											"name": {
-												"en": "Orcas"
-											},
-											"ref": "/home"
-										},
-										{
-											"name": {
-												"en": "Whales"
-											},
-											"ref": "/home"
-										}
-									]
-								},
-								{
-									"name": {
-										"en": "Orcas"
-									},
-									"ref": "/home"
-								},
-								{
-									"name": {
-										"en": "Whales"
-									},
-									"ref": "/home"
-								}
-							]
-						},
-						{
-							"ref": "169ecfb0-2916-11ee-ad92-6bd31f953e80"
-						},
-						{
-							"name": {
-								"en": "-"
-							}
-						},
-						{
-							"ref": "https://www.keyvisions.it"
-						},
-						{
-							"ref": "4afeeae0-2a4e-11ee-9a5d-8ff6b23b06b9"
-						}
-					]
-				},
-				{
-					"_id": "92a2ced0-be64-11ee-90a9-c195cb5cfc71",
-					"type": "Content",
-					"name": {
-						"en": "Tabs"
-					},
-					"slug": {
-						"en": "tabs"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Tabs",
-					"section": "main",
-					"sequence": "10",
-					"layout": {
-						"en": "\\s('mode=\"horizontal\"')"
-					},
-					"options": [
-						{
-							"name": {
-								"en": "./public"
-							},
-							"ref": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371"
-						},
-						{
-							"ref": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371"
-						}
-					]
-				},
-				{
-					"_id": "92a2ced0-be64-11ee-90a9-c195db5cfc71",
-					"type": "Content",
-					"name": {
-						"en": "Code Editor"
-					},
-					"slug": {
-						"en": "code-editor"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Form",
-					"section": "main",
-					"sequence": "11",
-					"layout": {
-						"en": "\\s('caption=\"Code Editor\"')m('javascript;note;Hello World!')\\rb(';stw;submit')t('Submit')"
-					}
-				},
-				{
-					"_id": "92a2ced0-be74-11ee-90a9-c195cb5cfc71",
-					"type": "Content",
-					"name": {
-						"en": "Explain"
-					},
-					"slug": {
-						"en": "explain"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Text",
-					"section": "main",
-					"sequence": "9",
-					"layout": {
-						"en": "<h2>Welcome to the Spin the Web Labs</h2><h3>What is WBDL (Webbase Description Language)?</h3><spn>While <b>HTML (HyperText Markup Language)</b> describes the structure and content of a single web page and is interpreted and rendered by <i>client-side browsers</i>, WBDL (Webbase Description Language)</b> describes the architecture, composition and function of an entire web portal and is interpreted and rendered by <i>server-side webspinners</i>.</span>"
-					}
-				},
-				{
-					"_id": "b1e2c3d4-5678-11ee-9abc-def012345678",
-					"type": "Content",
-					"name": {
-						"en": "Offices"
-					},
-					"slug": {
-						"en": "offices"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Table",
-					"section": "rightSidebar",
-					"sequence": "1",
-					"dsn": "mysqlsample",
-					"command": "select * from offices",
-					"layout": {
-						"en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('-')b(';stw;insert')t('+')"
-					}
-				},
-				{
-					"_id": "b7e6e6b0-1a2b-4c3d-9e8f-123456789abd",
-					"type": "Content",
-					"name": {
-						"en": "Calendar"
-					},
-					"slug": {
-						"en": "calendar"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "Calendar",
-					"section": "leftSidebar",
-					"sequence": "1",
-					"layout": {
-						"en": "\\s('mode=\"month\" key=\"date\"')"
-					}
-				}
-			],
-			"visibility": {},
-			"keywords": {},
-			"description": {},
-			"contentType": "text/html",
-			"template": "index.html"
-		},
-		{
-			"_id": "e96850b0-2934-11ee-9adf-ab38b1846e6d",
-			"type": "Page",
-			"name": {
-				"en": "Sales"
-			},
-			"slug": {
-				"en": "sales"
-			},
-			"children": [
-				{
-					"_id": "82b2e8e0-b105-11ee-bfb3-b7497c4c5371",
-					"type": "Content",
-					"name": {
-						"en": "Files"
-					},
-					"slug": {
-						"en": "files"
-					},
-					"visibility": {},
-					"subtype": "Table",
-					"sequence": "1",
-					"dsn": "bash",
-					"command": "ls -l ./public",
-					"contentType": "application/json",
-					"layout": {}
-				},
-				{
-					"_id": "82b2e8e0-b105-11ee-cfb3-b7497c4c5371",
-					"type": "Content",
-					"name": {
-						"en": "Objects"
-					},
-					"slug": {
-						"en": "objects"
-					},
-					"visibility": {
-						"guests": true
-					},
-					"subtype": "List",
-					"sequence": "5",
-					"dsn": "objects",
-					"command": "$.({\"name\":name,\"color\":data.color})",
-					"params": "id=3&id=5&id=10",
-					"layout": {
-						"en": "\\s('closable header=\"This data comes from the API: https://api.restful-api.dev/objects\"')"
-					}
-				},
-				{
-					"_id": "f20a8d00-2934-11ee-9d73-23bae420eae3",
-					"type": "Content",
-					"name": {
-						"en": "Employees"
-					},
-					"slug": {
-						"en": "employees"
-					},
-					"visibility": {},
-					"subtype": "Table",
-					"section": "main",
-					"sequence": "1",
-					"dsn": "mysqlsample",
-					"command": "select *, 'collapsible' as foo from employees limit 3",
-					"layout": {
-						"en": "\\s('caption=\"Employees\" key=\"employeeNumber\" @@foo ')\nl('Name')a('dashboard')pp('fufi;@@foo')ff\nl('Ext.')f\nl('eMail')a('mailto:@@email')f\nlf\nlf\nl('Title')f"
-					}
-				}
-			],
-			"visibility": {
-				"guests": true
-			},
-			"contentType": "text/html",
-			"template": "index.html"
-		},
-		{
-			"_id": "056a46e0-2969-11ee-b3cb-63dd69d21471",
-			"type": "Area",
-			"name": {
-				"en": "Profile"
-			},
-			"slug": {
-				"en": "profile"
-			},
-			"children": [
-				{
-					"_id": "12266810-2ed6-11ee-b84a-515b8aa1e448",
-					"type": "Area",
-					"name": {
-						"en": "Area"
-					},
-					"slug": {
-						"en": "area"
-					},
-					"children": [
-						{
-							"_id": "75fb5ef0-31af-11ee-8fc0-fb48e074503e",
-							"type": "Page",
-							"name": {
-								"en": "Page"
-							},
-							"slug": {
-								"en": "page"
-							},
-							"children": [],
-							"visibility": {
-								"guests": true
-							},
-							"keywords": {},
-							"description": {},
-							"contentType": "text/html",
-							"template": "index.html"
-						}
-					],
-					"visibility": {
-						"guests": true
-					},
-					"keywords": {},
-					"description": {},
-					"mainpage": "131e0e80-2ed6-11ee-b84a-515b8aa1e448"
-				}
-			],
-			"visibility": {
-				"guests": true
-			},
-			"keywords": {
-				"en": ""
-			},
-			"description": {
-				"en": ""
-			},
-			"mainpage": ""
-		},
-		{
-			"_id": "14061700-400d-11ee-861d-b761bb0ba80e",
-			"type": "Page",
-			"name": {
-				"en": "Page"
-			},
-			"slug": {
-				"en": "page"
-			},
-			"children": [],
-			"visibility": {
-				"guests": true
-			},
-			"keywords": {},
-			"description": {},
-			"contentType": "text/html",
-			"template": "index.html"
-		},
-		{
-			"_id": "ebf2b990-298b-11ee-9495-a9d1845d6f69",
-			"type": "Content",
-			"name": {
-				"en": "Breadcrumbs"
-			},
-			"slug": {
-				"en": "breadcrumbs"
-			},
-			"visibility": {
-				"guests": true
-			},
-			"subtype": "Breadcrumbs",
-			"cssClass": "stwBreadcrumbs",
-			"section": "header",
-			"sequence": "2",
-			"layout": {
-				"en": "\\s('header='<i class=\"fa-light fa-sidebar\" onclick=\"toggleSidebar(event)\"></i>' footer='<i class=\"fa-light fa-sidebar-flip\" onclick=\"toggleSidebar(event)\"></i>'')j('function toggleSidebar(event){const sidebar=document.getElementById(event.target.className.indexOf(\"flip\") == -1 ? \"leftSidebar\" : \"rightSidebar\"); sidebar.style.display = sidebar.style.display === \"none\" ? \"flex\" : \"none\";}')"
-			}
-		},
-		{
-			"_id": "04aefc10-293b-11ee-92de-0fc9206ffad8",
-			"type": "Content",
-			"name": {
-				"en": "Languages"
-			},
-			"slug": {
-				"en": "languages"
-			},
-			"visibility": {
-				"guests": true
-			},
-			"subtype": "Languages",
-			"cssClass": "stwLanguages",
-			"section": "footer",
-			"sequence": "1",
-			"layout": {}
-		}
-	],
-	"visibility": {
-		"administrators": true,
-		"guests": false,
-		"users": false,
-		"editors": false,
-		"developers": false,
-		"moderators": false,
-		"contributors": false
-	},
-	"keywords": {
-		"en": "stw"
-	},
-	"description": {
-		"en": "This site demonstrates..."
-	},
-	"mainpage": "169ecfb1-2916-11ee-ad92-6bd31f953e80",
-	"langs": [
-		"en"
-	],
-	"datasources": {
-		"mysqlsample": "https://www.mysqltutorial.org/getting-started-with-mysql/mysql-sample-database/"
-	}
+  "_id": "xGGpiW7IjjrFqapqVuZopW",
+  "type": "Site",
+  "name": {
+    "en": "Spin the Web"
+  },
+  "children": [
+    {
+      "_id": "xGGpiXMKLBB9JzXmwCV1IY",
+      "type": "Page",
+      "name": {
+        "en": "Home"
+      },
+      "slug": {
+        "en": "home"
+      },
+      "children": [
+        {
+          "_id": "xGGpiZrNdTKE2Zvi7KQF20",
+          "type": "Content",
+          "name": {
+            "en": "Customers"
+          },
+          "slug": {
+            "en": "customers"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Table",
+          "cssClass": "stwTable",
+          "section": "main",
+          "sequence": "1",
+          "dsn": "mysqlsample",
+          "command": "SELECT * FROM customers LIMIT 3",
+          "params": "",
+          "layout": {
+            "en": "\\s('caption=\"Customers\"')"
+          }
+        },
+        {
+          "_id": "xno61aDt5dXpvK93DcE96l",
+          "type": "Content",
+          "name": {
+            "en": "DB Schema"
+          },
+          "slug": {
+            "en": "dbschema"
+          },
+          "visibility": {
+            "guests": false
+          },
+          "subtype": "Tree",
+          "cssClass": "stwTree",
+          "section": "main",
+          "sequence": "10",
+          "dsn": "mysqlsample",
+          "command": "SELECT 'TABLES' as TYPE, 'TABLES' as NAME, null as rows, '' as DATA_TYPE, '' as COLUMN_TYPE, '' as COLUMN_KEY, 'TABLE' as PATH\nUNION\nSELECT 'TABLE', T.TABLE_NAME, T.TABLE_ROWS, '', '', '', concat_ws('/', 'TABLE', T.TABLE_NAME)\n    FROM information_schema.tables T \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'TABLE', T.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.tables T inner join information_schema.columns C on T.TABLE_SCHEMA = C.TABLE_SCHEMA and T.TABLE_NAME = C.TABLE_NAME \n    WHERE T.TABLE_SCHEMA='qt3ul9nb_sampledb' and T.TABLE_TYPE = 'BASE TABLE'\nUNION\nSELECT 'VIEWS', 'VIEWS', null, '', '', '', 'VIEW'\nUNION\nSELECT 'VIEW', V.TABLE_NAME, null, '', '', '', concat_ws('/', 'VIEW', V.TABLE_NAME)\n    FROM information_schema.views V\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'COLUMN', C.COLUMN_NAME, null, C.DATA_TYPE, C.COLUMN_TYPE, C.COLUMN_KEY, concat_ws('/', 'VIEW', V.TABLE_NAME, C.COLUMN_NAME)\n    FROM information_schema.views V inner join information_schema.columns C on V.TABLE_SCHEMA = C.TABLE_SCHEMA and V.TABLE_NAME = C.TABLE_NAME\n    WHERE V.TABLE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'ROUTINES', 'ROUTINES', null, '', '', '', 'ROUTINE'\nUNION\nSELECT distinct concat(R.ROUTINE_TYPE, 'S'), concat(R.ROUTINE_TYPE, 'S'), null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT R.ROUTINE_TYPE, R.ROUTINE_NAME, null, '', '', '', concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME)\n    FROM information_schema.ROUTINES R\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'\nUNION\nSELECT 'PARAMETER', ifnull(P.PARAMETER_NAME, 'RETURN'), null, P.DATA_TYPE, P.DTD_IDENTIFIER, ifnull(P.PARAMETER_MODE, ''), concat_ws('/', 'ROUTINE', R.ROUTINE_TYPE, R.ROUTINE_NAME, ifnull(P.PARAMETER_NAME, 'RETURN'))\n    FROM information_schema.ROUTINES R left join information_schema.PARAMETERS P ON R.ROUTINE_SCHEMA = P.SPECIFIC_SCHEMA and R.ROUTINE_NAME = P.SPECIFIC_NAME\n    WHERE R.ROUTINE_SCHEMA='qt3ul9nb_sampledb'",
+          "params": "",
+          "layout": {
+            "en": "\\s('caption=\"DB Schema\" key=\"PATH\"')"
+          }
+        },
+        {
+          "_id": "x3gJOg8rVapMR0eiVIizt6c",
+          "type": "Content",
+          "name": {
+            "en": "Logoff"
+          },
+          "slug": {
+            "en": "logoff"
+          },
+          "visibility": {
+            "guests": false
+          },
+          "subtype": "Form",
+          "cssClass": "stwForm",
+          "section": "main",
+          "sequence": "2",
+          "dsn": "",
+          "command": "",
+          "params": "",
+          "layout": {
+            "en": "t('\n<form action=\"/stw/logoff\" method=\"post\">\n<button type=\"submit\">Logoff</button>\n</form>')"
+          }
+        },
+        {
+          "_id": "x4sHhyptkJDFXjfOgnM0lRD",
+          "type": "Content",
+          "name": {
+            "en": "Menus"
+          },
+          "slug": {
+            "en": "menus"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Menus",
+          "cssClass": null,
+          "section": "header",
+          "sequence": "1",
+          "layout": {
+            "en": "\\s('short')"
+          },
+          "options": [
+            {
+              "name": {
+                "en": "Animals"
+              },
+              "options": [
+                {
+                  "name": {
+                    "en": "Dogs"
+                  },
+                  "ref": "/home"
+                },
+                {
+                  "name": {
+                    "en": "Cats"
+                  },
+                  "ref": "/home"
+                },
+                {
+                  "name": {
+                    "en": "Bears"
+                  },
+                  "options": [
+                    {
+                      "name": {
+                        "en": "Dogs"
+                      },
+                      "ref": "/home"
+                    },
+                    {
+                      "name": {
+                        "en": "Cats"
+                      },
+                      "ref": "/home"
+                    },
+                    {
+                      "name": {
+                        "en": "Bears"
+                      },
+                      "ref": "/home"
+                    },
+                    {
+                      "name": {
+                        "en": "-"
+                      }
+                    },
+                    {
+                      "name": {
+                        "en": "Orcas"
+                      },
+                      "ref": "/home"
+                    },
+                    {
+                      "name": {
+                        "en": "Whales"
+                      },
+                      "ref": "/home"
+                    }
+                  ]
+                },
+                {
+                  "name": {
+                    "en": "Orcas"
+                  },
+                  "ref": "/home"
+                },
+                {
+                  "name": {
+                    "en": "Whales"
+                  },
+                  "ref": "/home"
+                }
+              ]
+            },
+            {
+              "ref": "xGGpiW7IjjrFqapqVuZopW"
+            },
+            {
+              "name": {
+                "en": "-"
+              }
+            },
+            {
+              "ref": "https://www.keyvisions.it"
+            },
+            {
+              "ref": "x2hvVEcjC57XCDxmovj54PD"
+            }
+          ]
+        },
+        {
+          "_id": "x4sHhypzM0UjizY20BICPrH",
+          "type": "Content",
+          "name": {
+            "en": "Tabs"
+          },
+          "slug": {
+            "en": "tabs"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Tabs",
+          "section": "main",
+          "sequence": "10",
+          "layout": {
+            "en": "\\s('mode=\"horizontal\"')"
+          },
+          "options": [
+            {
+              "name": {
+                "en": "./public"
+              },
+              "ref": "x3YCLoAbUczj9NNvlOFO081"
+            },
+            {
+              "ref": "x3YCLoAbUczjbaXTHruz8Yx"
+            }
+          ]
+        },
+        {
+          "_id": "x4sHhypzM0UjizY20C0N9LP",
+          "type": "Content",
+          "name": {
+            "en": "Code Editor"
+          },
+          "slug": {
+            "en": "code-editor"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Form",
+          "section": "main",
+          "sequence": "11",
+          "layout": {
+            "en": "\\s('caption=\"Code Editor\"')m('javascript;note;Hello World!')\\rb(';stw;submit')t('Submit')"
+          }
+        },
+        {
+          "_id": "x4sHhypzNzBJ7LpOv3ROBvX",
+          "type": "Content",
+          "name": {
+            "en": "Explain"
+          },
+          "slug": {
+            "en": "explain"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Text",
+          "section": "main",
+          "sequence": "9",
+          "layout": {
+            "en": "<h2>Welcome to the Spin the Web Labs</h2><h3>What is WBDL (Webbase Description Language)?</h3><spn>While <b>HTML (HyperText Markup Language)</b> describes the structure and content of a single web page and is interpreted and rendered by <i>client-side browsers</i>, WBDL (Webbase Description Language)</b> describes the architecture, composition and function of an entire web portal and is interpreted and rendered by <i>server-side webspinners</i>.</span>"
+          }
+        },
+        {
+          "_id": "x5pFgYiS4cfdHZyTCNV3Wdi",
+          "type": "Content",
+          "name": {
+            "en": "Offices"
+          },
+          "slug": {
+            "en": "offices"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Table",
+          "section": "rightSidebar",
+          "sequence": "1",
+          "dsn": "mysqlsample",
+          "command": "select * from offices",
+          "layout": {
+            "en": "\\s('caption=\"Offices\" key=\"officeId\"')l('City')hel('Tel.')e\\a('type=\"tel\"')b(';stw;delete')t('-')b(';stw;insert')t('+')"
+          }
+        },
+        {
+          "_id": "x5B17joaUJGDnbYu9ft7xlH",
+          "type": "Content",
+          "name": {
+            "en": "Calendar"
+          },
+          "slug": {
+            "en": "calendar"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "Calendar",
+          "section": "leftSidebar",
+          "sequence": "1",
+          "layout": {
+            "en": "\\s('mode=\"month\" key=\"date\"')"
+          }
+        }
+      ],
+      "visibility": {},
+      "keywords": {},
+      "description": {},
+      "contentType": "text/html",
+      "template": "index.html"
+    },
+    {
+      "_id": "x76qSPuePylfg88klSQBx5r",
+      "type": "Page",
+      "name": {
+        "en": "Sales"
+      },
+      "slug": {
+        "en": "sales"
+      },
+      "children": [
+        {
+          "_id": "x3YCLoAbUczj9NNvlOFO081",
+          "type": "Content",
+          "name": {
+            "en": "Files"
+          },
+          "slug": {
+            "en": "files"
+          },
+          "visibility": {},
+          "subtype": "Table",
+          "sequence": "1",
+          "dsn": "bash",
+          "command": "ls -l ./public",
+          "contentType": "application/json",
+          "layout": {}
+        },
+        {
+          "_id": "x3YCLoAbUczjbaXTHruz8Yx",
+          "type": "Content",
+          "name": {
+            "en": "Objects"
+          },
+          "slug": {
+            "en": "objects"
+          },
+          "visibility": {
+            "guests": true
+          },
+          "subtype": "List",
+          "sequence": "5",
+          "dsn": "objects",
+          "command": "$.({\"name\":name,\"color\":data.color})",
+          "params": "id=3&id=5&id=10",
+          "layout": {
+            "en": "\\s('closable header=\"This data comes from the API: https://api.restful-api.dev/objects\"')"
+          }
+        },
+        {
+          "_id": "x7mIXOTljyDnSgsnYFNOqrh",
+          "type": "Content",
+          "name": {
+            "en": "Employees"
+          },
+          "slug": {
+            "en": "employees"
+          },
+          "visibility": {},
+          "subtype": "Table",
+          "section": "main",
+          "sequence": "1",
+          "dsn": "mysqlsample",
+          "command": "select *, 'collapsible' as foo from employees limit 3",
+          "layout": {
+            "en": "\\s('caption=\"Employees\" key=\"employeeNumber\" @@foo ')\nl('Name')a('dashboard')pp('fufi;@@foo')ff\nl('Ext.')f\nl('eMail')a('mailto:@@email')f\nlf\nlf\nl('Title')f"
+          }
+        }
+      ],
+      "visibility": {
+        "guests": true
+      },
+      "contentType": "text/html",
+      "template": "index.html"
+    },
+    {
+      "_id": "xadwSs5vCJGXHbaqMwAYpj",
+      "type": "Area",
+      "name": {
+        "en": "Profile"
+      },
+      "slug": {
+        "en": "profile"
+      },
+      "children": [
+        {
+          "_id": "xyfpEhe2ISsKb9NiVLcw5y",
+          "type": "Area",
+          "name": {
+            "en": "Area"
+          },
+          "slug": {
+            "en": "area"
+          },
+          "children": [
+            {
+              "_id": "x3ACYHuY1IOe1UCmBuXClNc",
+              "type": "Page",
+              "name": {
+                "en": "Page"
+              },
+              "slug": {
+                "en": "page"
+              },
+              "children": [],
+              "visibility": {
+                "guests": true
+              },
+              "keywords": {},
+              "description": {},
+              "contentType": "text/html",
+              "template": "index.html"
+            }
+          ],
+          "visibility": {
+            "guests": true
+          },
+          "keywords": {},
+          "description": {},
+          "mainpage": "xA4AAudfi95qvRWq5gJo5W"
+        }
+      ],
+      "visibility": {
+        "guests": true
+      },
+      "keywords": {
+        "en": ""
+      },
+      "description": {
+        "en": ""
+      },
+      "mainpage": ""
+    },
+    {
+      "_id": "xBMD2db90OORrnHEXlmSiq",
+      "type": "Page",
+      "name": {
+        "en": "Page"
+      },
+      "slug": {
+        "en": "page"
+      },
+      "children": [],
+      "visibility": {
+        "guests": true
+      },
+      "keywords": {},
+      "description": {},
+      "contentType": "text/html",
+      "template": "index.html"
+    },
+    {
+      "_id": "x7be7AxZl4EpUSHsMrRVMPD",
+      "type": "Content",
+      "name": {
+        "en": "Breadcrumbs"
+      },
+      "slug": {
+        "en": "breadcrumbs"
+      },
+      "visibility": {
+        "guests": true
+      },
+      "subtype": "Breadcrumbs",
+      "cssClass": "stwBreadcrumbs",
+      "section": "header",
+      "sequence": "2",
+      "layout": {
+        "en": "\\s('header='<i class=\"fa-light fa-sidebar\" onclick=\"toggleSidebar(event)\"></i>' footer='<i class=\"fa-light fa-sidebar-flip\" onclick=\"toggleSidebar(event)\"></i>'')j('function toggleSidebar(event){const sidebar=document.getElementById(event.target.className.indexOf(\"flip\") == -1 ? \"leftSidebar\" : \"rightSidebar\"); sidebar.style.display = sidebar.style.display === \"none\" ? \"flex\" : \"none\";}')"
+      }
+    },
+    {
+      "_id": "x8PW7Ll3WxQGzFYtKAyojK",
+      "type": "Content",
+      "name": {
+        "en": "Languages"
+      },
+      "slug": {
+        "en": "languages"
+      },
+      "visibility": {
+        "guests": true
+      },
+      "subtype": "Languages",
+      "cssClass": "stwLanguages",
+      "section": "footer",
+      "sequence": "1",
+      "layout": {}
+    }
+  ],
+  "visibility": {
+    "administrators": true,
+    "guests": false,
+    "users": false,
+    "editors": false,
+    "developers": false,
+    "moderators": false,
+    "contributors": false
+  },
+  "keywords": {
+    "en": "stw"
+  },
+  "description": {
+    "en": "This site demonstrates..."
+  },
+  "mainpage": "xGGpiXMKLBB9JzXmwCV1IY",
+  "langs": [
+    "en"
+  ],
+  "datasources": {
+    "mysqlsample": "https://www.mysqltutorial.org/getting-started-with-mysql/mysql-sample-database/"
+  }
 }

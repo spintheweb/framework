@@ -4,6 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWContentWithOptions, ISTWOption } from "../stwElements/stwContent.ts";
+import { newId } from "../stwComponents/stwIds.ts";
 
 export class STWMenus extends STWContent {
 	options: ISTWOption[] = [];
@@ -63,7 +64,7 @@ export class STWMenus extends STWContent {
 				body += iteration ? "<hr>" : "";
 			} else if (!element || element.isVisible(session)) {
 				if (element instanceof STWContent) {
-					body += `<li><article id="${crypto.randomUUID()}" href="${element._id}${(new URL(_req.url)).search}"></article>`;
+					body += `<li><article id="${newId()}" href="${element._id}${(new URL(_req.url)).search}"></article>`;
 				} else if (option.options?.length) {
 					body += `<li><div>${!option.options?.length && href ? `<a href="${href}">${name}</a>` : name}<i class="fa-light fa-angle-right"></i></div>`;
 					body += "<menu>", option.options.forEach(option => subrender(option, true)), body += "</menu>";

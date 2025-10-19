@@ -4,6 +4,7 @@
 import type { STWSession } from "../stwComponents/stwSession.ts";
 import { registerElement } from "../stwComponents/stwFactory.ts";
 import { STWContent, ISTWOption, ISTWContentWithOptions } from "../stwElements/stwContent.ts";
+import { newId } from "../stwComponents/stwIds.ts";
 
 export class STWAccordion extends STWContent {
 	options: ISTWOption[] = [];
@@ -35,7 +36,7 @@ export class STWAccordion extends STWContent {
 			const element = session.site.find(session, option.ref || "");
 			if (element instanceof STWContent && element.isVisible(session)) {
 				const name = option.name.get(session.lang) || (element ? element.localize(session, "name") : option.ref);
-				body += `<dt data-ref="${element._id}"><i class="fa-light fa-angle-${i > 0 ? "right" : "down"}"></i>${name}</dt><dd><article id="${crypto.randomUUID()}" href="${option.ref}${(new URL(_req.url)).search}"><i class="fa-light fa-loader fa-spin"></i></article></dd>`;
+				body += `<dt data-ref="${element._id}"><i class="fa-light fa-angle-${i > 0 ? "right" : "down"}"></i>${name}</dt><dd><article id="${newId()}" href="${option.ref}${(new URL(_req.url)).search}"><i class="fa-light fa-loader fa-spin"></i></article></dd>`;
 			}
 		});
 
